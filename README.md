@@ -57,28 +57,6 @@
 ```
 *Text glitches randomly on hover*
 
-## 💻 Usage
-
-### 🌐 Vanilla HTML
-```html
-<!DOCTYPE html>
-<html>
-<head>
-  <script type="module" src="path/to/are-you-a-robot.es.js"></script>
-</head>
-<body>
-  <escaping-checkbox></escaping-checkbox>
-  <unfocusable-checkbox></unfocusable-checkbox>
-  <reverse-checkbox></reverse-checkbox>
-  <infinite-loading-checkbox></infinite-loading-checkbox>
-  <impossible-captcha></impossible-captcha>
-  <moving-checkbox></moving-checkbox>
-  <tiny-checkbox></tiny-checkbox>
-  <glitch-checkbox></glitch-checkbox>
-</body>
-</html>
-```
-
 ## 🛠️ Development
 
 ```bash
