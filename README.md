@@ -7,22 +7,6 @@
 [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Built with Svelte](https://img.shields.io/badge/built%20with-Svelte-ff3e00.svg)](https://svelte.dev/)
 
-## ⚠️ Warning
-
-These components are **jokes**. Do not use in production. Ever.
-
-## 🚀 Quick Start
-
-### CDN
-```html
-<script type="module" src="https://ivgtr.github.io/Are-you-a-robot/assets/index-[hash].js"></script>
-```
-
-### NPM *(Coming Soon)*
-```bash
-npm install are-you-a-robot
-```
-
 ## 🎭 Components Gallery
 
 ### 🏃 `<escaping-checkbox>`
@@ -110,8 +94,4 @@ A parody of "I'm not a robot" checkboxes (reCAPTCHA, etc.) that humorously demon
 
 ## 📄 License
 
-**MIT** - *Create terrible UX freely* 💀
-
----
-
-Made with 💜 and a sense of humor
+**MIT**
