@@ -1,7 +1,10 @@
 import { defineConfig } from 'vite'
 import { svelte } from '@sveltejs/vite-plugin-svelte'
 
+const isGitHubPages = process.env.BUILD_TARGET === 'gh-pages'
+
 export default defineConfig({
+  base: isGitHubPages ? '/Are-you-a-robot/' : '/',
   plugins: [
     svelte({
       compilerOptions: {
@@ -9,7 +12,17 @@ export default defineConfig({
       }
     })
   ],
-  build: {
+  build: isGitHubPages ? {
+    // GitHub Pages build
+    outDir: 'out',
+    emptyOutDir: true,
+    rollupOptions: {
+      output: {
+        inlineDynamicImports: true
+      }
+    }
+  } : {
+    // Library build
     lib: {
       entry: 'src/index.js',
       name: 'AreYouARobot',

@@ -117,6 +117,81 @@
       color: #333;
     }
 
+    .installation-section {
+      background: white;
+      border-radius: 12px;
+      padding: 32px;
+      margin-bottom: 40px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+
+    .installation-section h2 {
+      font-size: 28px;
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    .installation-section h3 {
+      font-size: 20px;
+      margin: 24px 0 12px;
+      color: #444;
+    }
+
+    .code-block {
+      background: #2d2d2d;
+      color: #f8f8f2;
+      padding: 16px;
+      border-radius: 8px;
+      font-family: 'Courier New', Consolas, monospace;
+      font-size: 14px;
+      overflow-x: auto;
+      margin: 12px 0;
+    }
+
+    .code-block code {
+      display: block;
+      white-space: pre;
+    }
+
+    .component-tag {
+      background: #e7f3ff;
+      border: 1px solid #2196f3;
+      color: #0d47a1;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-family: 'Courier New', Consolas, monospace;
+      font-size: 13px;
+      display: inline-block;
+      margin-top: 8px;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 12px 24px;
+      background: white;
+      color: #764ba2;
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: bold;
+      transition: all 0.3s;
+      margin: 8px;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+
+    .btn-github {
+      background: #24292e;
+      color: white;
+    }
+
+    .links {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
     footer {
       text-align: center;
       color: white;
@@ -138,6 +213,11 @@
       h1 {
         font-size: 32px;
       }
+
+      .btn {
+        display: block;
+        margin: 8px auto;
+      }
     }
   </style>
 </head>
@@ -148,11 +228,45 @@
       <p class="subtitle">実際には人間であることを証明できないパロディコンポーネント集</p>
     </header>
 
+    <div class="links">
+      <a href="https://github.com/ivgtr/Are-you-a-robot" class="btn btn-github" target="_blank" rel="noopener">
+        View on GitHub
+      </a>
+    </div>
+
     <div class="warning">
       <div class="warning-title">⚠️ 注意</div>
       <div class="warning-text">
         これらのコンポーネントはジョーク目的で作成されています。<br>
         実際のプロダクションでは使用しないでください。
+      </div>
+    </div>
+
+    <div class="installation-section">
+      <h2>📦 使い方</h2>
+
+      <h3>CDN経由で使用</h3>
+      <p style="margin-bottom: 12px; color: #666;">HTMLファイルに直接読み込んで使用できます：</p>
+      <div class="code-block"><code>&lt;script type="module" src="https://ivgtr.github.io/Are-you-a-robot/assets/index-[hash].js"&gt;&lt;/script&gt;
+
+&lt;!-- コンポーネントを使用 --&gt;
+&lt;escaping-checkbox&gt;&lt;/escaping-checkbox&gt;
+&lt;unfocusable-checkbox&gt;&lt;/unfocusable-checkbox&gt;
+&lt;reverse-checkbox&gt;&lt;/reverse-checkbox&gt;</code></div>
+
+      <h3>NPMからインストール（予定）</h3>
+      <div class="code-block"><code>npm install are-you-a-robot</code></div>
+
+      <h3>利用可能なコンポーネント</h3>
+      <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px;">
+        <span class="component-tag">&lt;escaping-checkbox&gt;</span>
+        <span class="component-tag">&lt;unfocusable-checkbox&gt;</span>
+        <span class="component-tag">&lt;reverse-checkbox&gt;</span>
+        <span class="component-tag">&lt;infinite-loading-checkbox&gt;</span>
+        <span class="component-tag">&lt;impossible-captcha&gt;</span>
+        <span class="component-tag">&lt;moving-checkbox&gt;</span>
+        <span class="component-tag">&lt;tiny-checkbox&gt;</span>
+        <span class="component-tag">&lt;glitch-checkbox&gt;</span>
       </div>
     </div>
 
