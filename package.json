@@ -1,0 +1,25 @@
+{
+  "name": "are-you-a-robot",
+  "version": "1.0.0",
+  "description": "A collection of parody robot check components that make it impossible to prove you're human",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "keywords": [
+    "captcha",
+    "parody",
+    "web-components",
+    "svelte",
+    "joke"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@sveltejs/vite-plugin-svelte": "^3.0.0",
+    "svelte": "^4.2.0",
+    "vite": "^5.0.0"
+  }
+}

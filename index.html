@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Are You a Robot? - パロディコンポーネント集</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 40px 20px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 60px;
+      color: white;
+    }
+
+    h1 {
+      font-size: 48px;
+      margin-bottom: 16px;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .subtitle {
+      font-size: 18px;
+      opacity: 0.9;
+    }
+
+    .warning {
+      background: #fff3cd;
+      border: 2px solid #ffc107;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 40px;
+      text-align: center;
+    }
+
+    .warning-title {
+      font-size: 20px;
+      font-weight: bold;
+      color: #856404;
+      margin-bottom: 8px;
+    }
+
+    .warning-text {
+      color: #856404;
+      font-size: 14px;
+    }
+
+    .components-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+      gap: 30px;
+      margin-bottom: 60px;
+    }
+
+    .component-card {
+      background: white;
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      transition: transform 0.3s;
+    }
+
+    .component-card:hover {
+      transform: translateY(-5px);
+    }
+
+    .component-title {
+      font-size: 24px;
+      margin-bottom: 12px;
+      color: #333;
+    }
+
+    .component-description {
+      font-size: 14px;
+      color: #666;
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+
+    .difficulty {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: bold;
+      margin-bottom: 16px;
+    }
+
+    .difficulty.impossible {
+      background: #dc3545;
+      color: white;
+    }
+
+    .difficulty.very-hard {
+      background: #fd7e14;
+      color: white;
+    }
+
+    .difficulty.hard {
+      background: #ffc107;
+      color: #333;
+    }
+
+    footer {
+      text-align: center;
+      color: white;
+      font-size: 14px;
+      opacity: 0.8;
+      margin-top: 60px;
+    }
+
+    .github-link {
+      color: white;
+      text-decoration: underline;
+    }
+
+    @media (max-width: 768px) {
+      .components-grid {
+        grid-template-columns: 1fr;
+      }
+
+      h1 {
+        font-size: 32px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🤖 Are You a Robot?</h1>
+      <p class="subtitle">実際には人間であることを証明できないパロディコンポーネント集</p>
+    </header>
+
+    <div class="warning">
+      <div class="warning-title">⚠️ 注意</div>
+      <div class="warning-text">
+        これらのコンポーネントはジョーク目的で作成されています。<br>
+        実際のプロダクションでは使用しないでください。
+      </div>
+    </div>
+
+    <div class="components-grid">
+      <div class="component-card">
+        <h2 class="component-title">1. 逃げるチェックボックス</h2>
+        <span class="difficulty impossible">不可能</span>
+        <p class="component-description">
+          マウスカーソルが近づくと逃げていきます。クリックすることは実質不可能です。
+        </p>
+        <escaping-checkbox></escaping-checkbox>
+      </div>
+
+      <div class="component-card">
+        <h2 class="component-title">2. フォーカス不可能</h2>
+        <span class="difficulty very-hard">非常に困難</span>
+        <p class="component-description">
+          キーボード操作が一切できません。Tabキーでフォーカスを当てることも、Enterキーで選択することもできません。
+        </p>
+        <unfocusable-checkbox></unfocusable-checkbox>
+      </div>
+
+      <div class="component-card">
+        <h2 class="component-title">3. 反転チェックボックス</h2>
+        <span class="difficulty impossible">不可能</span>
+        <p class="component-description">
+          「私はロボットです」としか主張できません。人間であることを証明する手段がありません。
+        </p>
+        <reverse-checkbox></reverse-checkbox>
+      </div>
+
+      <div class="component-card">
+        <h2 class="component-title">4. 無限ローディング</h2>
+        <span class="difficulty impossible">不可能</span>
+        <p class="component-description">
+          クリックすると検証が始まりますが、永遠に終わりません。
+        </p>
+        <infinite-loading-checkbox></infinite-loading-checkbox>
+      </div>
+
+      <div class="component-card">
+        <h2 class="component-title">5. 不可能なCAPTCHA</h2>
+        <span class="difficulty impossible">不可能</span>
+        <p class="component-description">
+          どの画像を選択しても必ず失敗します。理由は毎回変わります。
+        </p>
+        <impossible-captcha></impossible-captcha>
+      </div>
+
+      <div class="component-card">
+        <h2 class="component-title">6. 移動するチェックボックス</h2>
+        <span class="difficulty very-hard">非常に困難</span>
+        <p class="component-description">
+          クリックするたびに位置が変わります。チェックを入れることができません。
+        </p>
+        <moving-checkbox></moving-checkbox>
+      </div>
+
+      <div class="component-card">
+        <h2 class="component-title">7. 極小チェックボックス</h2>
+        <span class="difficulty very-hard">非常に困難</span>
+        <p class="component-description">
+          チェックボックスが極端に小さく表示されます。クリックするのは至難の業です。
+        </p>
+        <tiny-checkbox></tiny-checkbox>
+      </div>
+
+      <div class="component-card">
+        <h2 class="component-title">8. グリッチチェックボックス</h2>
+        <span class="difficulty hard">困難</span>
+        <p class="component-description">
+          マウスを近づけると、テキストがランダムにグリッチします。正しいタイミングでクリックできるでしょうか？
+        </p>
+        <glitch-checkbox></glitch-checkbox>
+      </div>
+    </div>
+
+    <footer>
+      <p>Made with 💜 and a sense of humor</p>
+      <p>These components are for entertainment purposes only</p>
+    </footer>
+  </div>
+
+  <script type="module" src="/src/index.js"></script>
+</body>
+</html>
