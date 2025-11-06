@@ -46,10 +46,15 @@ npm run dev
 ### ビルド
 
 ```bash
+# ライブラリビルド
 npm run build
+
+# GitHub Pagesビルド
+npm run build:gh
 ```
 
-ビルドされたファイルは `dist` ディレクトリに出力されます。
+- ライブラリビルド: `dist` ディレクトリに出力
+- GitHub Pagesビルド: `out` ディレクトリに出力
 
 ### Web Components として使用
 
@@ -72,11 +77,87 @@ npm run build
 </html>
 ```
 
+## 🌐 GitHub Pages デプロイ
+
+このプロジェクトはGitHub Pagesでホスティング可能です。
+
+### セットアップ手順
+
+1. **GitHub Actions ワークフローを追加**
+
+`.github/workflows/deploy.yml` ファイルを作成：
+
+```yaml
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build for GitHub Pages
+        run: npm run build:gh
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./out
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+```
+
+2. **GitHub Pages を有効化**
+
+- リポジトリの **Settings** > **Pages** へ移動
+- Source を **GitHub Actions** に設定
+
+3. **デプロイ**
+
+mainブランチにプッシュすると、自動的にデプロイされます。
+
+デモサイト: `https://ivgtr.github.io/Are-you-a-robot/`
+
 ## 🛠️ 技術スタック
 
 - **Svelte 4** - コンポーネントフレームワーク
 - **Vite** - ビルドツール
 - **Web Components** - 配布形式
+- **GitHub Pages** - ホスティング
 
 ## 💡 アイデアの元ネタ
 
