@@ -266,16 +266,16 @@
         <h2 class="component-title">1. 逃げるチェックボックス</h2>
         <span class="difficulty impossible">不可能</span>
         <p class="component-description">
-          マウスカーソルが近づくと逃げていきます。クリックすることは実質不可能です。
+          マウスカーソルが近づくとフェイントやジグザグ移動で逃げます。近いほど速く逃げ、タッチデバイスにも対応。追いかけると挑発してきます。
         </p>
         <escaping-checkbox></escaping-checkbox>
       </div>
 
       <div class="component-card">
         <h2 class="component-title">2. フォーカス不可能</h2>
-        <span class="difficulty very-hard">非常に困難</span>
+        <span class="difficulty impossible">不可能</span>
         <p class="component-description">
-          キーボード操作が一切できません。Tabキーでフォーカスを当てることも、Enterキーで選択することもできません。
+          最初はキーボード操作のみ無効。何度も試すとマウスクリックも無効化され、最終的にチェックボックス自体が使用不能になります。
         </p>
         <unfocusable-checkbox></unfocusable-checkbox>
       </div>
@@ -284,7 +284,7 @@
         <h2 class="component-title">3. 反転チェックボックス</h2>
         <span class="difficulty impossible">不可能</span>
         <p class="component-description">
-          「私はロボットです」としか主張できません。人間であることを証明する手段がありません。
+          チェックを入れると「ロボット確認」、外すと「人間確認取消」。ラベルも動的に変わり、どちらを選んでも人間とは認められません。
         </p>
         <reverse-checkbox></reverse-checkbox>
       </div>
@@ -293,7 +293,7 @@
         <h2 class="component-title">4. 無限ローディング</h2>
         <span class="difficulty impossible">不可能</span>
         <p class="component-description">
-          クリックすると検証が始まりますが、永遠に終わりません。
+          クリックすると検証開始。進捗バーは99%で止まり、ステータスは「量子認証」「AI評価」と荒唐無稽にエスカレートします。
         </p>
         <infinite-loading-checkbox></infinite-loading-checkbox>
       </div>
@@ -302,16 +302,16 @@
         <h2 class="component-title">5. 不可能なCAPTCHA</h2>
         <span class="difficulty impossible">不可能</span>
         <p class="component-description">
-          どの画像を選択しても必ず失敗します。理由は毎回変わります。
+          どの画像を選択しても失敗。失敗ごとに画像がシャッフルされ、お題も「赤い車を選べ」「存在しない車を選べ」とエスカレート。たまに偽の正解演出も。
         </p>
         <impossible-captcha></impossible-captcha>
       </div>
 
       <div class="component-card">
         <h2 class="component-title">6. 移動するチェックボックス</h2>
-        <span class="difficulty very-hard">非常に困難</span>
+        <span class="difficulty impossible">不可能</span>
         <p class="component-description">
-          クリックするたびに位置が変わります。チェックを入れることができません。
+          クリックするたびにランダムな位置に移動し、速度もどんどん上がります。5回クリック後は分身が出現し、本物がどれか分からなくなります。
         </p>
         <moving-checkbox></moving-checkbox>
       </div>
@@ -320,7 +320,7 @@
         <h2 class="component-title">7. 極小チェックボックス</h2>
         <span class="difficulty very-hard">非常に困難</span>
         <p class="component-description">
-          チェックボックスが極端に小さく表示されます。クリックするのは至難の業です。
+          最初は普通サイズですが、クリックするたびに縮小。チェックに成功しても「もう一度お願いします」とリセットされます。
         </p>
         <tiny-checkbox></tiny-checkbox>
       </div>
@@ -329,7 +329,7 @@
         <h2 class="component-title">8. グリッチチェックボックス</h2>
         <span class="difficulty hard">困難</span>
         <p class="component-description">
-          マウスを近づけると、テキストがランダムにグリッチします。正しいタイミングでクリックできるでしょうか？
+          マウスを近づけるとテキストがグリッチし、色相回転やスキューの視覚効果も発動。グリッチ中はクリック無効。ホバーするほど発動確率が上がります。
         </p>
         <glitch-checkbox></glitch-checkbox>
       </div>

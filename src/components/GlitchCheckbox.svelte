@@ -1,8 +1,12 @@
 <svelte:options customElement="glitch-checkbox" />
 
 <script>
+  import { onDestroy } from 'svelte';
+
   let text = '私はロボットではありません';
   let isGlitching = false;
+  let hoverCount = 0;
+  let glitchInterval;
 
   const glitchTexts = [
     '私は□□□ではありません',
@@ -13,19 +17,27 @@
     '私はロボットではありません',
     'SYSTEM.OUT.PRINTLN("人間");',
     '私は███████████',
+    'undefined is not a human',
+    'segmentation fault (core dumped)',
+    '01000010 01000101 01000101 01010000',
+    '人人人人人人人人人人人',
   ];
+
+  // ホバーするたびに発動確率が上がる
+  $: glitchProbability = Math.min(1, 0.5 + hoverCount * 0.1);
 
   function startGlitch() {
     if (isGlitching) return;
     isGlitching = true;
 
     let count = 0;
-    const interval = setInterval(() => {
+    glitchInterval = setInterval(() => {
       text = glitchTexts[Math.floor(Math.random() * glitchTexts.length)];
       count++;
 
       if (count > 20) {
-        clearInterval(interval);
+        clearInterval(glitchInterval);
+        glitchInterval = null;
         text = '私はロボットではありません';
         isGlitching = false;
       }
@@ -33,10 +45,24 @@
   }
 
   function handleMouseEnter() {
-    if (Math.random() > 0.3) {
+    hoverCount++;
+    if (Math.random() < glitchProbability) {
       startGlitch();
     }
   }
+
+  function handleClick(e) {
+    // グリッチ中はクリックを無効化
+    if (isGlitching) {
+      e.preventDefault();
+      const checkbox = e.currentTarget.querySelector('input[type="checkbox"]');
+      if (checkbox) checkbox.checked = false;
+    }
+  }
+
+  onDestroy(() => {
+    if (glitchInterval) clearInterval(glitchInterval);
+  });
 </script>
 
 <div class="container">
@@ -44,10 +70,16 @@
     class="checkbox-wrapper"
     class:glitching={isGlitching}
     on:mouseenter={handleMouseEnter}
+    on:click={handleClick}
   >
     <input type="checkbox" id="glitch-check" />
     <label for="glitch-check">{text}</label>
   </div>
+  {#if hoverCount > 0}
+    <div class="stats">
+      <span class="probability">グリッチ確率: {Math.round(glitchProbability * 100)}%</span>
+    </div>
+  {/if}
 </div>
 
 <style>
@@ -73,26 +105,39 @@
 
   .checkbox-wrapper.glitching {
     animation: glitch 0.1s infinite;
+    border-color: #b91c1c;
+    box-shadow: 0 0 8px rgba(185, 28, 28, 0.2);
+  }
+
+  .checkbox-wrapper.glitching input[type="checkbox"],
+  .checkbox-wrapper.glitching label {
+    pointer-events: none;
   }
 
   @keyframes glitch {
     0% {
       transform: translate(0);
+      filter: hue-rotate(0deg);
     }
     20% {
       transform: translate(-2px, 2px);
+      filter: hue-rotate(90deg);
     }
     40% {
-      transform: translate(-2px, -2px);
+      transform: translate(-2px, -2px) skewX(2deg);
+      filter: hue-rotate(180deg);
     }
     60% {
-      transform: translate(2px, 2px);
+      transform: translate(2px, 2px) skewX(-1deg);
+      filter: hue-rotate(270deg);
     }
     80% {
       transform: translate(2px, -2px);
+      filter: hue-rotate(360deg);
     }
     100% {
       transform: translate(0);
+      filter: hue-rotate(0deg);
     }
   }
 
@@ -110,5 +155,21 @@
     font-size: 13px;
     min-width: 200px;
     color: #333;
+  }
+
+  .stats {
+    margin-top: 8px;
+    display: flex;
+    gap: 12px;
+  }
+
+  .probability {
+    padding: 4px 8px;
+    background: #f5f5f5;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    font-family: 'SF Mono', 'Fira Code', Menlo, Consolas, monospace;
+    font-size: 11px;
+    color: #666;
   }
 </style>

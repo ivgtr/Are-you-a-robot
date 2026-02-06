@@ -2,9 +2,22 @@
 
 <script>
   let checked = false;
+  let toggleCount = 0;
+
+  const messages = [
+    { text: 'ロボットであることが確認されました', type: 'robot' },
+    { text: '人間確認が取り消されました', type: 'cancel' },
+    { text: 'やはりロボットのようです', type: 'robot' },
+    { text: '人間...ではなさそうです', type: 'cancel' },
+    { text: 'ロボット確定です。諦めてください', type: 'robot' },
+    { text: '何度切り替えても無駄です', type: 'cancel' },
+  ];
+
+  $: currentLabel = checked ? '私はロボットではありません' : '私はロボットです';
+  $: currentMessage = toggleCount > 0 ? messages[Math.min(toggleCount - 1, messages.length - 1)] : null;
 
   function handleChange() {
-    checked = !checked;
+    toggleCount++;
   }
 </script>
 
@@ -16,11 +29,20 @@
       bind:checked
       on:change={handleChange}
     />
-    <label for="reverse-check">私はロボットです</label>
+    <label for="reverse-check">{currentLabel}</label>
   </div>
-  {#if checked}
-    <div class="message success">
-      ✓ ロボットであることが確認されました
+  {#if currentMessage}
+    <div class="message" class:robot={currentMessage.type === 'robot'} class:cancel={currentMessage.type === 'cancel'}>
+      {#if currentMessage.type === 'robot'}
+        ✓ {currentMessage.text}
+      {:else}
+        ✗ {currentMessage.text}
+      {/if}
+    </div>
+  {/if}
+  {#if toggleCount >= 4}
+    <div class="despair">
+      切り替え回数: {toggleCount} — どちらを選んでも人間とは認められません
     </div>
   {/if}
 </div>
@@ -57,6 +79,7 @@
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     font-size: 13px;
     color: #333;
+    transition: color 0.2s;
   }
 
   .message {
@@ -65,11 +88,35 @@
     border-radius: 4px;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     font-size: 12px;
+    animation: slideIn 0.2s ease-out;
   }
 
-  .success {
+  .message.robot {
     background: #f0faf0;
     color: #1a6b2a;
     border: 1px solid #d4e8d4;
+  }
+
+  .message.cancel {
+    background: #fef2f2;
+    color: #b91c1c;
+    border: 1px solid #fecaca;
+  }
+
+  .despair {
+    margin-top: 8px;
+    padding: 8px;
+    background: #f5f5f5;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    text-align: center;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 11px;
+    color: #666;
+  }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(-4px); }
+    to { opacity: 1; transform: translateY(0); }
   }
 </style>
