@@ -185,20 +185,83 @@
       background: #fafafa;
       border: 1px solid #e0e0e0;
       border-radius: 8px;
-      padding: 16px;
+      overflow: hidden;
+    }
+
+    .catalog-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      cursor: pointer;
+      user-select: none;
+      transition: background 0.15s;
+    }
+
+    .catalog-card-header:hover {
+      background: #f0f0f0;
+    }
+
+    .catalog-card.locked .catalog-card-header {
+      cursor: default;
+      opacity: 0.55;
+    }
+
+    .catalog-card.locked .catalog-card-header:hover {
+      background: transparent;
+    }
+
+    .catalog-card-header-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
     }
 
     .catalog-card-title {
       font-size: 14px;
       font-weight: 600;
-      margin-bottom: 4px;
       color: #111;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .catalog-card.locked .catalog-card-title {
+      color: #999;
+    }
+
+    .catalog-card-lock {
+      font-size: 13px;
+      flex-shrink: 0;
+      color: #bbb;
+    }
+
+    .catalog-card-chevron {
+      font-size: 11px;
+      flex-shrink: 0;
+      color: #999;
+      transition: transform 0.2s;
+    }
+
+    .catalog-card.open .catalog-card-chevron {
+      transform: rotate(90deg);
+    }
+
+    .catalog-card-body {
+      display: none;
+      padding: 0 16px 16px;
+      border-top: 1px solid #e0e0e0;
+    }
+
+    .catalog-card.open .catalog-card-body {
+      display: block;
     }
 
     .catalog-card-desc {
       font-size: 12px;
       color: #666;
-      margin-bottom: 12px;
+      margin: 12px 0;
       line-height: 1.5;
     }
 
@@ -208,7 +271,7 @@
       border-radius: 3px;
       font-size: 10px;
       font-weight: 600;
-      margin-bottom: 10px;
+      margin-top: 12px;
       letter-spacing: 0.02em;
     }
 
@@ -225,6 +288,31 @@
     .difficulty.hard {
       background: #fffbe6;
       color: #92400e;
+    }
+
+    .catalog-progress {
+      padding: 8px 12px;
+      margin-bottom: 8px;
+      background: #f0f0f0;
+      border-radius: 6px;
+      font-size: 12px;
+      color: #666;
+      text-align: center;
+    }
+
+    .catalog-progress-bar-track {
+      height: 4px;
+      background: #e0e0e0;
+      border-radius: 2px;
+      margin-top: 6px;
+      overflow: hidden;
+    }
+
+    .catalog-progress-bar-fill {
+      height: 100%;
+      background: #333;
+      border-radius: 2px;
+      transition: width 0.3s;
     }
 
     .catalog-info {
@@ -301,96 +389,188 @@
       <button class="catalog-close" id="catalogClose">&times;</button>
     </div>
     <div class="catalog-body">
-      <div class="catalog-grid">
-        <div class="catalog-card">
-          <h3 class="catalog-card-title">1. 逃げるチェックボックス</h3>
-          <span class="difficulty impossible">不可能</span>
-          <p class="catalog-card-desc">マウスカーソルが近づくとフェイントやジグザグ移動で逃げます。</p>
-          <escaping-checkbox></escaping-checkbox>
+      <div class="catalog-progress" id="catalogProgress"></div>
+      <div class="catalog-grid" id="catalogGrid">
+        <div class="catalog-card locked" data-component="escaping-checkbox">
+          <div class="catalog-card-header">
+            <div class="catalog-card-header-left">
+              <h3 class="catalog-card-title">1. 逃げるチェックボックス</h3>
+            </div>
+            <span class="catalog-card-lock">&#128274;</span>
+          </div>
+          <div class="catalog-card-body">
+            <span class="difficulty impossible">不可能</span>
+            <p class="catalog-card-desc">マウスカーソルが近づくとフェイントやジグザグ移動で逃げます。</p>
+            <escaping-checkbox></escaping-checkbox>
+          </div>
         </div>
 
-        <div class="catalog-card">
-          <h3 class="catalog-card-title">2. フォーカス不可能</h3>
-          <span class="difficulty impossible">不可能</span>
-          <p class="catalog-card-desc">何度も試すとマウスクリックも無効化され、最終的にチェックボックスが使用不能に。</p>
-          <unfocusable-checkbox></unfocusable-checkbox>
+        <div class="catalog-card locked" data-component="unfocusable-checkbox">
+          <div class="catalog-card-header">
+            <div class="catalog-card-header-left">
+              <h3 class="catalog-card-title">2. フォーカス不可能</h3>
+            </div>
+            <span class="catalog-card-lock">&#128274;</span>
+          </div>
+          <div class="catalog-card-body">
+            <span class="difficulty impossible">不可能</span>
+            <p class="catalog-card-desc">何度も試すとマウスクリックも無効化され、最終的にチェックボックスが使用不能に。</p>
+            <unfocusable-checkbox></unfocusable-checkbox>
+          </div>
         </div>
 
-        <div class="catalog-card">
-          <h3 class="catalog-card-title">3. 反転チェックボックス</h3>
-          <span class="difficulty impossible">不可能</span>
-          <p class="catalog-card-desc">チェックを入れると「ロボット確認」、外すと「人間確認取消」。どちらを選んでも失敗。</p>
-          <reverse-checkbox></reverse-checkbox>
+        <div class="catalog-card locked" data-component="reverse-checkbox">
+          <div class="catalog-card-header">
+            <div class="catalog-card-header-left">
+              <h3 class="catalog-card-title">3. 反転チェックボックス</h3>
+            </div>
+            <span class="catalog-card-lock">&#128274;</span>
+          </div>
+          <div class="catalog-card-body">
+            <span class="difficulty impossible">不可能</span>
+            <p class="catalog-card-desc">チェックを入れると「ロボット確認」、外すと「人間確認取消」。どちらを選んでも失敗。</p>
+            <reverse-checkbox></reverse-checkbox>
+          </div>
         </div>
 
-        <div class="catalog-card">
-          <h3 class="catalog-card-title">4. 無限ローディング</h3>
-          <span class="difficulty impossible">不可能</span>
-          <p class="catalog-card-desc">進捗バーは99%で止まり、ステータスが荒唐無稽にエスカレートします。</p>
-          <infinite-loading-checkbox></infinite-loading-checkbox>
+        <div class="catalog-card locked" data-component="infinite-loading-checkbox">
+          <div class="catalog-card-header">
+            <div class="catalog-card-header-left">
+              <h3 class="catalog-card-title">4. 無限ローディング</h3>
+            </div>
+            <span class="catalog-card-lock">&#128274;</span>
+          </div>
+          <div class="catalog-card-body">
+            <span class="difficulty impossible">不可能</span>
+            <p class="catalog-card-desc">進捗バーは99%で止まり、ステータスが荒唐無稽にエスカレートします。</p>
+            <infinite-loading-checkbox></infinite-loading-checkbox>
+          </div>
         </div>
 
-        <div class="catalog-card">
-          <h3 class="catalog-card-title">5. 不可能なCAPTCHA</h3>
-          <span class="difficulty impossible">不可能</span>
-          <p class="catalog-card-desc">どの画像を選択しても失敗。お題もエスカレートし、たまに偽の正解演出も。</p>
-          <impossible-captcha></impossible-captcha>
+        <div class="catalog-card locked" data-component="impossible-captcha">
+          <div class="catalog-card-header">
+            <div class="catalog-card-header-left">
+              <h3 class="catalog-card-title">5. 不可能なCAPTCHA</h3>
+            </div>
+            <span class="catalog-card-lock">&#128274;</span>
+          </div>
+          <div class="catalog-card-body">
+            <span class="difficulty impossible">不可能</span>
+            <p class="catalog-card-desc">どの画像を選択しても失敗。お題もエスカレートし、たまに偽の正解演出も。</p>
+            <impossible-captcha></impossible-captcha>
+          </div>
         </div>
 
-        <div class="catalog-card">
-          <h3 class="catalog-card-title">6. 移動するチェックボックス</h3>
-          <span class="difficulty impossible">不可能</span>
-          <p class="catalog-card-desc">クリックするたびにランダムな位置に移動。5回後は分身が出現。</p>
-          <moving-checkbox></moving-checkbox>
+        <div class="catalog-card locked" data-component="moving-checkbox">
+          <div class="catalog-card-header">
+            <div class="catalog-card-header-left">
+              <h3 class="catalog-card-title">6. 移動するチェックボックス</h3>
+            </div>
+            <span class="catalog-card-lock">&#128274;</span>
+          </div>
+          <div class="catalog-card-body">
+            <span class="difficulty impossible">不可能</span>
+            <p class="catalog-card-desc">クリックするたびにランダムな位置に移動。5回後は分身が出現。</p>
+            <moving-checkbox></moving-checkbox>
+          </div>
         </div>
 
-        <div class="catalog-card">
-          <h3 class="catalog-card-title">7. 極小チェックボックス</h3>
-          <span class="difficulty very-hard">非常に困難</span>
-          <p class="catalog-card-desc">クリックするたびに縮小。チェック成功してもリセットされます。</p>
-          <tiny-checkbox></tiny-checkbox>
+        <div class="catalog-card locked" data-component="tiny-checkbox">
+          <div class="catalog-card-header">
+            <div class="catalog-card-header-left">
+              <h3 class="catalog-card-title">7. 極小チェックボックス</h3>
+            </div>
+            <span class="catalog-card-lock">&#128274;</span>
+          </div>
+          <div class="catalog-card-body">
+            <span class="difficulty very-hard">非常に困難</span>
+            <p class="catalog-card-desc">クリックするたびに縮小。チェック成功してもリセットされます。</p>
+            <tiny-checkbox></tiny-checkbox>
+          </div>
         </div>
 
-        <div class="catalog-card">
-          <h3 class="catalog-card-title">8. グリッチチェックボックス</h3>
-          <span class="difficulty hard">困難</span>
-          <p class="catalog-card-desc">テキストがグリッチし、グリッチ中はクリック無効。ホバーするほど発動確率アップ。</p>
-          <glitch-checkbox></glitch-checkbox>
+        <div class="catalog-card locked" data-component="glitch-checkbox">
+          <div class="catalog-card-header">
+            <div class="catalog-card-header-left">
+              <h3 class="catalog-card-title">8. グリッチチェックボックス</h3>
+            </div>
+            <span class="catalog-card-lock">&#128274;</span>
+          </div>
+          <div class="catalog-card-body">
+            <span class="difficulty hard">困難</span>
+            <p class="catalog-card-desc">テキストがグリッチし、グリッチ中はクリック無効。ホバーするほど発動確率アップ。</p>
+            <glitch-checkbox></glitch-checkbox>
+          </div>
         </div>
 
-        <div class="catalog-card">
-          <h3 class="catalog-card-title">9. UFOキャッチャー認証</h3>
-          <span class="difficulty impossible">不可能</span>
-          <p class="catalog-card-desc">クレーンで掴んでも途中で必ず滑り落ちます。投入金額だけが増えていきます。</p>
-          <crane-game-checkbox></crane-game-checkbox>
+        <div class="catalog-card locked" data-component="crane-game-checkbox">
+          <div class="catalog-card-header">
+            <div class="catalog-card-header-left">
+              <h3 class="catalog-card-title">9. UFOキャッチャー認証</h3>
+            </div>
+            <span class="catalog-card-lock">&#128274;</span>
+          </div>
+          <div class="catalog-card-body">
+            <span class="difficulty impossible">不可能</span>
+            <p class="catalog-card-desc">クレーンで掴んでも途中で必ず滑り落ちます。投入金額だけが増えていきます。</p>
+            <crane-game-checkbox></crane-game-checkbox>
+          </div>
         </div>
 
-        <div class="catalog-card">
-          <h3 class="catalog-card-title">10. ブロック崩し認証</h3>
-          <span class="difficulty impossible">不可能</span>
-          <p class="catalog-card-desc">ブロックを全て壊すと一瞬見えますが、すぐに再生成されます。</p>
-          <breakout-checkbox></breakout-checkbox>
+        <div class="catalog-card locked" data-component="breakout-checkbox">
+          <div class="catalog-card-header">
+            <div class="catalog-card-header-left">
+              <h3 class="catalog-card-title">10. ブロック崩し認証</h3>
+            </div>
+            <span class="catalog-card-lock">&#128274;</span>
+          </div>
+          <div class="catalog-card-body">
+            <span class="difficulty impossible">不可能</span>
+            <p class="catalog-card-desc">ブロックを全て壊すと一瞬見えますが、すぐに再生成されます。</p>
+            <breakout-checkbox></breakout-checkbox>
+          </div>
         </div>
 
-        <div class="catalog-card">
-          <h3 class="catalog-card-title">11. フェイク広告認証</h3>
-          <span class="difficulty impossible">不可能</span>
-          <p class="catalog-card-desc">×ボタンで閉じようとすると、逆に広告が増殖します。</p>
-          <fake-close-checkbox></fake-close-checkbox>
+        <div class="catalog-card locked" data-component="fake-close-checkbox">
+          <div class="catalog-card-header">
+            <div class="catalog-card-header-left">
+              <h3 class="catalog-card-title">11. フェイク広告認証</h3>
+            </div>
+            <span class="catalog-card-lock">&#128274;</span>
+          </div>
+          <div class="catalog-card-body">
+            <span class="difficulty impossible">不可能</span>
+            <p class="catalog-card-desc">×ボタンで閉じようとすると、逆に広告が増殖します。</p>
+            <fake-close-checkbox></fake-close-checkbox>
+          </div>
         </div>
 
-        <div class="catalog-card">
-          <h3 class="catalog-card-title">12. スライドパズル認証</h3>
-          <span class="difficulty impossible">不可能</span>
-          <p class="catalog-card-desc">正しく並べると一瞬成功しますが、すぐにシャッフルされます。</p>
-          <slider-puzzle-checkbox></slider-puzzle-checkbox>
+        <div class="catalog-card locked" data-component="slider-puzzle-checkbox">
+          <div class="catalog-card-header">
+            <div class="catalog-card-header-left">
+              <h3 class="catalog-card-title">12. スライドパズル認証</h3>
+            </div>
+            <span class="catalog-card-lock">&#128274;</span>
+          </div>
+          <div class="catalog-card-body">
+            <span class="difficulty impossible">不可能</span>
+            <p class="catalog-card-desc">正しく並べると一瞬成功しますが、すぐにシャッフルされます。</p>
+            <slider-puzzle-checkbox></slider-puzzle-checkbox>
+          </div>
         </div>
 
-        <div class="catalog-card">
-          <h3 class="catalog-card-title">13. だるま落とし認証</h3>
-          <span class="difficulty impossible">不可能</span>
-          <p class="catalog-card-desc">ブロックを慎重に外しても、チェックボックスは必ず落下します。</p>
-          <stack-drop-checkbox></stack-drop-checkbox>
+        <div class="catalog-card locked" data-component="stack-drop-checkbox">
+          <div class="catalog-card-header">
+            <div class="catalog-card-header-left">
+              <h3 class="catalog-card-title">13. だるま落とし認証</h3>
+            </div>
+            <span class="catalog-card-lock">&#128274;</span>
+          </div>
+          <div class="catalog-card-body">
+            <span class="difficulty impossible">不可能</span>
+            <p class="catalog-card-desc">ブロックを慎重に外しても、チェックボックスは必ず落下します。</p>
+            <stack-drop-checkbox></stack-drop-checkbox>
+          </div>
         </div>
       </div>
     </div>
@@ -405,7 +585,51 @@
 
   <script type="module" src="/src/index.js"></script>
   <script>
-    // モーダル開閉
+    // ===== ローカルストレージ: 遭遇済みコンポーネント管理 =====
+    const TOTAL_COMPONENTS = 13;
+
+    function getEncountered() {
+      try {
+        return JSON.parse(localStorage.getItem('encounteredComponents') || '[]');
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function updateCatalogCards() {
+      const encountered = getEncountered();
+      const cards = document.querySelectorAll('.catalog-card[data-component]');
+      cards.forEach(card => {
+        const tag = card.getAttribute('data-component');
+        const isUnlocked = encountered.includes(tag);
+        const lockIcon = card.querySelector('.catalog-card-lock') || card.querySelector('.catalog-card-chevron');
+        if (isUnlocked) {
+          card.classList.remove('locked');
+          if (lockIcon) {
+            lockIcon.innerHTML = '&#9656;';
+            lockIcon.classList.remove('catalog-card-lock');
+            lockIcon.classList.add('catalog-card-chevron');
+          }
+        } else {
+          card.classList.add('locked');
+          card.classList.remove('open');
+          if (lockIcon) {
+            lockIcon.innerHTML = '&#128274;';
+          }
+        }
+      });
+      // 進捗バー更新
+      const progressEl = document.getElementById('catalogProgress');
+      if (progressEl) {
+        const count = encountered.length;
+        progressEl.innerHTML =
+          '発見済み: ' + count + ' / ' + TOTAL_COMPONENTS +
+          '<div class="catalog-progress-bar-track"><div class="catalog-progress-bar-fill" style="width:' +
+          Math.round((count / TOTAL_COMPONENTS) * 100) + '%"></div></div>';
+      }
+    }
+
+    // ===== モーダル開閉 =====
     const toggle = document.getElementById('catalogToggle');
     const toggleIcon = document.getElementById('catalogToggleIcon');
     const backdrop = document.getElementById('catalogBackdrop');
@@ -416,6 +640,7 @@
 
     function openModal() {
       isOpen = true;
+      updateCatalogCards();
       modal.classList.add('visible');
       backdrop.classList.add('visible');
       toggle.classList.add('open');
@@ -428,6 +653,8 @@
       backdrop.classList.remove('visible');
       toggle.classList.remove('open');
       toggleIcon.innerHTML = '&#9776;';
+      // 開いているカードを全て閉じる
+      document.querySelectorAll('.catalog-card.open').forEach(c => c.classList.remove('open'));
     }
 
     toggle.addEventListener('click', () => {
@@ -441,6 +668,23 @@
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && isOpen) closeModal();
     });
+
+    // ===== カードトグル =====
+    document.getElementById('catalogGrid').addEventListener('click', (e) => {
+      const header = e.target.closest('.catalog-card-header');
+      if (!header) return;
+      const card = header.closest('.catalog-card');
+      if (!card || card.classList.contains('locked')) return;
+      card.classList.toggle('open');
+    });
+
+    // ===== ゲームからの遭遇イベントを受信 =====
+    window.addEventListener('component-encountered', () => {
+      if (isOpen) updateCatalogCards();
+    });
+
+    // 初期化
+    updateCatalogCards();
   </script>
 </body>
 </html>

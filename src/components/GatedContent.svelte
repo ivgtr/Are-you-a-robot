@@ -87,6 +87,19 @@
     requestAnimationFrame(() => loadCurrentComponent());
   }
 
+  function saveEncounteredComponent(tag) {
+    try {
+      const encountered = JSON.parse(localStorage.getItem('encounteredComponents') || '[]');
+      if (!encountered.includes(tag)) {
+        encountered.push(tag);
+        localStorage.setItem('encounteredComponents', JSON.stringify(encountered));
+        window.dispatchEvent(new CustomEvent('component-encountered', { detail: { tag } }));
+      }
+    } catch (e) {
+      // localStorage unavailable
+    }
+  }
+
   function loadCurrentComponent() {
     canProceed = false;
     timeoutMsg = '';
@@ -101,6 +114,7 @@
         const el = document.createElement(comp.tag);
         componentContainer.appendChild(el);
         currentEl = el;
+        saveEncounteredComponent(comp.tag);
       }
     });
 
