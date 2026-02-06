@@ -36,6 +36,7 @@
   </div>
 
   <div class="checkbox-area">
+    <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
     <div
       class="checkbox-wrapper"
       style="transform: scale({currentScale});"

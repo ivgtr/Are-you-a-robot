@@ -106,6 +106,7 @@
 
   <div class="grid">
     {#each images as image (image.id)}
+      <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
       <div
         class="image-box"
         class:selected={selectedImages.has(image.id)}

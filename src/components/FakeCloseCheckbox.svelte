@@ -99,8 +99,10 @@
 
 <div class="container">
   <div class="checkbox-area" class:visible={checkboxVisible}>
+    <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
     <div class="real-checkbox" on:click={handleCheckboxClick}>
       <input type="checkbox" />
+      <!-- svelte-ignore a11y-label-has-associated-control -->
       <label>私はロボットではありません</label>
     </div>
   </div>
