@@ -6,8 +6,10 @@
   let message = '';
   let vulnerableWindow = false;
   let cleared = false;
+  let gameOver = false;
+  let vulnerableUsed = false;
 
-  // 5回ごとにシステムが一瞬不安定になり、0.8秒だけ操作可能になる
+  // 5回ごとにシステムが一瞬不安定になり、0.8秒だけ操作可能になる — チャンスは1回のみ
   const VULNERABLE_INTERVAL = 5;
   const VULNERABLE_DURATION = 800;
 
@@ -20,19 +22,19 @@
   ];
 
   function handleFocus(e) {
-    if (vulnerableWindow || cleared) return;
+    if (vulnerableWindow || cleared || gameOver) return;
     e.target.blur();
     registerAttempt();
   }
 
   function handleKeyDown(e) {
-    if (vulnerableWindow || cleared) return;
+    if (vulnerableWindow || cleared || gameOver) return;
     e.preventDefault();
     registerAttempt();
   }
 
   function handleClick(e) {
-    if (cleared) return;
+    if (cleared || gameOver) return;
 
     // 脆弱ウィンドウ中はチェックを許可する
     if (vulnerableWindow) {
@@ -61,16 +63,19 @@
       disabled = true;
     }
 
-    // 5回ごとにシステムが不安定になり一瞬操作可能
-    if (attempts > 0 && attempts % VULNERABLE_INTERVAL === 0) {
+    // 5回ごとにシステムが不安定になり一瞬操作可能 — チャンスは1回のみ
+    if (!vulnerableUsed && attempts > 0 && attempts % VULNERABLE_INTERVAL === 0) {
+      vulnerableUsed = true;
       vulnerableWindow = true;
       disabled = false;
       message = 'システムが不安定です...（今がチャンス！）';
       setTimeout(() => {
         if (!cleared) {
           vulnerableWindow = false;
-          disabled = attempts >= 6;
-          updateMessage();
+          // チャンスを逃した → ゲームオーバー
+          gameOver = true;
+          disabled = true;
+          message = 'セキュリティが完全に復旧しました。ゲームオーバー';
         }
       }, VULNERABLE_DURATION);
       return;
@@ -120,7 +125,9 @@
       {disabled}
     />
     <label for="unfocusable-check">
-      {#if disabled}
+      {#if gameOver}
+        ゲームオーバー
+      {:else if disabled}
         操作不能
       {:else}
         私はロボットではありません

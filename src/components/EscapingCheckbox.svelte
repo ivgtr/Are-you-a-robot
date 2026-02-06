@@ -21,8 +21,10 @@
   let showTaunt = false;
   let isTired = false;
   let tiredTimeout = null;
+  let gameOver = false;
+  let cleared = false;
 
-  // 20回追跡されると疲れて一瞬(1.2秒)停止する
+  // 20回追跡されると疲れて一瞬(1.2秒)停止する — チャンスは1回だけ
   const TIRED_THRESHOLD = 20;
   const TIRED_DURATION = 1200;
 
@@ -38,8 +40,17 @@
     return 'straight';
   }
 
+  function handleCheckboxClick() {
+    if (gameOver || cleared) return;
+    if (isTired) {
+      cleared = true;
+      tauntText = '捕まった...認証成功！';
+      showTaunt = true;
+    }
+  }
+
   function handleMouseMove(e) {
-    if (!containerRef) return;
+    if (!containerRef || gameOver || cleared) return;
 
     const rect = containerRef.getBoundingClientRect();
     const mouseX = e.clientX - rect.left;
@@ -55,14 +66,20 @@
       // 疲れている間は逃げない（クリアのチャンス）
       if (isTired) return;
 
-      // 一定回数追跡されると疲れる
+      // 一定回数追跡されると疲れる — チャンスは1回のみ
       if (chaseCount > 0 && chaseCount % TIRED_THRESHOLD === 0) {
         isTired = true;
-        tauntText = 'はぁ...はぁ...（疲れた）';
+        tauntText = 'はぁ...はぁ...（疲れた）今がチャンス！';
         showTaunt = true;
         tiredTimeout = setTimeout(() => {
           isTired = false;
           showTaunt = false;
+          // チャンスを逃した → ゲームオーバー
+          if (!cleared) {
+            gameOver = true;
+            tauntText = 'チャンスを逃しました。ゲームオーバー';
+            showTaunt = true;
+          }
         }, TIRED_DURATION);
         return;
       }
@@ -118,9 +135,10 @@
   on:mousemove={handleMouseMove}
   on:touchmove|preventDefault={handleTouchMove}
 >
-  <div class="checkbox-wrapper" style="left: {x}px; top: {y}px;">
-    <input type="checkbox" id="escaping-check" />
-    <label for="escaping-check">私はロボットではありません</label>
+  <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
+  <div class="checkbox-wrapper" class:game-over={gameOver} style="left: {x}px; top: {y}px;" on:click={handleCheckboxClick}>
+    <input type="checkbox" id="escaping-check" checked={cleared} disabled={gameOver} />
+    <label for="escaping-check">{gameOver ? 'ゲームオーバー' : cleared ? '認証成功' : '私はロボットではありません'}</label>
   </div>
   {#if showTaunt}
     <div class="taunt">{tauntText}</div>
@@ -155,6 +173,13 @@
     transition: left 0.25s ease-out, top 0.25s ease-out;
     cursor: pointer;
     white-space: nowrap;
+  }
+
+  .checkbox-wrapper.game-over {
+    opacity: 0.4;
+    cursor: not-allowed;
+    border-color: #b91c1c;
+    background: #fef2f2;
   }
 
   input[type="checkbox"] {

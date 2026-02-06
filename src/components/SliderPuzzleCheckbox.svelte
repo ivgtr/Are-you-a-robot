@@ -6,9 +6,12 @@
   let showMessage = false;
   let cleared = false;
   let repairClicks = 0;
+  let gameOver = false;
 
   // 破損文字を5回クリックすると修復される
   const REPAIR_CLICKS = 5;
+  // パズル完成チャンスは2回まで（修復前1回 + 修復後1回）
+  const MAX_SOLVES = 2;
 
   // 3x3 スライドパズル (0 = empty)
   // 「私はロボットでは」の8文字だが、1文字が欠損している
@@ -74,7 +77,7 @@
   }
 
   function handleTileClick(index) {
-    if (cleared) return;
+    if (cleared || gameOver) return;
     const tile = tiles[index];
     // 破損タイルをクリックした場合、修復カウントを増やす
     if (tile !== 0 && tile - 1 === brokenIndex) {
@@ -93,7 +96,7 @@
   }
 
   function checkSolved() {
-    if (cleared) return;
+    if (cleared || gameOver) return;
     const isSolved = tiles.every((t, i) => t === solvedState[i]);
     if (isSolved) {
       attempts++;
@@ -106,7 +109,15 @@
         return;
       }
 
-      // 揃っても文字が間違っているので失敗
+      // 揃っても文字が間違っている
+      if (attempts >= MAX_SOLVES) {
+        // もうチャンスがない → ゲームオーバー
+        gameOver = true;
+        message = '文字が破損したまま完成させてしまいました。ゲームオーバー';
+        showMessage = true;
+        return;
+      }
+
       let msg = failMessages[attempts % failMessages.length];
       msg = msg.replace('{wrong}', displayLabels[brokenIndex]);
       message = msg;
@@ -114,9 +125,6 @@
 
       setTimeout(() => {
         showMessage = false;
-        // 間違った文字を変えてシャッフル
-        repairClicks = 0;
-        breakOneLabel();
         shuffle();
       }, 2500);
     }

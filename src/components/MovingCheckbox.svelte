@@ -8,6 +8,7 @@
   let decoys = [];
   let containerRef;
   let cleared = false;
+  let gameOver = false;
 
   // 本物を10回正確にクリックするとクリア
   const CLICKS_TO_CLEAR = 10;
@@ -23,7 +24,7 @@
 
   function handleClick(e) {
     e.preventDefault();
-    if (cleared) return;
+    if (cleared || gameOver) return;
     clickCount++;
     realClickCount++;
 
@@ -61,24 +62,9 @@
 
   function handleDecoyClick(e) {
     e.preventDefault();
-    if (cleared) return;
-    clickCount++;
-    // デコイをクリックすると本物カウントがリセット
-    realClickCount = Math.max(0, realClickCount - 1);
-
-    // デコイをクリックしても全体が移動
-    const newPos = getRandomPosition();
-    left = newPos.left;
-    top = newPos.top;
-
-    decoys = decoys.map(d => ({
-      ...d,
-      ...getRandomPosition(),
-    }));
-
-    if (decoys.length < 4) {
-      addDecoy();
-    }
+    if (cleared || gameOver) return;
+    // デコイをクリック → ゲームオーバー
+    gameOver = true;
   }
 </script>
 
@@ -108,7 +94,9 @@
     </div>
   {/each}
 
-  {#if clickCount > 0}
+  {#if gameOver}
+    <p class="hint game-over">偽物をクリックしました。ゲームオーバー</p>
+  {:else if clickCount > 0}
     <p class="hint">
       {#if cleared}
         本物を見抜きました！認証成功 ({realClickCount}/{CLICKS_TO_CLEAR})
@@ -182,5 +170,10 @@
     padding: 3px 8px;
     border-radius: 3px;
     white-space: nowrap;
+  }
+
+  .hint.game-over {
+    color: #b91c1c;
+    font-weight: 600;
   }
 </style>

@@ -14,6 +14,10 @@
   let message = '';
   let showMessage = false;
   let cleared = false;
+  let gameOver = false;
+
+  // 5回までしかプレイできない
+  const MAX_COINS = 5;
 
   let checkboxX = 50;
   let checkboxBottomPx = 10;
@@ -56,7 +60,7 @@
   }
 
   function dropClaw() {
-    if (phase !== 'idle') return;
+    if (phase !== 'idle' || gameOver) return;
     phase = 'dropping';
     clawOpen = true;
     clawY = 0;
@@ -99,7 +103,12 @@
               checkboxBottomPx = 10;
               checkboxX = 15 + Math.random() * 70;
               attempts++;
-              showMsg(messages[attempts % messages.length]);
+              if (attempts >= MAX_COINS) {
+                showMsg('コインが尽きました。ゲームオーバー');
+                gameOver = true;
+              } else {
+                showMsg(messages[attempts % messages.length]);
+              }
             }
 
             if (clawY <= 0) {
@@ -121,11 +130,16 @@
 
               if (!showMessage) {
                 attempts++;
-                showMsg(messages[attempts % messages.length]);
+                if (attempts >= MAX_COINS) {
+                  showMsg('コインが尽きました。ゲームオーバー');
+                  gameOver = true;
+                } else {
+                  showMsg(messages[attempts % messages.length]);
+                }
               }
 
               setTimeout(() => {
-                phase = 'idle';
+                if (!gameOver) phase = 'idle';
               }, 300);
             }
           }, 25);
@@ -181,7 +195,9 @@
   {/if}
 
   <div class="instructions">
-    {#if phase === 'idle'}
+    {#if gameOver}
+      ゲームオーバー
+    {:else if phase === 'idle'}
       マウスで移動 → クリックでキャッチ
     {:else}
       操作中...
@@ -189,7 +205,7 @@
   </div>
 
   {#if attempts > 0}
-    <div class="attempts">投入金額: {attempts * 100}円</div>
+    <div class="attempts">投入金額: {attempts * 100}円 (残り{MAX_COINS - attempts}回)</div>
   {/if}
 </div>
 

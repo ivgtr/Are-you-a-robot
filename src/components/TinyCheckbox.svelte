@@ -6,6 +6,7 @@
   let checked = false;
   let successMessage = '';
   let cleared = false;
+  let gameOver = false;
 
   const scales = [1, 0.5, 0.25, 0.1, 0.05, 0.02];
 
@@ -13,7 +14,7 @@
   $: currentScale = scales[scaleIndex];
 
   function handleClick() {
-    if (cleared) return;
+    if (cleared || gameOver) return;
     attempts++;
 
     if (checked) {
@@ -24,13 +25,19 @@
         return;
       }
 
-      // それ以外のサイズでは再チャレンジ
-      successMessage = 'すごい！...でももう一度お願いします';
+      // それ以外のサイズではチャンスが減る（そのまま次へ）
+      successMessage = 'すごい！...でもまだ小さくなります';
       checked = false;
 
       setTimeout(() => {
         successMessage = '';
       }, 2000);
+    } else {
+      // チェックせずにクリック（最小サイズ時のみゲームオーバー）
+      if (currentScale <= 0.02) {
+        gameOver = true;
+        successMessage = 'チェックを入れられませんでした。ゲームオーバー';
+      }
     }
   }
 
@@ -62,7 +69,7 @@
   </div>
 
   {#if successMessage}
-    <div class="success-message">
+    <div class="success-message" class:is-success={cleared} class:is-gameover={gameOver}>
       {successMessage}
     </div>
   {/if}
@@ -129,14 +136,26 @@
   .success-message {
     margin-top: 10px;
     padding: 10px 12px;
-    background: #f0faf0;
-    color: #1a6b2a;
-    border: 1px solid #d4e8d4;
+    background: #fffbe6;
+    color: #7a6c1a;
+    border: 1px solid #e6d98c;
     border-radius: 4px;
     text-align: center;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     font-size: 12px;
     animation: slideIn 0.2s ease-out;
+  }
+
+  .success-message.is-success {
+    background: #f0faf0;
+    color: #1a6b2a;
+    border: 1px solid #d4e8d4;
+  }
+
+  .success-message.is-gameover {
+    background: #fef2f2;
+    color: #b91c1c;
+    border: 1px solid #fecaca;
   }
 
   .info {

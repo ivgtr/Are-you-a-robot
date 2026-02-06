@@ -10,14 +10,20 @@
   let showAlmostDone = false;
   let completed = false;
   let clickCount = 0;
+  let gameOver = false;
+  let timeLeft = 0;
 
   // 99%到達後、プログレスバーを10回クリックすると100%に押し上げられる
   const CLICKS_TO_COMPLETE = 10;
+  // 99%到達後の制限時間（秒）
+  const TIME_LIMIT = 8;
 
   let dotsInterval;
   let progressInterval;
   let statusInterval;
   let almostDoneTimeout;
+  let countdownInterval;
+  let reached99 = false;
 
   const statusMessages = [
     '検証中',
@@ -34,8 +40,27 @@
 
   $: currentStatus = statusMessages[statusIndex % statusMessages.length];
 
+  function startCountdown() {
+    if (reached99) return;
+    reached99 = true;
+    timeLeft = TIME_LIMIT;
+    countdownInterval = setInterval(() => {
+      timeLeft--;
+      if (timeLeft <= 0) {
+        clearInterval(countdownInterval);
+        if (!completed) {
+          gameOver = true;
+          clearInterval(dotsInterval);
+          clearInterval(progressInterval);
+          clearInterval(statusInterval);
+          clearTimeout(almostDoneTimeout);
+        }
+      }
+    }, 1000);
+  }
+
   function handleClick() {
-    if (completed) return;
+    if (completed || gameOver) return;
     if (!clicked) {
       clicked = true;
       startLoading();
@@ -44,6 +69,7 @@
 
     // 99%に到達している場合、クリックで少しずつ押し上げる
     if (progress >= 98.5) {
+      if (!reached99) startCountdown();
       clickCount++;
       progress = Math.min(99 + (clickCount / CLICKS_TO_COMPLETE), 100);
       if (clickCount >= CLICKS_TO_COMPLETE) {
@@ -53,6 +79,7 @@
         clearInterval(progressInterval);
         clearInterval(statusInterval);
         clearTimeout(almostDoneTimeout);
+        clearInterval(countdownInterval);
       }
     }
   }
@@ -89,6 +116,7 @@
     if (progressInterval) clearInterval(progressInterval);
     if (statusInterval) clearInterval(statusInterval);
     if (almostDoneTimeout) clearTimeout(almostDoneTimeout);
+    if (countdownInterval) clearInterval(countdownInterval);
   });
 </script>
 
@@ -98,6 +126,9 @@
     {#if !clicked}
       <input type="checkbox" id="loading-check" />
       <label for="loading-check">私はロボットではありません</label>
+    {:else if gameOver}
+      <input type="checkbox" id="loading-check" disabled />
+      <label for="loading-check">時間切れ。ゲームオーバー</label>
     {:else if completed}
       <input type="checkbox" id="loading-check" checked />
       <label for="loading-check">認証完了！手動で押し切りました</label>
@@ -112,8 +143,8 @@
         </div>
         <div class="progress-info">
           <span class="progress-percent">{progress.toFixed(1)}%</span>
-          {#if progress >= 98.5 && !completed}
-            <span class="almost-done">クリックで押し上げろ！({clickCount}/{CLICKS_TO_COMPLETE})</span>
+          {#if progress >= 98.5 && !completed && !gameOver}
+            <span class="almost-done">クリックで押し上げろ！({clickCount}/{CLICKS_TO_COMPLETE}) 残り{timeLeft}秒</span>
           {:else if showAlmostDone}
             <span class="almost-done">もうすぐ完了します...</span>
           {/if}

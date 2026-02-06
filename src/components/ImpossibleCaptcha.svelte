@@ -72,6 +72,10 @@
   };
 
   let cleared = false;
+  let gameOver = false;
+
+  // 3回不正解でゲームオーバー
+  const MAX_ATTEMPTS = 3;
 
   function checkCorrectAnswer() {
     const answer = correctAnswers[Math.min(promptIndex, Object.keys(correctAnswers).length - 1)];
@@ -84,7 +88,7 @@
   }
 
   function verify() {
-    if (cleared) return;
+    if (cleared || gameOver) return;
     attempts++;
 
     // 正解チェック（最初の5つのお題にのみ正解が存在する）
@@ -95,20 +99,12 @@
       return;
     }
 
-    // 5回に1回、偽の正解演出
-    if (attempts % 5 === 0) {
-      showFakeSuccess = true;
-      showError = false;
-
-      setTimeout(() => {
-        showFakeSuccess = false;
-        errorMessage = 'やっぱり不正解です。再試行してください';
-        showError = true;
-        selectedImages.clear();
-        selectedImages = selectedImages;
-        shuffleImages();
-        promptIndex++;
-      }, 1500);
+    // 上限チェック
+    if (attempts >= MAX_ATTEMPTS) {
+      gameOver = true;
+      errorMessage = `${MAX_ATTEMPTS}回不正解。ゲームオーバー`;
+      showError = true;
+      showFakeSuccess = false;
       return;
     }
 
@@ -121,11 +117,6 @@
 
     // 検証失敗時に画像をシャッフル
     shuffleImages();
-
-    // 3回失敗ごとにお題を変更
-    if (attempts % 3 === 0) {
-      promptIndex++;
-    }
   }
 </script>
 
@@ -151,8 +142,8 @@
     {/each}
   </div>
 
-  <button class="verify-btn" on:click={verify}>
-    確認
+  <button class="verify-btn" on:click={verify} disabled={cleared || gameOver}>
+    {gameOver ? 'ゲームオーバー' : '確認'}
   </button>
 
   {#if showFakeSuccess && cleared}
@@ -174,7 +165,7 @@
 
   {#if attempts > 0}
     <div class="attempts">
-      試行回数: {attempts}
+      試行回数: {attempts}/{MAX_ATTEMPTS}
     </div>
   {/if}
 </div>
