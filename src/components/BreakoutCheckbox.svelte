@@ -10,6 +10,7 @@
   let showMessage = false;
   let gameStarted = false;
   let cleared = false;
+  let gameOver = false;
 
   const COLS = 8;
   const ROWS = 4;
@@ -172,19 +173,11 @@
 
       resetTimeout = setTimeout(() => {
         if (cleared) return;
-        const msgs = [
-          '認証ブロックが再生成されました',
-          'セキュリティ層が追加されました',
-          'もう1ラウンド必要です',
-          'ブロック強度が上がりました',
-          '追加検証が必要です',
-        ];
-        message = msgs[attempts % msgs.length];
+        // チャンスを逃した → ゲームオーバー
+        gameOver = true;
+        cancelAnimationFrame(animationId);
+        message = 'チェックボックスを逃しました。ゲームオーバー';
         showMessage = true;
-        setTimeout(() => { showMessage = false; }, 2000);
-        checkboxRevealed = false;
-        initBlocks();
-        resetBall();
       }, 1500);
     }
 

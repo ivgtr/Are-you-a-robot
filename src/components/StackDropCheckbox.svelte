@@ -10,6 +10,7 @@
   let animating = false;
   let cleared = false;
   let dragStartTime = 0;
+  let gameOver = false;
 
   // ドラッグ状態
   let draggingBlock = null;
@@ -44,7 +45,7 @@
   }
 
   function onDragStart(e, block) {
-    if (animating || checkboxFallen || !block.alive || cleared) return;
+    if (animating || checkboxFallen || !block.alive || cleared || gameOver) return;
     e.preventDefault();
     draggingBlock = block;
     const clientX = e.type.startsWith('touch') ? e.touches[0].clientX : e.clientX;
@@ -98,7 +99,7 @@
   }
 
   function checkBalance() {
-    if (cleared) return;
+    if (cleared || gameOver) return;
     const remaining = blocks.filter(b => b.alive).length;
     const speed = getDragSpeed();
     // ゆっくり操作(speed < 0.3)で安定性ボーナス
@@ -112,14 +113,10 @@
         showMsg('完璧な手さばき...認証成功！');
         return;
       }
-      // 雑に操作した場合は失敗
+      // 雑に操作した場合はゲームオーバー
       animating = true;
-      showMsg(successButMessages[attempts % successButMessages.length]);
-      setTimeout(() => {
-        showMessage = false;
-        animating = false;
-        resetStack();
-      }, 2500);
+      gameOver = true;
+      showMsg('ブロックは除去しましたが、チェックボックスの着地が不正です。ゲームオーバー');
     } else if (remaining <= 2) {
       // 慎重な操作なら30%の確率で耐える
       const surviveChance = isCareful ? 0.3 : 0;
@@ -129,17 +126,14 @@
         setTimeout(() => { checkboxTilt = 0; }, 300);
         return;
       }
+      // 落下 → ゲームオーバー
       animating = true;
       checkboxTilt = (Math.random() > 0.5 ? 1 : -1) * (15 + Math.random() * 30);
       setTimeout(() => {
         checkboxFallen = true;
         checkboxOffset = checkboxTilt > 0 ? 120 : -120;
-        showMsg(failMessages[attempts % failMessages.length]);
-        setTimeout(() => {
-          showMessage = false;
-          animating = false;
-          resetStack();
-        }, 2000);
+        gameOver = true;
+        showMsg(failMessages[attempts % failMessages.length] + ' ゲームオーバー');
       }, 400);
     } else {
       // 途中でもランダムにバランスを崩す（慎重操作なら確率低下）
@@ -149,14 +143,11 @@
         checkboxTilt = (Math.random() > 0.5 ? 1 : -1) * (8 + Math.random() * 15);
         setTimeout(() => {
           if (Math.random() < 0.5) {
+            // 落下 → ゲームオーバー
             checkboxFallen = true;
             checkboxOffset = checkboxTilt > 0 ? 100 : -100;
-            showMsg(failMessages[attempts % failMessages.length]);
-            setTimeout(() => {
-              showMessage = false;
-              animating = false;
-              resetStack();
-            }, 2000);
+            gameOver = true;
+            showMsg(failMessages[attempts % failMessages.length] + ' ゲームオーバー');
           } else {
             // グラついたけど耐えた
             checkboxTilt = 0;
@@ -167,12 +158,6 @@
     }
   }
 
-  function resetStack() {
-    checkboxFallen = false;
-    checkboxOffset = 0;
-    checkboxTilt = 0;
-    blocks = blocks.map(b => ({ ...b, alive: true, offset: 0 }));
-  }
 </script>
 
 <svelte:window

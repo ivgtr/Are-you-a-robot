@@ -13,9 +13,13 @@
   let showMessage = false;
   let cleared = false;
   let checkboxClickCount = 0;
+  let gameOver = false;
+  let checkboxAppearances = 0;
 
   // チェックボックスを3回素早くクリックすると広告を突破して認証成功
   const CLICKS_TO_CLEAR = 3;
+  // チェックボックスは最大3回しか出現しない
+  const MAX_APPEARANCES = 3;
 
   const adTitles = [
     '🎰 今すぐ無料でプレイ！',
@@ -69,6 +73,7 @@
   }
 
   function handleClose(popup) {
+    if (gameOver) return;
     attempts++;
 
     // 偽の×ボタン: 閉じる代わりに新しい広告を生成
@@ -86,17 +91,27 @@
 
     // たまにチェックボックスがチラ見えする演出
     if (attempts > 0 && attempts % 5 === 0) {
+      checkboxAppearances++;
+      if (checkboxAppearances > MAX_APPEARANCES) {
+        // もう出現しない → ゲームオーバー
+        gameOver = true;
+        message = '広告に完全に埋もれました。ゲームオーバー';
+        showMessage = true;
+        return;
+      }
       checkboxVisible = true;
       setTimeout(() => {
-        checkboxVisible = false;
-        spawnPopup(20, 35);
-        spawnPopup(30, 45);
+        if (!cleared) {
+          checkboxVisible = false;
+          spawnPopup(20, 35);
+          spawnPopup(30, 45);
+        }
       }, 800);
     }
   }
 
   function handleCheckboxClick() {
-    if (cleared) return;
+    if (cleared || gameOver) return;
     checkboxClickCount++;
 
     // 累計3回チェックボックスをクリックすればクリア

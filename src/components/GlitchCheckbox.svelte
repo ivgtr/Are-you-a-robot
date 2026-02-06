@@ -9,8 +9,10 @@
   let glitchInterval;
   let cleared = false;
   let inCooldown = false;
+  let gameOver = false;
+  let cooldownUsed = false;
 
-  // グリッチ終了後0.5秒だけクールダウン（安全にクリック可能な隙間）
+  // グリッチ確率100%到達後の最初のクールダウンが唯一のチャンス
   const COOLDOWN_DURATION = 500;
 
   const glitchTexts = [
@@ -45,15 +47,28 @@
         glitchInterval = null;
         text = '私はロボットではありません';
         isGlitching = false;
-        // グリッチ終了後の短いクールダウン期間を設ける
-        inCooldown = true;
-        setTimeout(() => { inCooldown = false; }, COOLDOWN_DURATION);
+        // グリッチ確率100%到達後のクールダウンが唯一のチャンス
+        if (glitchProbability >= 1 && !cooldownUsed) {
+          cooldownUsed = true;
+          inCooldown = true;
+          text = '...システム安定化中（今がチャンス！）';
+          setTimeout(() => {
+            inCooldown = false;
+            if (!cleared) {
+              gameOver = true;
+              text = 'システムが完全にロックされました。ゲームオーバー';
+            }
+          }, COOLDOWN_DURATION);
+        } else {
+          inCooldown = true;
+          setTimeout(() => { inCooldown = false; }, COOLDOWN_DURATION);
+        }
       }
     }, 100);
   }
 
   function handleMouseEnter() {
-    if (cleared || inCooldown) return;
+    if (cleared || inCooldown || gameOver) return;
     hoverCount++;
     if (Math.random() < glitchProbability) {
       startGlitch();
@@ -61,7 +76,7 @@
   }
 
   function handleClick(e) {
-    if (cleared) return;
+    if (cleared || gameOver) return;
     // グリッチ中はクリックを無効化
     if (isGlitching) {
       e.preventDefault();
