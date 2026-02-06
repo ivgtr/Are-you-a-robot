@@ -49,6 +49,20 @@
   let timeoutMsg = '';
   let transitioning = false;
 
+  // 失敗（ロボット判定）状態
+  let robotDetected = false;
+  let failedAtStep = 0;
+
+  const robotMessages = [
+    'ロボットの疑いがあります',
+    '人間ではない可能性が検出されました',
+    '認証パターンが機械的です',
+    '人間の応答速度を超えています',
+    '不審な操作が検出されました',
+    'ロボット特有の行動パターンを検知',
+    '生体認証に失敗しました',
+  ];
+
   function shuffle(arr) {
     const a = [...arr];
     for (let i = a.length - 1; i > 0; i--) {
@@ -103,8 +117,12 @@
     stepTimer = setInterval(() => {
       stepElapsed = (Date.now() - stepStart) / 1000;
       if (stepElapsed >= STEP_TIMEOUT && !canProceed) {
-        canProceed = true;
-        timeoutMsg = timeoutMessages[Math.floor(Math.random() * timeoutMessages.length)];
+        // タイムアウト → ロボット判定で失敗
+        clearInterval(stepTimer);
+        failedAtStep = currentStep;
+        timeoutMsg = robotMessages[Math.floor(Math.random() * robotMessages.length)];
+        robotDetected = true;
+        stopTimer();
       }
     }, 100);
   }
@@ -135,6 +153,8 @@
     gameStarted = false;
     gameOver = false;
     gameRunning = false;
+    robotDetected = false;
+    failedAtStep = 0;
     currentStep = 0;
   }
 
@@ -353,7 +373,7 @@
 
 <div class="gated-wrapper">
   <!-- 進行バー -->
-  {#if currentStep > 0 && currentStep <= NUM_STEPS}
+  {#if currentStep > 0 && currentStep <= NUM_STEPS && !robotDetected}
     <div class="top-bar">
       <div class="progress-dots">
         {#each selectedComponents as _, i}
@@ -396,7 +416,7 @@
   {/if}
 
   <!-- チャレンジ画面 -->
-  {#if currentStep >= 1 && currentStep <= NUM_STEPS}
+  {#if currentStep >= 1 && currentStep <= NUM_STEPS && !robotDetected}
     <div class="challenge" class:transitioning>
       <div class="challenge-header">
         <span class="challenge-num">認証 {currentStep}/{NUM_STEPS}</span>
@@ -417,6 +437,36 @@
             <div class="step-progress-bar" style="width: {Math.min(100, (stepElapsed / STEP_TIMEOUT) * 100)}%"></div>
           </div>
         {/if}
+      </div>
+    </div>
+  {/if}
+
+  <!-- ロボット判定（失敗画面） -->
+  {#if robotDetected}
+    <div class="robot-detected">
+      <div class="robot-detected-inner">
+        <div class="robot-icon">🤖</div>
+        <h2 class="robot-title">ロボット判定</h2>
+        <p class="robot-verdict">あなたはロボットです</p>
+        <div class="robot-detail">
+          <div class="robot-detail-row">
+            <span class="robot-detail-label">判定理由</span>
+            <span class="robot-detail-value">{timeoutMsg}</span>
+          </div>
+          <div class="robot-detail-row">
+            <span class="robot-detail-label">失敗ステップ</span>
+            <span class="robot-detail-value">認証 {failedAtStep}/{NUM_STEPS}</span>
+          </div>
+          <div class="robot-detail-row">
+            <span class="robot-detail-label">経過時間</span>
+            <span class="robot-detail-value">{elapsedTime}</span>
+          </div>
+        </div>
+        <div class="robot-bar">
+          <div class="robot-bar-fill"></div>
+          <span class="robot-bar-label">ロボット確率: 99.7%</span>
+        </div>
+        <button class="retry-btn" on:click={restart}>もう一度挑戦する</button>
       </div>
     </div>
   {/if}
@@ -687,6 +737,110 @@
     background: #f59e0b;
     border-radius: 2px;
     transition: width 0.15s linear;
+  }
+
+  /* ロボット判定（失敗画面） */
+  .robot-detected {
+    animation: fadeIn 0.5s ease-out;
+  }
+
+  .robot-detected-inner {
+    text-align: center;
+    padding: 36px 24px;
+    background: #fff;
+    border: 2px solid #b91c1c;
+    border-radius: 8px;
+  }
+
+  .robot-icon {
+    font-size: 56px;
+    margin-bottom: 12px;
+    animation: robotShake 0.5s ease-out;
+  }
+
+  @keyframes robotShake {
+    0%, 100% { transform: rotate(0deg); }
+    20% { transform: rotate(-10deg); }
+    40% { transform: rotate(10deg); }
+    60% { transform: rotate(-6deg); }
+    80% { transform: rotate(6deg); }
+  }
+
+  .robot-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: #b91c1c;
+    margin-bottom: 4px;
+  }
+
+  .robot-verdict {
+    font-size: 15px;
+    color: #dc2626;
+    font-weight: 600;
+    margin-bottom: 20px;
+  }
+
+  .robot-detail {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 6px;
+    padding: 14px 18px;
+    margin-bottom: 20px;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .robot-detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+  }
+
+  .robot-detail-label {
+    color: #991b1b;
+    font-weight: 600;
+  }
+
+  .robot-detail-value {
+    color: #b91c1c;
+    font-family: 'SF Mono', 'Fira Code', Menlo, Consolas, monospace;
+    font-size: 12px;
+  }
+
+  .robot-bar {
+    position: relative;
+    width: 100%;
+    height: 24px;
+    background: #fee2e2;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 24px;
+  }
+
+  .robot-bar-fill {
+    width: 99.7%;
+    height: 100%;
+    background: linear-gradient(90deg, #dc2626, #b91c1c);
+    border-radius: 12px;
+    animation: barFill 1s ease-out;
+  }
+
+  @keyframes barFill {
+    from { width: 0%; }
+    to { width: 99.7%; }
+  }
+
+  .robot-bar-label {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 11px;
+    font-weight: 700;
+    color: #fff;
   }
 
   /* ゲーム解放 */
