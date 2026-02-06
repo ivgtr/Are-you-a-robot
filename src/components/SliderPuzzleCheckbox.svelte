@@ -1,8 +1,9 @@
 <svelte:options customElement="slider-puzzle-checkbox" />
 
 <script>
-  import { onDestroy } from 'svelte';
+  import { onDestroy, createEventDispatcher } from 'svelte';
 
+  const dispatch = createEventDispatcher();
   let attempts = 0;
   let message = '';
   let showMessage = false;
@@ -119,6 +120,7 @@
         gameOver = true;
         message = '文字が破損したまま完成させてしまいました。ゲームオーバー';
         showMessage = true;
+        dispatch('gameover');
         return;
       }
 

@@ -1,8 +1,9 @@
 <svelte:options customElement="stack-drop-checkbox" />
 
 <script>
-  import { onDestroy } from 'svelte';
+  import { onDestroy, createEventDispatcher } from 'svelte';
 
+  const dispatch = createEventDispatcher();
   let attempts = 0;
   let message = '';
   let showMessage = false;
@@ -116,6 +117,7 @@
       animating = true;
       gameOver = true;
       showMsg('ブロックは除去しましたが、チェックボックスの着地が不正です。ゲームオーバー');
+      dispatch('gameover');
     } else if (remaining <= 2) {
       // 慎重な操作なら30%の確率で耐える
       const surviveChance = isCareful ? 0.3 : 0;
@@ -133,6 +135,7 @@
         checkboxOffset = checkboxTilt > 0 ? 120 : -120;
         gameOver = true;
         showMsg(failMessages[attempts % failMessages.length] + ' ゲームオーバー');
+        dispatch('gameover');
       }, 400));
     } else {
       // 途中でもランダムにバランスを崩す（慎重操作なら確率低下）
@@ -147,6 +150,7 @@
             checkboxOffset = checkboxTilt > 0 ? 100 : -100;
             gameOver = true;
             showMsg(failMessages[attempts % failMessages.length] + ' ゲームオーバー');
+            dispatch('gameover');
           } else {
             // グラついたけど耐えた
             checkboxTilt = 0;

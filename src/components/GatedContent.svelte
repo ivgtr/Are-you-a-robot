@@ -114,6 +114,14 @@
         componentContainer.innerHTML = '';
         const comp = selectedComponents[currentStep - 1];
         const el = document.createElement(comp.tag);
+        el.addEventListener('gameover', () => {
+          if (robotDetected) return;
+          clearInterval(stepTimer);
+          failedAtStep = currentStep;
+          timeoutMsg = 'ゲームオーバーにより認証失敗';
+          robotDetected = true;
+          stopTimer();
+        });
         componentContainer.appendChild(el);
         currentEl = el;
         saveEncounteredComponent(comp.tag);
