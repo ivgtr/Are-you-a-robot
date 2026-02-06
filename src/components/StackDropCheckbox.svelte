@@ -113,6 +113,7 @@
       </div>
 
       {#each blocks as block (block.id)}
+        <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
         <div
           class="block"
           class:removed={!block.alive}

@@ -68,6 +68,7 @@
 
 <div class="container" bind:this={containerRef}>
   <!-- 本物のチェックボックス -->
+  <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
   <div
     class="checkbox-wrapper"
     style="left: {left}; top: {top}; transition-duration: {transitionDuration}s;"
@@ -79,12 +80,14 @@
 
   <!-- 分身 (デコイ) -->
   {#each decoys as decoy (decoy.id)}
+    <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
     <div
       class="checkbox-wrapper decoy"
       style="left: {decoy.left}; top: {decoy.top}; transition-duration: {transitionDuration}s;"
       on:click={handleDecoyClick}
     >
       <input type="checkbox" />
+      <!-- svelte-ignore a11y-label-has-associated-control -->
       <label>私はロボットではありません</label>
     </div>
   {/each}

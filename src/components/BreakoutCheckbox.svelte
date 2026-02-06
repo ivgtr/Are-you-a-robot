@@ -188,6 +188,7 @@
 
 <div class="container">
   {#if !gameStarted}
+    <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
     <div class="start-screen" on:click={startGame}>
       <div class="start-icon">🧱</div>
       <div class="start-text">ブロックを壊して認証を解放せよ</div>
