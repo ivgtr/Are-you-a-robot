@@ -1,8 +1,9 @@
 <svelte:options customElement="breakout-checkbox" />
 
 <script>
-  import { onMount, onDestroy } from 'svelte';
+  import { onMount, onDestroy, createEventDispatcher } from 'svelte';
 
+  const dispatch = createEventDispatcher();
   let canvasRef;
   let animationId;
   let attempts = 0;
@@ -194,6 +195,7 @@
         cancelAnimationFrame(animationId);
         message = 'チェックボックスを逃しました。ゲームオーバー';
         showMessage = true;
+        dispatch('gameover');
       }, 1500);
     }
 

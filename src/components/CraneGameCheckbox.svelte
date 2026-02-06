@@ -1,8 +1,9 @@
 <svelte:options customElement="crane-game-checkbox" />
 
 <script>
-  import { onDestroy } from 'svelte';
+  import { onDestroy, createEventDispatcher } from 'svelte';
 
+  const dispatch = createEventDispatcher();
   let containerRef;
   let craneX = 50;
   let clawY = 0;
@@ -109,6 +110,7 @@
               if (attempts >= MAX_COINS) {
                 showMsg('コインが尽きました。ゲームオーバー');
                 gameOver = true;
+                dispatch('gameover');
               } else {
                 showMsg(messages[attempts % messages.length]);
               }
