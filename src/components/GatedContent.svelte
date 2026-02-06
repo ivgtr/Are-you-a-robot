@@ -20,18 +20,8 @@
     { tag: 'stack-drop-checkbox', name: 'だるま落とし認証' },
   ];
 
-  const NUM_STEPS = 3;
+  const NUM_STEPS = 5;
   const STEP_TIMEOUT = 15; // 秒
-
-  const timeoutMessages = [
-    '認証サーバーがタイムアウトしました',
-    '認証処理に時間がかかりすぎています',
-    '別の認証方法を試みます',
-    '認証システムが応答しません',
-    '認証アルゴリズムが困惑しています',
-    'この認証は想定外の挙動です',
-    'サーバーが諦めかけています',
-  ];
 
   // ===== グローバル状態 =====
   let currentStep = 0; // 0=イントロ, 1-N=チャレンジ, N+1=ゲーム解放
@@ -116,7 +106,7 @@
     const stepStart = Date.now();
     stepTimer = setInterval(() => {
       stepElapsed = (Date.now() - stepStart) / 1000;
-      if (stepElapsed >= STEP_TIMEOUT && !canProceed) {
+      if (stepElapsed >= STEP_TIMEOUT && !canProceed && !robotDetected) {
         // タイムアウト → ロボット判定で失敗
         clearInterval(stepTimer);
         failedAtStep = currentStep;
@@ -428,7 +418,6 @@
 
       <div class="challenge-footer">
         {#if canProceed}
-          <span class="timeout-msg">{timeoutMsg}</span>
           <button class="next-btn" on:click={nextStep}>
             {currentStep < NUM_STEPS ? '次の認証へ' : '結果を見る'}
           </button>
@@ -695,13 +684,6 @@
     border-top: 1px solid #e0e0e0;
     background: #fafafa;
     gap: 12px;
-  }
-
-  .timeout-msg {
-    font-size: 11px;
-    color: #b91c1c;
-    flex: 1;
-    animation: fadeIn 0.3s ease-out;
   }
 
   .next-btn {
