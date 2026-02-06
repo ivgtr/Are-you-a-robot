@@ -2,6 +2,7 @@
 
 <script>
   import { onDestroy, createEventDispatcher } from 'svelte';
+  import AttemptsCounter from '../internal/AttemptsCounter.svelte';
 
   const dispatch = createEventDispatcher();
   let containerRef;
@@ -204,7 +205,7 @@
   </div>
 
   {#if attempts > 0}
-    <div class="attempts">投入金額: {attempts * 100}円 (残り{MAX_COINS - attempts}回)</div>
+    <div class="attempts-position"><AttemptsCounter label="投入金額: {attempts * 100}円 (残り{MAX_COINS - attempts}回)" variant="inline" /></div>
   {/if}
 </div>
 
@@ -322,8 +323,8 @@
     position: absolute;
     display: flex;
     align-items: center;
-    gap: var(--ar-space-2, 4px);
-    padding: var(--ar-space-3, 6px) var(--ar-space-5, 10px);
+    gap: var(--ar-checkbox-wrapper-gap, 8px);
+    padding: var(--ar-checkbox-wrapper-padding, 10px 14px);
     background: var(--ar-color-surface, #fff);
     border: 2px solid var(--ar-color-primary, #333);
     border-radius: var(--ar-radius, 4px);
@@ -335,14 +336,14 @@
   }
 
   .checkbox-prize input {
-    width: 14px;
-    height: 14px;
+    width: var(--ar-checkbox-size, 18px);
+    height: var(--ar-checkbox-size, 18px);
     accent-color: var(--ar-checkbox-accent, #333);
   }
 
   .checkbox-prize span {
     font-family: var(--ar-font-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
-    font-size: var(--ar-font-size-sm, 11px);
+    font-size: var(--ar-font-size-base, 13px);
     font-weight: var(--ar-font-weight-semibold, 600);
     color: var(--ar-color-text, #333);
   }
@@ -395,12 +396,9 @@
     color: var(--ar-color-text-muted, #999);
   }
 
-  .attempts {
+  .attempts-position {
     position: absolute;
     bottom: var(--ar-space-4, 8px);
     right: var(--ar-space-5, 10px);
-    font-family: var(--ar-font-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
-    font-size: var(--ar-font-size-sm, 11px);
-    color: var(--ar-color-text-muted, #999);
   }
 </style>

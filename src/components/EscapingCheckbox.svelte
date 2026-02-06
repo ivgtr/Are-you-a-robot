@@ -2,6 +2,7 @@
 
 <script>
   import { onDestroy } from 'svelte';
+  import AttemptsCounter from '../internal/AttemptsCounter.svelte';
 
   let x = 50;
   let y = 50;
@@ -156,7 +157,7 @@
     <div class="taunt">{tauntText}</div>
   {/if}
   {#if chaseCount > 0}
-    <div class="counter">{chaseCount}回追跡</div>
+    <div class="counter-position"><AttemptsCounter label="{chaseCount}回追跡" variant="inline" /></div>
   {/if}
 </div>
 
@@ -229,12 +230,9 @@
     100% { opacity: 0; transform: translate(-50%, -60%) scale(1); }
   }
 
-  .counter {
+  .counter-position {
     position: absolute;
     bottom: var(--ar-space-4, 8px);
     right: var(--ar-space-5, 10px);
-    font-family: var(--ar-font-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
-    font-size: var(--ar-font-size-sm, 11px);
-    color: var(--ar-color-text-muted, #999);
   }
 </style>

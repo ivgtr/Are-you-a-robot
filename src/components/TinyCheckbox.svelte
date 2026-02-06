@@ -2,6 +2,8 @@
 
 <script>
   import { onDestroy } from 'svelte';
+  import MessageDisplay from '../internal/MessageDisplay.svelte';
+  import AttemptsCounter from '../internal/AttemptsCounter.svelte';
 
   let attempts = 0;
   let currentScale = 1;
@@ -71,15 +73,11 @@
     </div>
   </div>
 
-  {#if successMessage}
-    <div class="success-message" class:is-success={cleared} class:is-gameover={gameOver}>
-      {successMessage}
-    </div>
-  {/if}
+  <MessageDisplay message={successMessage} type={cleared ? 'success' : gameOver ? 'error' : 'warning'} visible={!!successMessage} />
 
   {#if attempts > 0}
     <div class="info">
-      <div class="attempts">クリック試行回数: {attempts}</div>
+      <AttemptsCounter label="クリック試行回数: {attempts}" />
       <div class="scale-info">現在のサイズ: {(currentScale * 100).toFixed(0)}%</div>
     </div>
   {/if}
@@ -136,46 +134,11 @@
     color: var(--ar-color-text, #333);
   }
 
-  .success-message {
-    margin-top: var(--ar-space-5, 10px);
-    padding: var(--ar-message-padding, 10px 12px);
-    background: var(--ar-color-warning-bg, #fffbe6);
-    color: var(--ar-color-warning, #7a6c1a);
-    border: 1px solid var(--ar-color-warning-border, #e6d98c);
-    border-radius: var(--ar-radius, 4px);
-    text-align: center;
-    font-family: var(--ar-font-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
-    font-size: var(--ar-message-font-size, 12px);
-    animation: slideIn 0.2s ease-out;
-  }
-
-  .success-message.is-success {
-    background: var(--ar-color-success-bg, #f0faf0);
-    color: var(--ar-color-success, #1a6b2a);
-    border: 1px solid var(--ar-color-success-border, #d4e8d4);
-  }
-
-  .success-message.is-gameover {
-    background: var(--ar-color-error-bg, #fef2f2);
-    color: var(--ar-color-error, #b91c1c);
-    border: 1px solid var(--ar-color-error-border, #fecaca);
-  }
-
   .info {
     margin-top: var(--ar-space-5, 10px);
     display: flex;
     justify-content: space-between;
     gap: var(--ar-space-4, 8px);
-  }
-
-  .attempts {
-    padding: var(--ar-counter-padding, 6px 8px);
-    background: var(--ar-color-warning-bg, #fffbe6);
-    border: 1px solid var(--ar-color-warning-border, #e6d98c);
-    border-radius: var(--ar-radius, 4px);
-    font-family: var(--ar-font-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
-    font-size: var(--ar-font-size-sm, 11px);
-    color: var(--ar-color-warning, #7a6c1a);
   }
 
   .scale-info {
@@ -186,10 +149,5 @@
     font-family: var(--ar-font-mono, 'SF Mono', 'Fira Code', Menlo, Consolas, monospace);
     font-size: var(--ar-font-size-sm, 11px);
     color: var(--ar-color-text-secondary, #666);
-  }
-
-  @keyframes slideIn {
-    from { opacity: 0; transform: translateY(-4px); }
-    to { opacity: 1; transform: translateY(0); }
   }
 </style>

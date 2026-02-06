@@ -2,6 +2,9 @@
 
 <script>
   import { onDestroy, createEventDispatcher } from 'svelte';
+  import GameHeader from '../internal/GameHeader.svelte';
+  import MessageDisplay from '../internal/MessageDisplay.svelte';
+  import AttemptsCounter from '../internal/AttemptsCounter.svelte';
 
   const dispatch = createEventDispatcher();
   let attempts = 0;
@@ -175,10 +178,7 @@
 />
 
 <div class="container">
-  <div class="header">
-    <span class="icon">🏗️</span>
-    <span class="title">ブロックをスワイプして認証を取り出せ</span>
-  </div>
+  <GameHeader icon="🏗️" title="ブロックをスワイプして認証を取り出せ" />
 
   <div class="play-area">
     <div class="stack">
@@ -212,12 +212,12 @@
     </div>
   </div>
 
-  {#if showMessage}
-    <div class="message" class:success={isSuccess}>{message}</div>
-  {/if}
+  <MessageDisplay message={message} type={isSuccess ? 'success' : 'error'} visible={showMessage} />
 
   {#if attempts > 0}
-    <div class="attempts">試行回数: {attempts}</div>
+    <div class="attempts-spacing">
+      <AttemptsCounter label="試行回数: {attempts}" variant="inline" />
+    </div>
   {/if}
 </div>
 
@@ -229,28 +229,6 @@
     background: var(--ar-color-bg, #fafafa);
     user-select: none;
     touch-action: none;
-  }
-
-  .header {
-    display: flex;
-    align-items: center;
-    gap: var(--ar-header-gap, 8px);
-    margin-bottom: var(--ar-space-7, 14px);
-    padding: var(--ar-header-padding, 10px 12px);
-    background: var(--ar-color-surface, #fff);
-    border: 1px solid var(--ar-color-border, #e0e0e0);
-    border-radius: var(--ar-radius, 4px);
-  }
-
-  .icon {
-    font-size: var(--ar-header-icon-size, 18px);
-  }
-
-  .title {
-    font-family: var(--ar-font-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
-    font-size: var(--ar-font-size-base, 13px);
-    font-weight: var(--ar-font-weight-medium, 500);
-    color: var(--ar-color-text, #333);
   }
 
   .play-area {
@@ -271,8 +249,8 @@
   .checkbox-top {
     display: flex;
     align-items: center;
-    gap: var(--ar-space-3, 6px);
-    padding: var(--ar-space-4, 8px) var(--ar-space-7, 14px);
+    gap: var(--ar-checkbox-wrapper-gap, 8px);
+    padding: var(--ar-checkbox-wrapper-padding, 10px 14px);
     background: var(--ar-color-surface, #fff);
     border: 2px solid var(--ar-color-primary, #333);
     border-radius: var(--ar-radius, 4px);
@@ -287,14 +265,14 @@
   }
 
   .checkbox-top input {
-    width: 16px;
-    height: 16px;
+    width: var(--ar-checkbox-size, 18px);
+    height: var(--ar-checkbox-size, 18px);
     accent-color: var(--ar-checkbox-accent, #333);
   }
 
   .checkbox-top span {
     font-family: var(--ar-font-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
-    font-size: var(--ar-message-font-size, 12px);
+    font-size: var(--ar-font-size-base, 13px);
     font-weight: var(--ar-font-weight-semibold, 600);
     color: var(--ar-color-text, #333);
   }
@@ -363,36 +341,8 @@
     margin-top: var(--ar-space-2, 4px);
   }
 
-  .message {
-    margin-top: var(--ar-space-6, 12px);
-    padding: var(--ar-message-padding, 10px 12px);
-    border-radius: var(--ar-radius, 4px);
-    font-family: var(--ar-font-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
-    font-size: var(--ar-message-font-size, 12px);
-    font-weight: var(--ar-font-weight-medium, 500);
-    color: var(--ar-color-error, #b91c1c);
-    background: var(--ar-color-error-bg, #fef2f2);
-    border: 1px solid var(--ar-color-error-border, #fecaca);
-    text-align: center;
-    animation: slideIn 0.2s ease-out;
-  }
-
-  .message.success {
-    color: var(--ar-color-success, #1a6b2a);
-    background: var(--ar-color-success-bg, #f0faf0);
-    border: 1px solid var(--ar-color-success-border, #d4e8d4);
-  }
-
-  @keyframes slideIn {
-    from { opacity: 0; transform: translateY(-4px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  .attempts {
+  .attempts-spacing {
     margin-top: var(--ar-space-5, 10px);
     text-align: right;
-    font-family: var(--ar-font-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
-    font-size: var(--ar-font-size-sm, 11px);
-    color: var(--ar-color-text-muted, #999);
   }
 </style>

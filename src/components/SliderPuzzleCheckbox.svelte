@@ -2,6 +2,9 @@
 
 <script>
   import { onDestroy, createEventDispatcher } from 'svelte';
+  import GameHeader from '../internal/GameHeader.svelte';
+  import MessageDisplay from '../internal/MessageDisplay.svelte';
+  import AttemptsCounter from '../internal/AttemptsCounter.svelte';
 
   const dispatch = createEventDispatcher();
   let attempts = 0;
@@ -147,10 +150,7 @@
 </script>
 
 <div class="container">
-  <div class="header">
-    <span class="lock">🧩</span>
-    <span class="title">パズルを完成させて認証してください</span>
-  </div>
+  <GameHeader icon="🧩" title="パズルを完成させて認証してください" />
 
   <div class="puzzle-grid">
     {#each tiles as tile, i}
@@ -180,18 +180,15 @@
   </div>
 
   {#if cleared}
-    <div class="result" style="background: #f0faf0; color: #1a6b2a; border: 1px solid #d4e8d4;">
-      <input type="checkbox" checked disabled style="margin-right: 6px;" />
-      ✓ {message}
-    </div>
+    <MessageDisplay message="✓ {message}" type="success" />
   {:else if showMessage}
-    <div class="result" class:error={brokenIndex !== -1} class:repair={brokenIndex === -1}>
-      {brokenIndex === -1 ? '✓' : '✗'} {message}
-    </div>
+    <MessageDisplay message="{brokenIndex === -1 ? '✓' : '✗'} {message}" type={brokenIndex === -1 ? 'success' : 'error'} />
   {/if}
 
   {#if attempts > 0}
-    <div class="attempts">完成回数: {attempts} (認証: {cleared ? '完了！' : '未完了 - 文字破損'})</div>
+    <div class="attempts-spacing">
+      <AttemptsCounter label="完成回数: {attempts} (認証: {cleared ? '完了！' : '未完了 - 文字破損'})" variant="inline" />
+    </div>
   {/if}
 </div>
 
@@ -201,28 +198,6 @@
     border: 1px solid var(--ar-color-border, #e0e0e0);
     border-radius: var(--ar-radius-lg, 6px);
     background: var(--ar-color-bg, #fafafa);
-  }
-
-  .header {
-    display: flex;
-    align-items: center;
-    gap: var(--ar-header-gap, 8px);
-    margin-bottom: var(--ar-space-7, 14px);
-    padding: var(--ar-header-padding, 10px 12px);
-    background: var(--ar-color-surface, #fff);
-    border: 1px solid var(--ar-color-border, #e0e0e0);
-    border-radius: var(--ar-radius, 4px);
-  }
-
-  .lock {
-    font-size: var(--ar-header-icon-size, 18px);
-  }
-
-  .title {
-    font-family: var(--ar-font-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
-    font-size: var(--ar-font-size-base, 13px);
-    font-weight: var(--ar-font-weight-medium, 500);
-    color: var(--ar-color-text, #333);
   }
 
   .puzzle-grid {
@@ -311,37 +286,8 @@
     color: var(--ar-color-error, #b91c1c);
   }
 
-  .result {
-    margin-top: var(--ar-space-5, 10px);
-    padding: var(--ar-message-padding, 10px 12px);
-    border-radius: var(--ar-radius, 4px);
-    font-family: var(--ar-font-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
-    font-size: var(--ar-message-font-size, 12px);
-    animation: slideIn 0.2s ease-out;
-  }
-
-  .result.error {
-    background: var(--ar-color-error-bg, #fef2f2);
-    color: var(--ar-color-error, #b91c1c);
-    border: 1px solid var(--ar-color-error-border, #fecaca);
-  }
-
-  .result.repair {
-    background: var(--ar-color-success-bg, #f0faf0);
-    color: var(--ar-color-success, #1a6b2a);
-    border: 1px solid var(--ar-color-success-border, #d4e8d4);
-  }
-
-  @keyframes slideIn {
-    from { opacity: 0; transform: translateY(-4px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  .attempts {
+  .attempts-spacing {
     margin-top: var(--ar-space-5, 10px);
     text-align: right;
-    font-family: var(--ar-font-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
-    font-size: var(--ar-font-size-sm, 11px);
-    color: var(--ar-color-text-muted, #999);
   }
 </style>
