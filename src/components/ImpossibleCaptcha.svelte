@@ -1,6 +1,10 @@
 <svelte:options customElement="impossible-captcha" />
 
 <script>
+  import GameHeader from '../internal/GameHeader.svelte';
+  import MessageDisplay from '../internal/MessageDisplay.svelte';
+  import AttemptsCounter from '../internal/AttemptsCounter.svelte';
+
   let selectedImages = new Set();
   let attempts = 0;
   let errorMessage = '';
@@ -127,10 +131,7 @@
 </script>
 
 <div class="container">
-  <div class="header">
-    <div class="icon">{currentPrompt.icon}</div>
-    <div class="title">{currentPrompt.text}</div>
-  </div>
+  <GameHeader icon={currentPrompt.icon} title={currentPrompt.text} />
 
   <div class="grid">
     {#each images as image (image.id)}
@@ -152,22 +153,13 @@
     {gameOver ? 'ゲームオーバー' : '確認'}
   </button>
 
-  {#if showFakeSuccess && cleared}
-    <div class="result success">
-      <input type="checkbox" checked disabled style="margin-right: 6px;" />
-      ✓ 正解！認証成功
-    </div>
-  {/if}
+  <MessageDisplay message="✓ 正解！認証成功" type="success" visible={showFakeSuccess && cleared} />
 
-  {#if showError}
-    <div class="result error">
-      ✗ {errorMessage}
-    </div>
-  {/if}
+  <MessageDisplay message={'✗ ' + errorMessage} type="error" visible={showError} />
 
   {#if attempts > 0}
-    <div class="attempts">
-      試行回数: {attempts}/{MAX_ATTEMPTS}
+    <div style="margin-top: var(--ar-space-5, 10px);">
+      <AttemptsCounter label="試行回数: {attempts}/{MAX_ATTEMPTS}" />
     </div>
   {/if}
 </div>
@@ -179,28 +171,6 @@
     border-radius: var(--ar-radius-lg, 6px);
     background: var(--ar-color-bg, #fafafa);
     max-width: 400px;
-  }
-
-  .header {
-    display: flex;
-    align-items: center;
-    gap: var(--ar-space-5, 10px);
-    margin-bottom: var(--ar-space-6, 12px);
-    padding: var(--ar-header-padding, 10px 12px);
-    background: var(--ar-color-surface, #fff);
-    border: 1px solid var(--ar-color-border, #e0e0e0);
-    border-radius: var(--ar-radius, 4px);
-  }
-
-  .icon {
-    font-size: 20px;
-  }
-
-  .title {
-    font-family: var(--ar-font-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
-    font-size: var(--ar-font-size-base, 13px);
-    font-weight: var(--ar-font-weight-medium, 500);
-    color: var(--ar-color-text, #333);
   }
 
   .grid {
@@ -277,43 +247,5 @@
   .verify-btn:disabled {
     opacity: 0.4;
     cursor: not-allowed;
-  }
-
-  .result {
-    margin-top: var(--ar-space-5, 10px);
-    padding: var(--ar-message-padding, 10px 12px);
-    border-radius: var(--ar-radius, 4px);
-    font-family: var(--ar-font-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
-    font-size: var(--ar-message-font-size, 12px);
-    animation: slideIn 0.2s ease-out;
-  }
-
-  .result.success {
-    background: var(--ar-color-success-bg, #f0faf0);
-    color: var(--ar-color-success, #1a6b2a);
-    border: 1px solid var(--ar-color-success-border, #d4e8d4);
-  }
-
-  .result.error {
-    background: var(--ar-color-error-bg, #fef2f2);
-    color: var(--ar-color-error, #b91c1c);
-    border: 1px solid var(--ar-color-error-border, #fecaca);
-  }
-
-  .attempts {
-    margin-top: var(--ar-space-5, 10px);
-    padding: var(--ar-space-4, 8px);
-    background: var(--ar-color-warning-bg, #fffbe6);
-    border: 1px solid var(--ar-color-warning-border, #e6d98c);
-    border-radius: var(--ar-radius, 4px);
-    text-align: center;
-    font-family: var(--ar-font-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
-    font-size: var(--ar-font-size-sm, 11px);
-    color: var(--ar-color-warning, #7a6c1a);
-  }
-
-  @keyframes slideIn {
-    from { opacity: 0; transform: translateY(-4px); }
-    to { opacity: 1; transform: translateY(0); }
   }
 </style>

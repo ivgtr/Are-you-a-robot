@@ -2,6 +2,8 @@
 
 <script>
   import { onDestroy } from 'svelte';
+  import CheckboxWrapper from '../internal/CheckboxWrapper.svelte';
+  import AttemptsCounter from '../internal/AttemptsCounter.svelte';
 
   let messageTimeouts = [];
   let checkboxTimeout = null;
@@ -247,10 +249,12 @@
 <div class="container">
   <div class="checkbox-area" class:visible={checkboxVisible || cleared}>
     <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
-    <div class="real-checkbox" on:click={handleCheckboxClick}>
-      <input type="checkbox" checked={cleared} />
-      <!-- svelte-ignore a11y-label-has-associated-control -->
-      <label>{cleared ? '認証成功' : '私はロボットではありません'}</label>
+    <div on:click={handleCheckboxClick}>
+      <CheckboxWrapper
+        id="fake-close-check"
+        checked={cleared}
+        label={cleared ? '認証成功' : '私はロボットではありません'}
+      />
     </div>
   </div>
 
@@ -282,7 +286,9 @@
   {/if}
 
   {#if attempts > 0}
-    <div class="attempts">閉じた広告: {attempts} / 現在の広告: {popups.length}</div>
+    <div class="attempts-position">
+      <AttemptsCounter label="閉じた広告: {attempts} / 現在の広告: {popups.length}" variant="inline" />
+    </div>
   {/if}
 
   {#if !cleared && !gameOver && popups.length > 0}
@@ -316,31 +322,6 @@
     opacity: 1;
     pointer-events: auto;
     z-index: 50;
-  }
-
-  .real-checkbox {
-    display: flex;
-    align-items: center;
-    gap: var(--ar-checkbox-wrapper-gap, 8px);
-    padding: var(--ar-checkbox-wrapper-padding, 10px 14px);
-    background: var(--ar-color-surface, #fff);
-    border: 1px solid var(--ar-color-border-dark, #d0d0d0);
-    border-radius: var(--ar-radius, 4px);
-    cursor: pointer;
-    white-space: nowrap;
-  }
-
-  .real-checkbox input {
-    width: var(--ar-checkbox-size, 18px);
-    height: var(--ar-checkbox-size, 18px);
-    accent-color: var(--ar-checkbox-accent, #333);
-  }
-
-  .real-checkbox label {
-    font-family: var(--ar-font-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
-    font-size: var(--ar-font-size-base, 13px);
-    color: var(--ar-color-text, #333);
-    cursor: pointer;
   }
 
   .popup {
@@ -476,13 +457,10 @@
     100% { opacity: 0; }
   }
 
-  .attempts {
+  .attempts-position {
     position: absolute;
     bottom: var(--ar-space-4, 8px);
     right: var(--ar-space-5, 10px);
-    font-family: var(--ar-font-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
-    font-size: var(--ar-font-size-sm, 11px);
-    color: var(--ar-color-text-muted, #999);
     z-index: 100;
   }
 

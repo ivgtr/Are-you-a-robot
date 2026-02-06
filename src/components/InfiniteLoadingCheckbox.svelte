@@ -2,6 +2,7 @@
 
 <script>
   import { onDestroy } from 'svelte';
+  import CheckboxWrapper from '../internal/CheckboxWrapper.svelte';
 
   let clicked = false;
   let dots = '';
@@ -116,18 +117,18 @@
 </script>
 
 <div class="container">
-  <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
-  <div class="checkbox-wrapper" class:loading={clicked} on:click={handleClick}>
-    {#if !clicked}
-      <input type="checkbox" id="loading-check" />
-      <label for="loading-check">私はロボットではありません</label>
-    {:else if gameOver}
-      <input type="checkbox" id="loading-check" disabled />
-      <label for="loading-check">時間切れ。ゲームオーバー</label>
-    {:else if completed}
-      <input type="checkbox" id="loading-check" checked />
-      <label for="loading-check">認証完了！手動で押し切りました</label>
-    {:else}
+  {#if !clicked}
+    <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
+    <div on:click={handleClick}>
+      <CheckboxWrapper id="loading-check" />
+    </div>
+  {:else if gameOver}
+    <CheckboxWrapper id="loading-check" disabled label="時間切れ。ゲームオーバー" />
+  {:else if completed}
+    <CheckboxWrapper id="loading-check" checked label="認証完了！手動で押し切りました" />
+  {:else}
+    <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
+    <div class="loading-wrapper" on:click={handleClick}>
       <div class="loading-content">
         <div class="spinner-row">
           <div class="spinner"></div>
@@ -145,8 +146,8 @@
           {/if}
         </div>
       </div>
-    {/if}
-  </div>
+    </div>
+  {/if}
 </div>
 
 <style>
@@ -157,7 +158,7 @@
     background: var(--ar-color-bg, #fafafa);
   }
 
-  .checkbox-wrapper {
+  .loading-wrapper {
     display: flex;
     align-items: center;
     gap: var(--ar-checkbox-wrapper-gap, 8px);
@@ -165,29 +166,10 @@
     background: var(--ar-color-surface, #fff);
     border: 1px solid var(--ar-color-border-dark, #d0d0d0);
     border-radius: var(--ar-radius, 4px);
-    width: fit-content;
-    cursor: pointer;
-    min-width: 300px;
-  }
-
-  .checkbox-wrapper.loading {
     cursor: pointer;
     width: 100%;
-  }
-
-  input[type="checkbox"] {
-    width: var(--ar-checkbox-size, 18px);
-    height: var(--ar-checkbox-size, 18px);
-    cursor: pointer;
-    accent-color: var(--ar-checkbox-accent, #333);
-  }
-
-  label {
-    cursor: pointer;
-    user-select: none;
-    font-family: var(--ar-font-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
-    font-size: var(--ar-font-size-base, 13px);
-    color: var(--ar-color-text, #333);
+    min-width: 300px;
+    box-sizing: border-box;
   }
 
   .loading-content {

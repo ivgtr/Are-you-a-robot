@@ -2,6 +2,7 @@
 
 <script>
   import { onDestroy } from 'svelte';
+  import CheckboxWrapper from '../internal/CheckboxWrapper.svelte';
 
   let text = '私はロボットではありません';
   let isGlitching = false;
@@ -77,6 +78,10 @@
     }
   }
 
+  function handleChange(e) {
+    isChecked = e.target.checked;
+  }
+
   function handleClick(e) {
     if (cleared || gameOver) return;
     // グリッチ中はクリックを無効化
@@ -100,13 +105,18 @@
 <div class="container">
   <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
   <div
-    class="checkbox-wrapper"
+    class="checkbox-outer"
     class:glitching={isGlitching}
     on:mouseenter={handleMouseEnter}
     on:click={handleClick}
   >
-    <input type="checkbox" id="glitch-check" bind:checked={isChecked} disabled={cleared || gameOver} />
-    <label for="glitch-check">{text}</label>
+    <CheckboxWrapper
+      id="glitch-check"
+      checked={isChecked}
+      disabled={cleared || gameOver}
+      label={text}
+      on:change={handleChange}
+    />
   </div>
   {#if hoverCount > 0}
     <div class="stats">
@@ -123,28 +133,14 @@
     background: var(--ar-color-bg, #fafafa);
   }
 
-  .checkbox-wrapper {
-    display: flex;
-    align-items: center;
-    gap: var(--ar-checkbox-wrapper-gap, 8px);
-    padding: var(--ar-checkbox-wrapper-padding, 10px 14px);
-    background: var(--ar-color-surface, #fff);
-    border: 1px solid var(--ar-color-border-dark, #d0d0d0);
-    border-radius: var(--ar-radius, 4px);
-    width: fit-content;
-    cursor: pointer;
+  .checkbox-outer {
     transition: all 0.1s;
   }
 
-  .checkbox-wrapper.glitching {
+  .checkbox-outer.glitching {
     animation: glitch 0.1s infinite;
     border-color: var(--ar-color-error, #b91c1c);
     box-shadow: 0 0 8px rgba(185, 28, 28, 0.2);
-  }
-
-  .checkbox-wrapper.glitching input[type="checkbox"],
-  .checkbox-wrapper.glitching label {
-    pointer-events: none;
   }
 
   @keyframes glitch {
@@ -172,22 +168,6 @@
       transform: translate(0);
       filter: hue-rotate(0deg);
     }
-  }
-
-  input[type="checkbox"] {
-    width: var(--ar-checkbox-size, 18px);
-    height: var(--ar-checkbox-size, 18px);
-    cursor: pointer;
-    accent-color: var(--ar-checkbox-accent, #333);
-  }
-
-  label {
-    cursor: pointer;
-    user-select: none;
-    font-family: var(--ar-font-mono, 'SF Mono', 'Fira Code', Menlo, Consolas, monospace);
-    font-size: var(--ar-font-size-base, 13px);
-    min-width: 200px;
-    color: var(--ar-color-text, #333);
   }
 
   .stats {

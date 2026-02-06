@@ -2,6 +2,7 @@
 
 <script>
   import { onMount, onDestroy, createEventDispatcher } from 'svelte';
+  import AttemptsCounter from '../internal/AttemptsCounter.svelte';
 
   const dispatch = createEventDispatcher();
   let canvasRef;
@@ -314,7 +315,7 @@
   {/if}
 
   {#if attempts > 0}
-    <div class="attempts">クリア回数: {attempts} (認証: {cleared ? '完了！' : '未完了'})</div>
+    <div class="attempts-position"><AttemptsCounter label="クリア回数: {attempts} (認証: {cleared ? '完了！' : '未完了'})" variant="inline" /></div>
   {/if}
 </div>
 
@@ -413,12 +414,9 @@
     100% { opacity: 0; }
   }
 
-  .attempts {
+  .attempts-position {
     position: absolute;
     bottom: var(--ar-space-4, 8px);
     right: var(--ar-space-5, 10px);
-    font-family: var(--ar-font-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
-    font-size: var(--ar-font-size-sm, 11px);
-    color: var(--ar-color-text-muted, #999);
   }
 </style>
