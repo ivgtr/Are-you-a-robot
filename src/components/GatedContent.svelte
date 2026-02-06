@@ -92,12 +92,15 @@
     timeoutMsg = '';
     stepElapsed = 0;
 
+    let currentEl = null;
+
     requestAnimationFrame(() => {
       if (componentContainer) {
         componentContainer.innerHTML = '';
         const comp = selectedComponents[currentStep - 1];
         const el = document.createElement(comp.tag);
         componentContainer.appendChild(el);
+        currentEl = el;
       }
     });
 
@@ -106,6 +109,18 @@
     const stepStart = Date.now();
     stepTimer = setInterval(() => {
       stepElapsed = (Date.now() - stepStart) / 1000;
+
+      // コンポーネント内のチェックボックスが選択されたか確認
+      if (!canProceed && currentEl) {
+        const shadow = currentEl.shadowRoot;
+        if (shadow) {
+          const checked = shadow.querySelector('input[type="checkbox"]:checked:not([disabled])');
+          if (checked) {
+            canProceed = true;
+          }
+        }
+      }
+
       if (stepElapsed >= STEP_TIMEOUT && !canProceed && !robotDetected) {
         // タイムアウト → ロボット判定で失敗
         clearInterval(stepTimer);
