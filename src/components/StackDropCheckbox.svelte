@@ -8,6 +8,8 @@
   let checkboxOffset = 0;
   let checkboxTilt = 0;
   let animating = false;
+  let cleared = false;
+  let dragStartTime = 0;
 
   // ドラッグ状態
   let draggingBlock = null;
@@ -42,12 +44,13 @@
   }
 
   function onDragStart(e, block) {
-    if (animating || checkboxFallen || !block.alive) return;
+    if (animating || checkboxFallen || !block.alive || cleared) return;
     e.preventDefault();
     draggingBlock = block;
     const clientX = e.type.startsWith('touch') ? e.touches[0].clientX : e.clientX;
     dragStartX = clientX;
     dragCurrentX = clientX;
+    dragStartTime = Date.now();
   }
 
   function onDragMove(e) {
@@ -86,11 +89,30 @@
     }
   }
 
+  // ドラッグの速度を計算（ゆっくり = 慎重な操作）
+  function getDragSpeed() {
+    const elapsed = Date.now() - dragStartTime;
+    if (elapsed <= 0) return 999;
+    const diff = Math.abs(dragCurrentX - dragStartX);
+    return diff / elapsed; // px/ms
+  }
+
   function checkBalance() {
+    if (cleared) return;
     const remaining = blocks.filter(b => b.alive).length;
+    const speed = getDragSpeed();
+    // ゆっくり操作(speed < 0.3)で安定性ボーナス
+    const isCareful = speed < 0.3;
 
     if (remaining === 0) {
-      // 全部除去しても失敗
+      // 全ブロック除去成功: 慎重に操作していれば認証成功
+      if (isCareful) {
+        cleared = true;
+        animating = false;
+        showMsg('完璧な手さばき...認証成功！');
+        return;
+      }
+      // 雑に操作した場合は失敗
       animating = true;
       showMsg(successButMessages[attempts % successButMessages.length]);
       setTimeout(() => {
@@ -99,7 +121,14 @@
         resetStack();
       }, 2500);
     } else if (remaining <= 2) {
-      // 必ずバランスを崩す
+      // 慎重な操作なら30%の確率で耐える
+      const surviveChance = isCareful ? 0.3 : 0;
+      if (Math.random() < surviveChance) {
+        // 耐えた
+        checkboxTilt = (Math.random() > 0.5 ? 1 : -1) * 5;
+        setTimeout(() => { checkboxTilt = 0; }, 300);
+        return;
+      }
       animating = true;
       checkboxTilt = (Math.random() > 0.5 ? 1 : -1) * (15 + Math.random() * 30);
       setTimeout(() => {
@@ -113,8 +142,9 @@
         }, 2000);
       }, 400);
     } else {
-      // 途中でもランダムにバランスを崩す
-      if (Math.random() < 0.3) {
+      // 途中でもランダムにバランスを崩す（慎重操作なら確率低下）
+      const failChance = isCareful ? 0.1 : 0.3;
+      if (Math.random() < failChance) {
         animating = true;
         checkboxTilt = (Math.random() > 0.5 ? 1 : -1) * (8 + Math.random() * 15);
         setTimeout(() => {
@@ -165,8 +195,8 @@
         class:fallen={checkboxFallen}
         style="transform: rotate({checkboxTilt}deg) translateX({checkboxOffset}px);"
       >
-        <input type="checkbox" disabled />
-        <span>認証</span>
+        <input type="checkbox" disabled={!cleared} checked={cleared} />
+        <span>{cleared ? '認証OK' : '認証'}</span>
       </div>
 
       {#each blocks as block (block.id)}

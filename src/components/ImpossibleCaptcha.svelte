@@ -61,8 +61,39 @@
     selectedImages = selectedImages;
   }
 
+  // 各お題に対する正解のimage id集合
+  // 「車」= 🚗(1), 🚕(2), 🚙(3), 🏎️(6), 🚓(7) — バス(4,5)と緊急車両(8,9)は除外
+  const correctAnswers = {
+    0: new Set([1, 2, 3, 6, 7]),       // 「車」を含む画像
+    1: new Set([1, 2, 3, 6, 7]),       // 「バス」ではない車
+    2: new Set([9]),                     // 「赤い車」= 🚒
+    3: new Set([1, 6]),                  // 「2ドアの車」= 🚗, 🏎️
+    4: new Set([6]),                     // 「走っている車」= 🏎️
+  };
+
+  let cleared = false;
+
+  function checkCorrectAnswer() {
+    const answer = correctAnswers[Math.min(promptIndex, Object.keys(correctAnswers).length - 1)];
+    if (!answer) return false;
+    if (selectedImages.size !== answer.size) return false;
+    for (const id of selectedImages) {
+      if (!answer.has(id)) return false;
+    }
+    return true;
+  }
+
   function verify() {
+    if (cleared) return;
     attempts++;
+
+    // 正解チェック（最初の5つのお題にのみ正解が存在する）
+    if (promptIndex < Object.keys(correctAnswers).length && checkCorrectAnswer()) {
+      cleared = true;
+      showFakeSuccess = true;
+      showError = false;
+      return;
+    }
 
     // 5回に1回、偽の正解演出
     if (attempts % 5 === 0) {
@@ -124,7 +155,12 @@
     確認
   </button>
 
-  {#if showFakeSuccess}
+  {#if showFakeSuccess && cleared}
+    <div class="result success">
+      <input type="checkbox" checked style="margin-right: 6px;" />
+      ✓ 正解！認証成功
+    </div>
+  {:else if showFakeSuccess}
     <div class="result success">
       ✓ 認証成功！リダイレクト中...
     </div>

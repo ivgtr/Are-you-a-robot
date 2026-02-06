@@ -4,6 +4,12 @@
   let attempts = 0;
   let disabled = false;
   let message = '';
+  let vulnerableWindow = false;
+  let cleared = false;
+
+  // 5回ごとにシステムが一瞬不安定になり、0.8秒だけ操作可能になる
+  const VULNERABLE_INTERVAL = 5;
+  const VULNERABLE_DURATION = 800;
 
   const escalationMessages = [
     'キーボードでの操作はできません',
@@ -14,16 +20,31 @@
   ];
 
   function handleFocus(e) {
+    if (vulnerableWindow || cleared) return;
     e.target.blur();
     registerAttempt();
   }
 
   function handleKeyDown(e) {
+    if (vulnerableWindow || cleared) return;
     e.preventDefault();
     registerAttempt();
   }
 
   function handleClick(e) {
+    if (cleared) return;
+
+    // 脆弱ウィンドウ中はチェックを許可する
+    if (vulnerableWindow) {
+      const checkbox = e.currentTarget.querySelector('input[type="checkbox"]');
+      if (checkbox && checkbox.checked) {
+        cleared = true;
+        message = 'セキュリティの隙を突かれました...認証成功';
+        disabled = false;
+      }
+      return;
+    }
+
     attempts++;
 
     // 段階的エスカレーション
@@ -40,12 +61,27 @@
       disabled = true;
     }
 
+    // 5回ごとにシステムが不安定になり一瞬操作可能
+    if (attempts > 0 && attempts % VULNERABLE_INTERVAL === 0) {
+      vulnerableWindow = true;
+      disabled = false;
+      message = 'システムが不安定です...（今がチャンス！）';
+      setTimeout(() => {
+        if (!cleared) {
+          vulnerableWindow = false;
+          disabled = attempts >= 6;
+          updateMessage();
+        }
+      }, VULNERABLE_DURATION);
+      return;
+    }
+
     updateMessage();
   }
 
   function registerAttempt() {
     attempts++;
-    if (attempts >= 6) {
+    if (attempts >= 6 && !vulnerableWindow) {
       disabled = true;
     }
     updateMessage();

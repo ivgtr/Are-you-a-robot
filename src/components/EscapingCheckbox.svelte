@@ -19,6 +19,12 @@
 
   let tauntText = '';
   let showTaunt = false;
+  let isTired = false;
+  let tiredTimeout = null;
+
+  // 20回追跡されると疲れて一瞬(1.2秒)停止する
+  const TIRED_THRESHOLD = 20;
+  const TIRED_DURATION = 1200;
 
   function getEscapeBehavior() {
     const rand = Math.random();
@@ -45,6 +51,22 @@
 
     if (distance < 120) {
       chaseCount++;
+
+      // 疲れている間は逃げない（クリアのチャンス）
+      if (isTired) return;
+
+      // 一定回数追跡されると疲れる
+      if (chaseCount > 0 && chaseCount % TIRED_THRESHOLD === 0) {
+        isTired = true;
+        tauntText = 'はぁ...はぁ...（疲れた）';
+        showTaunt = true;
+        tiredTimeout = setTimeout(() => {
+          isTired = false;
+          showTaunt = false;
+        }, TIRED_DURATION);
+        return;
+      }
+
       const angle = Math.atan2(y - mouseY, x - mouseX);
 
       // 距離に反比例する逃走速度 (近いほど速い)

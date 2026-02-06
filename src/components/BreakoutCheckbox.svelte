@@ -9,6 +9,7 @@
   let message = '';
   let showMessage = false;
   let gameStarted = false;
+  let cleared = false;
 
   const COLS = 8;
   const ROWS = 4;
@@ -95,6 +96,25 @@
     paddleX = Math.max(0, Math.min(canvasW - paddleW, cx - paddleW / 2));
   }
 
+  function handleCanvasClick(e) {
+    if (!checkboxRevealed || cleared) return;
+    // チェックボックスエリアをクリックしたかチェック
+    const cx = getCanvasX(e.clientX);
+    const rect = canvasRef.getBoundingClientRect();
+    const cy = ((e.clientY - rect.top) / rect.height) * canvasH;
+    const cbW = Math.min(180, canvasW - 40);
+    const cbH = 34;
+    const cbX = canvasW / 2 - cbW / 2;
+    const cbY = 45;
+    if (cx >= cbX && cx <= cbX + cbW && cy >= cbY && cy <= cbY + cbH) {
+      cleared = true;
+      clearTimeout(resetTimeout);
+      cancelAnimationFrame(animationId);
+      message = '認証ブロック突破！認証成功';
+      showMessage = true;
+    }
+  }
+
   function loop() {
     if (!canvasRef) return;
     const ctx = canvasRef.getContext('2d');
@@ -146,11 +166,12 @@
 
     // 全ブロック破壊チェック
     const allDestroyed = blocks.every(b => !b.alive);
-    if (allDestroyed && !checkboxRevealed) {
+    if (allDestroyed && !checkboxRevealed && !cleared) {
       checkboxRevealed = true;
       attempts++;
 
       resetTimeout = setTimeout(() => {
+        if (cleared) return;
         const msgs = [
           '認証ブロックが再生成されました',
           'セキュリティ層が追加されました',
@@ -260,6 +281,7 @@
       height={canvasH}
       on:mousemove={handleMouseMove}
       on:touchmove|preventDefault={handleTouchMove}
+      on:click={handleCanvasClick}
     ></canvas>
 
     {#if !gameStarted}
@@ -272,12 +294,16 @@
     {/if}
   </div>
 
+  {#if cleared}
+    <input type="checkbox" checked style="position: absolute; bottom: 4px; left: 10px;" />
+  {/if}
+
   {#if showMessage}
     <div class="message">{message}</div>
   {/if}
 
   {#if attempts > 0}
-    <div class="attempts">クリア回数: {attempts} (認証: 未完了)</div>
+    <div class="attempts">クリア回数: {attempts} (認証: {cleared ? '完了！' : '未完了'})</div>
   {/if}
 </div>
 

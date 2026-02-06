@@ -11,6 +11,11 @@
   let checkboxVisible = false;
   let message = '';
   let showMessage = false;
+  let cleared = false;
+  let checkboxClickCount = 0;
+
+  // チェックボックスを3回素早くクリックすると広告を突破して認証成功
+  const CLICKS_TO_CLEAR = 3;
 
   const adTitles = [
     '🎰 今すぐ無料でプレイ！',
@@ -91,23 +96,35 @@
   }
 
   function handleCheckboxClick() {
+    if (cleared) return;
+    checkboxClickCount++;
+
+    // 累計3回チェックボックスをクリックすればクリア
+    if (checkboxClickCount >= CLICKS_TO_CLEAR) {
+      cleared = true;
+      message = '広告の壁を突破しました...認証成功！';
+      showMessage = true;
+      popups = [];
+      return;
+    }
+
     checkboxVisible = false;
     for (let i = 0; i < 3; i++) {
       spawnPopup(15 + Math.random() * 35, 25 + Math.random() * 30);
     }
-    message = '認証エリアは広告スポンサーにより保護されています';
+    message = `認証エリアにアクセス中... (${checkboxClickCount}/${CLICKS_TO_CLEAR})`;
     showMessage = true;
     setTimeout(() => { showMessage = false; }, 2000);
   }
 </script>
 
 <div class="container">
-  <div class="checkbox-area" class:visible={checkboxVisible}>
+  <div class="checkbox-area" class:visible={checkboxVisible || cleared}>
     <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
     <div class="real-checkbox" on:click={handleCheckboxClick}>
-      <input type="checkbox" />
+      <input type="checkbox" checked={cleared} />
       <!-- svelte-ignore a11y-label-has-associated-control -->
-      <label>私はロボットではありません</label>
+      <label>{cleared ? '認証成功' : '私はロボットではありません'}</label>
     </div>
   </div>
 

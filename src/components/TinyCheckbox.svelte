@@ -5,6 +5,7 @@
   let currentScale = 1;
   let checked = false;
   let successMessage = '';
+  let cleared = false;
 
   const scales = [1, 0.5, 0.25, 0.1, 0.05, 0.02];
 
@@ -12,10 +13,18 @@
   $: currentScale = scales[scaleIndex];
 
   function handleClick() {
+    if (cleared) return;
     attempts++;
 
     if (checked) {
-      // チェックに成功した場合
+      // 最小サイズ(2%)でチェック成功 = クリア
+      if (currentScale <= 0.02) {
+        cleared = true;
+        successMessage = '信じられない...この精度は人間にしかできない。認証成功！';
+        return;
+      }
+
+      // それ以外のサイズでは再チャレンジ
       successMessage = 'すごい！...でももう一度お願いします';
       checked = false;
 

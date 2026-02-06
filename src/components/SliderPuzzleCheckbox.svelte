@@ -4,6 +4,11 @@
   let attempts = 0;
   let message = '';
   let showMessage = false;
+  let cleared = false;
+  let repairClicks = 0;
+
+  // 破損文字を5回クリックすると修復される
+  const REPAIR_CLICKS = 5;
 
   // 3x3 スライドパズル (0 = empty)
   // 「私はロボットでは」の8文字だが、1文字が欠損している
@@ -69,13 +74,37 @@
   }
 
   function handleTileClick(index) {
+    if (cleared) return;
+    const tile = tiles[index];
+    // 破損タイルをクリックした場合、修復カウントを増やす
+    if (tile !== 0 && tile - 1 === brokenIndex) {
+      repairClicks++;
+      if (repairClicks >= REPAIR_CLICKS) {
+        // 文字を修復
+        displayLabels = [...correctLabels];
+        brokenIndex = -1; // 修復済み
+        message = 'フォントデータを修復しました！パズルを完成させてください';
+        showMessage = true;
+        setTimeout(() => { showMessage = false; }, 2000);
+        return;
+      }
+    }
     swapTile(index, false);
   }
 
   function checkSolved() {
+    if (cleared) return;
     const isSolved = tiles.every((t, i) => t === solvedState[i]);
     if (isSolved) {
       attempts++;
+
+      // 文字が修復済みの場合、認証成功
+      if (brokenIndex === -1) {
+        cleared = true;
+        message = 'パズル完成！認証成功';
+        showMessage = true;
+        return;
+      }
 
       // 揃っても文字が間違っているので失敗
       let msg = failMessages[attempts % failMessages.length];
@@ -86,6 +115,7 @@
       setTimeout(() => {
         showMessage = false;
         // 間違った文字を変えてシャッフル
+        repairClicks = 0;
         breakOneLabel();
         shuffle();
       }, 2500);
@@ -123,17 +153,26 @@
 
   <div class="target">
     <span class="target-label">目標: 「私はロボットでは」</span>
-    <span class="target-hint">※ 文字をよく確認してください</span>
+    {#if brokenIndex >= 0}
+      <span class="target-hint">※ 破損文字をクリックで修復 ({repairClicks}/{REPAIR_CLICKS})</span>
+    {:else}
+      <span class="target-hint" style="color: #1a6b2a;">※ 文字修復済み！パズルを完成させてください</span>
+    {/if}
   </div>
 
-  {#if showMessage}
+  {#if cleared}
+    <div class="result" style="background: #f0faf0; color: #1a6b2a; border: 1px solid #d4e8d4;">
+      <input type="checkbox" checked style="margin-right: 6px;" />
+      ✓ {message}
+    </div>
+  {:else if showMessage}
     <div class="result error">
-      ✗ {message}
+      {brokenIndex === -1 ? '✓' : '✗'} {message}
     </div>
   {/if}
 
   {#if attempts > 0}
-    <div class="attempts">完成回数: {attempts} (認証: 未完了 - 文字破損)</div>
+    <div class="attempts">完成回数: {attempts} (認証: {cleared ? '完了！' : '未完了 - 文字破損'})</div>
   {/if}
 </div>
 

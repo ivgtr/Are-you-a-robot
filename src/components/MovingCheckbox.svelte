@@ -2,10 +2,15 @@
 
 <script>
   let clickCount = 0;
+  let realClickCount = 0;
   let left = '50%';
   let top = '40%';
   let decoys = [];
   let containerRef;
+  let cleared = false;
+
+  // 本物を10回正確にクリックするとクリア
+  const CLICKS_TO_CLEAR = 10;
 
   // クリック回数に応じたアニメーション速度
   $: transitionDuration = Math.max(0.05, 0.4 - clickCount * 0.05);
@@ -18,7 +23,15 @@
 
   function handleClick(e) {
     e.preventDefault();
+    if (cleared) return;
     clickCount++;
+    realClickCount++;
+
+    // 本物を一定回数クリックするとクリア
+    if (realClickCount >= CLICKS_TO_CLEAR) {
+      cleared = true;
+      return;
+    }
 
     // ランダムな位置に移動
     const newPos = getRandomPosition();
@@ -48,7 +61,10 @@
 
   function handleDecoyClick(e) {
     e.preventDefault();
+    if (cleared) return;
     clickCount++;
+    // デコイをクリックすると本物カウントがリセット
+    realClickCount = Math.max(0, realClickCount - 1);
 
     // デコイをクリックしても全体が移動
     const newPos = getRandomPosition();
@@ -74,7 +90,7 @@
     style="left: {left}; top: {top}; transition-duration: {transitionDuration}s;"
     on:click={handleClick}
   >
-    <input type="checkbox" id="moving-check" />
+    <input type="checkbox" id="moving-check" checked={cleared} />
     <label for="moving-check">私はロボットではありません</label>
   </div>
 
@@ -94,10 +110,12 @@
 
   {#if clickCount > 0}
     <p class="hint">
-      {#if clickCount < 5}
-        クリック回数: {clickCount}
+      {#if cleared}
+        本物を見抜きました！認証成功 ({realClickCount}/{CLICKS_TO_CLEAR})
+      {:else if clickCount < 5}
+        クリック回数: {clickCount} (本物: {realClickCount}/{CLICKS_TO_CLEAR})
       {:else}
-        クリック回数: {clickCount} — どれが本物？
+        クリック回数: {clickCount} — どれが本物？ (本物: {realClickCount}/{CLICKS_TO_CLEAR})
       {/if}
     </p>
   {/if}
@@ -132,6 +150,7 @@
 
   .checkbox-wrapper.decoy {
     opacity: 0.9;
+    border-style: dashed;
   }
 
   input[type="checkbox"] {
