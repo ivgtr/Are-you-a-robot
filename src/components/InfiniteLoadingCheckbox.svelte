@@ -143,10 +143,10 @@
         </div>
         <div class="progress-info">
           <span class="progress-percent">{progress.toFixed(1)}%</span>
-          {#if progress >= 98.5 && !completed && !gameOver}
-            <span class="almost-done">クリックで押し上げろ！({clickCount}/{CLICKS_TO_COMPLETE}) 残り{timeLeft}秒</span>
-          {:else if showAlmostDone}
+          {#if showAlmostDone && progress < 98.5}
             <span class="almost-done">もうすぐ完了します...</span>
+          {:else if progress >= 98.5 && !completed && !gameOver}
+            <span class="almost-done">クリックで押し上げろ！({clickCount}/{CLICKS_TO_COMPLETE}) 残り{reached99 ? timeLeft : '--'}秒</span>
           {/if}
         </div>
       </div>
@@ -176,7 +176,7 @@
   }
 
   .checkbox-wrapper.loading {
-    cursor: wait;
+    cursor: pointer;
     width: 100%;
   }
 

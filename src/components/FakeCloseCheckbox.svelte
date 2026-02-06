@@ -1,10 +1,16 @@
 <svelte:options customElement="fake-close-checkbox" />
 
 <script>
+  import { onDestroy } from 'svelte';
+
+  let messageTimeouts = [];
+  let checkboxTimeout = null;
+  let swipeTimeout = null;
+
   let popups = [
-    { id: 0, title: '🎉 おめでとうございます！', body: 'あなたは100万人目の訪問者です！', x: 5, y: 5, visible: true },
-    { id: 1, title: '⚠️ ウイルスが検出されました！', body: '今すぐスキャンしてください', x: 30, y: 20, visible: true },
-    { id: 2, title: '🍪 Cookieを受け入れますか？', body: '最適な体験のために必要です', x: 15, y: 40, visible: true },
+    { id: 0, title: '🎉 おめでとうございます！', body: 'あなたは100万人目の訪問者です！', x: 5, y: 5 },
+    { id: 1, title: '⚠️ ウイルスが検出されました！', body: '今すぐスキャンしてください', x: 30, y: 20 },
+    { id: 2, title: '🍪 Cookieを受け入れますか？', body: '最適な体験のために必要です', x: 15, y: 40 },
   ];
   let nextId = 3;
   let attempts = 0;
@@ -83,7 +89,6 @@
       body: adBodies[Math.floor(Math.random() * adBodies.length)],
       x: Math.max(0, Math.min(50, sourceX + (Math.random() - 0.5) * 30)),
       y: Math.max(0, Math.min(55, sourceY + (Math.random() - 0.5) * 25)),
-      visible: true,
     };
     popups = [...popups, newPopup];
   }
@@ -103,7 +108,7 @@
 
     message = closeMessages[attempts % closeMessages.length];
     showMessage = true;
-    setTimeout(() => { showMessage = false; }, 1500);
+    messageTimeouts.push(setTimeout(() => { showMessage = false; }, 1500));
 
     // たまにチェックボックスがチラ見えする演出
     if (attempts > 0 && attempts % 5 === 0) {
@@ -117,7 +122,7 @@
       }
       checkboxClickedThisAppearance = false;
       checkboxVisible = true;
-      setTimeout(() => {
+      checkboxTimeout = setTimeout(() => {
         // チェックボックスをクリック済みなら追加ポップアップを出さない
         if (!cleared && !checkboxClickedThisAppearance) {
           checkboxVisible = false;
@@ -148,7 +153,7 @@
     }
     message = `認証エリアにアクセス中... (${checkboxClickCount}/${CLICKS_TO_CLEAR})`;
     showMessage = true;
-    setTimeout(() => { showMessage = false; }, 2000);
+    messageTimeouts.push(setTimeout(() => { showMessage = false; }, 2000));
   }
 
   // ===== ドラッグ&スワイプ =====
@@ -193,14 +198,14 @@
       swipeOut = { id: popup.id, direction };
       drag = null;
 
-      setTimeout(() => {
+      swipeTimeout = setTimeout(() => {
         swipeOut = null;
         // スワイプで消しても handleClose と同じ扱い（広告増殖）
         handleClose(popup);
         // スワイプ用メッセージで上書き
         message = swipeMessages[Math.floor(Math.random() * swipeMessages.length)];
         showMessage = true;
-        setTimeout(() => { showMessage = false; }, 1500);
+        messageTimeouts.push(setTimeout(() => { showMessage = false; }, 1500));
       }, 300);
     } else {
       // 移動距離不足 → スナップバック
@@ -223,13 +228,19 @@
 
     return base;
   }
+
+  onDestroy(() => {
+    messageTimeouts.forEach(t => clearTimeout(t));
+    if (checkboxTimeout) clearTimeout(checkboxTimeout);
+    if (swipeTimeout) clearTimeout(swipeTimeout);
+  });
 </script>
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->
 <svelte:window
   on:mousemove={handleDragMove}
   on:mouseup={handleDragEnd}
-  on:touchmove|passive={handleDragMove}
+  on:touchmove|nonpassive={handleDragMove}
   on:touchend={handleDragEnd}
 />
 

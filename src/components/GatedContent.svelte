@@ -1,7 +1,7 @@
 <svelte:options customElement="gated-content" />
 
 <script>
-  import { onMount, onDestroy } from 'svelte';
+  import { onDestroy } from 'svelte';
 
   // ===== コンポーネントデータ =====
   const allComponents = [
@@ -38,6 +38,7 @@
   let canProceed = false;
   let timeoutMsg = '';
   let transitioning = false;
+  let nextStepTimeout = null;
 
   // 失敗（ロボット判定）状態
   let robotDetected = false;
@@ -76,6 +77,7 @@
 
   function stopTimer() {
     clearInterval(timerInterval);
+    timerInterval = null;
   }
 
   function begin() {
@@ -151,7 +153,7 @@
     completedCount++;
     transitioning = true;
 
-    setTimeout(() => {
+    nextStepTimeout = setTimeout(() => {
       transitioning = false;
       if (currentStep >= NUM_STEPS) {
         currentStep = NUM_STEPS + 1;
@@ -167,6 +169,7 @@
     clearInterval(timerInterval);
     clearInterval(stepTimer);
     cancelAnimationFrame(gameAnimFrame);
+    if (nextStepTimeout) clearTimeout(nextStepTimeout);
     startTime = null;
     elapsedTime = '00:00.000';
     gameStarted = false;
@@ -196,21 +199,25 @@
 
   function initGame() {
     if (!gameCanvas) return;
-    gameCanvas.width = gameCanvas.offsetWidth;
-    gameCanvas.height = 200;
-    groundY = gameCanvas.height - 30;
-    playerY = groundY;
+    gameStarted = true;
+    gameOver = false;
+    gameRunning = true;
     playerVelocity = 0;
     isJumping = false;
     obstacles = [];
     gameScore = 0;
     gameSpeed = 3;
-    gameRunning = true;
-    gameOver = false;
-    gameStarted = true;
     frameCount = 0;
     cancelAnimationFrame(gameAnimFrame);
-    gameLoop();
+    // Canvas is now visible (gameStarted=true removes hidden class)
+    // Wait for DOM update before reading dimensions
+    requestAnimationFrame(() => {
+      gameCanvas.width = gameCanvas.offsetWidth || 400;
+      gameCanvas.height = 200;
+      groundY = gameCanvas.height - 30;
+      playerY = groundY;
+      gameLoop();
+    });
   }
 
   function jump() {
@@ -273,12 +280,15 @@
         if (gameScore > gameBestScore) {
           gameBestScore = gameScore;
         }
+        break;
       }
     }
 
-    gameScore++;
-    if (gameScore % 300 === 0) {
-      gameSpeed += 0.3;
+    if (gameRunning) {
+      gameScore++;
+      if (gameScore % 300 === 0) {
+        gameSpeed += 0.3;
+      }
     }
 
     drawGame(ctx, w, h);
@@ -385,6 +395,7 @@
     clearInterval(timerInterval);
     clearInterval(stepTimer);
     cancelAnimationFrame(gameAnimFrame);
+    if (nextStepTimeout) clearTimeout(nextStepTimeout);
   });
 </script>
 

@@ -53,6 +53,7 @@
   }
 
   function toggleImage(id) {
+    if (cleared || gameOver) return;
     if (selectedImages.has(id)) {
       selectedImages.delete(id);
     } else {
@@ -89,15 +90,17 @@
 
   function verify() {
     if (cleared || gameOver) return;
-    attempts++;
 
     // 正解チェック（最初の5つのお題にのみ正解が存在する）
     if (promptIndex < Object.keys(correctAnswers).length && checkCorrectAnswer()) {
       cleared = true;
       showFakeSuccess = true;
       showError = false;
+      attempts++;
       return;
     }
+
+    attempts++;
 
     // 上限チェック
     if (attempts >= MAX_ATTEMPTS) {
@@ -108,12 +111,15 @@
       return;
     }
 
-    errorMessage = reasons[attempts % reasons.length];
+    errorMessage = reasons[(attempts - 1) % reasons.length];
     showError = true;
     showFakeSuccess = false;
 
     selectedImages.clear();
     selectedImages = selectedImages;
+
+    // プロンプトを次に進める
+    promptIndex++;
 
     // 検証失敗時に画像をシャッフル
     shuffleImages();
@@ -142,18 +148,14 @@
     {/each}
   </div>
 
-  <button class="verify-btn" on:click={verify} disabled={cleared || gameOver}>
+  <button type="button" class="verify-btn" on:click={verify} disabled={cleared || gameOver}>
     {gameOver ? 'ゲームオーバー' : '確認'}
   </button>
 
   {#if showFakeSuccess && cleared}
     <div class="result success">
-      <input type="checkbox" checked style="margin-right: 6px;" />
+      <input type="checkbox" checked disabled style="margin-right: 6px;" />
       ✓ 正解！認証成功
-    </div>
-  {:else if showFakeSuccess}
-    <div class="result success">
-      ✓ 認証成功！リダイレクト中...
     </div>
   {/if}
 
@@ -265,11 +267,16 @@
     font-size: 13px;
     font-weight: 500;
     cursor: pointer;
-    transition: background 0.15s;
+    transition: background 0.15s, opacity 0.15s;
   }
 
-  .verify-btn:hover {
+  .verify-btn:hover:not(:disabled) {
     background: #1a1a1a;
+  }
+
+  .verify-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
   }
 
   .result {

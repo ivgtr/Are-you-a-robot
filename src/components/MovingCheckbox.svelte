@@ -64,6 +64,7 @@
     e.preventDefault();
     if (cleared || gameOver) return;
     // デコイをクリック → ゲームオーバー
+    clickCount++;
     gameOver = true;
   }
 </script>
@@ -137,8 +138,8 @@
   }
 
   .checkbox-wrapper.decoy {
-    opacity: 0.9;
-    border-style: dashed;
+    opacity: 0.95;
+    border-style: solid;
   }
 
   input[type="checkbox"] {

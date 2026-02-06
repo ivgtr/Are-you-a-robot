@@ -1,6 +1,8 @@
 <svelte:options customElement="unfocusable-checkbox" />
 
 <script>
+  import { onDestroy } from 'svelte';
+
   let attempts = 0;
   let disabled = false;
   let message = '';
@@ -8,6 +10,7 @@
   let cleared = false;
   let gameOver = false;
   let vulnerableUsed = false;
+  let vulnerableTimeout = null;
 
   // 5回ごとにシステムが一瞬不安定になり、0.8秒だけ操作可能になる — チャンスは1回のみ
   const VULNERABLE_INTERVAL = 5;
@@ -24,40 +27,36 @@
   function handleFocus(e) {
     if (vulnerableWindow || cleared || gameOver) return;
     e.target.blur();
-    registerAttempt();
+    // フォーカスではカウントしない（クリックハンドラで一元管理）
   }
 
   function handleKeyDown(e) {
     if (vulnerableWindow || cleared || gameOver) return;
     e.preventDefault();
-    registerAttempt();
   }
 
   function handleClick(e) {
     if (cleared || gameOver) return;
 
-    // 脆弱ウィンドウ中はチェックを許可する
+    // 脆弱ウィンドウ中はチェックを許可する（preventDefaultしない）
     if (vulnerableWindow) {
       const checkbox = e.currentTarget.querySelector('input[type="checkbox"]');
       if (checkbox && checkbox.checked) {
         cleared = true;
-        message = 'セキュリティの隙を突かれました...認証成功';
         disabled = false;
+        message = 'セキュリティの隙を突かれました...認証成功';
       }
       return;
     }
 
-    attempts++;
-
-    // 段階的エスカレーション
-    if (attempts >= 3) {
-      e.preventDefault();
-      // チェックされていたら外す
-      const checkbox = e.currentTarget.querySelector('input[type="checkbox"]');
-      if (checkbox && checkbox.checked) {
-        checkbox.checked = false;
-      }
+    // 脆弱ウィンドウ外ではチェックボックスのトグルを防止
+    e.preventDefault();
+    const checkbox = e.currentTarget.querySelector('input[type="checkbox"]');
+    if (checkbox && checkbox.checked) {
+      checkbox.checked = false;
     }
+
+    attempts++;
 
     if (attempts >= 6) {
       disabled = true;
@@ -69,7 +68,7 @@
       vulnerableWindow = true;
       disabled = false;
       message = 'システムが不安定です...（今がチャンス！）';
-      setTimeout(() => {
+      vulnerableTimeout = setTimeout(() => {
         if (!cleared) {
           vulnerableWindow = false;
           // チャンスを逃した → ゲームオーバー
@@ -81,14 +80,6 @@
       return;
     }
 
-    updateMessage();
-  }
-
-  function registerAttempt() {
-    attempts++;
-    if (attempts >= 6 && !vulnerableWindow) {
-      disabled = true;
-    }
     updateMessage();
   }
 
@@ -107,6 +98,10 @@
       message = escalationMessages[4];
     }
   }
+
+  onDestroy(() => {
+    if (vulnerableTimeout) clearTimeout(vulnerableTimeout);
+  });
 </script>
 
 <div class="container">
@@ -114,7 +109,7 @@
   <div
     class="checkbox-wrapper"
     class:disabled
-    on:click|preventDefault={handleClick}
+    on:click={handleClick}
   >
     <input
       type="checkbox"
@@ -122,10 +117,12 @@
       tabindex="-1"
       on:focus={handleFocus}
       on:keydown={handleKeyDown}
-      {disabled}
+      disabled={disabled || cleared}
     />
     <label for="unfocusable-check">
-      {#if gameOver}
+      {#if cleared}
+        認証成功
+      {:else if gameOver}
         ゲームオーバー
       {:else if disabled}
         操作不能
@@ -135,7 +132,7 @@
     </label>
   </div>
   {#if message}
-    <p class="hint">{message}</p>
+    <p class="hint" class:success={cleared}>{message}</p>
   {/if}
   {#if attempts > 0}
     <div class="attempts">試行回数: {attempts}</div>
@@ -199,6 +196,10 @@
     color: #b91c1c;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     animation: shake 0.3s ease-in-out;
+  }
+
+  .hint.success {
+    color: #1a6b2a;
   }
 
   @keyframes shake {
