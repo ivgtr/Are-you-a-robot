@@ -249,8 +249,8 @@
   .checkbox-top {
     display: flex;
     align-items: center;
-    gap: var(--ar-space-3, 6px);
-    padding: var(--ar-space-4, 8px) var(--ar-space-7, 14px);
+    gap: var(--ar-checkbox-wrapper-gap, 8px);
+    padding: var(--ar-checkbox-wrapper-padding, 10px 14px);
     background: var(--ar-color-surface, #fff);
     border: 2px solid var(--ar-color-primary, #333);
     border-radius: var(--ar-radius, 4px);
@@ -265,14 +265,14 @@
   }
 
   .checkbox-top input {
-    width: 16px;
-    height: 16px;
+    width: var(--ar-checkbox-size, 18px);
+    height: var(--ar-checkbox-size, 18px);
     accent-color: var(--ar-checkbox-accent, #333);
   }
 
   .checkbox-top span {
     font-family: var(--ar-font-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
-    font-size: var(--ar-message-font-size, 12px);
+    font-size: var(--ar-font-size-base, 13px);
     font-weight: var(--ar-font-weight-semibold, 600);
     color: var(--ar-color-text, #333);
   }

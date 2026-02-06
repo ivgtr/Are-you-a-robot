@@ -307,7 +307,10 @@
   </div>
 
   {#if cleared}
-    <input type="checkbox" checked style="position: absolute; bottom: 4px; left: 10px;" />
+    <div class="cleared-checkbox">
+      <input type="checkbox" checked />
+      <span>認証OK</span>
+    </div>
   {/if}
 
   {#if showMessage}
@@ -412,6 +415,33 @@
     15% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
     75% { opacity: 1; }
     100% { opacity: 0; }
+  }
+
+  .cleared-checkbox {
+    position: absolute;
+    bottom: var(--ar-space-4, 8px);
+    left: var(--ar-space-5, 10px);
+    display: flex;
+    align-items: center;
+    gap: var(--ar-checkbox-wrapper-gap, 8px);
+    padding: var(--ar-checkbox-wrapper-padding, 10px 14px);
+    background: var(--ar-color-surface, #fff);
+    border: 1px solid var(--ar-color-border-dark, #d0d0d0);
+    border-radius: var(--ar-radius, 4px);
+    z-index: 10;
+  }
+
+  .cleared-checkbox input {
+    width: var(--ar-checkbox-size, 18px);
+    height: var(--ar-checkbox-size, 18px);
+    accent-color: var(--ar-checkbox-accent, #333);
+  }
+
+  .cleared-checkbox span {
+    font-family: var(--ar-font-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
+    font-size: var(--ar-font-size-base, 13px);
+    font-weight: var(--ar-font-weight-semibold, 600);
+    color: var(--ar-color-text, #333);
   }
 
   .attempts-position {
