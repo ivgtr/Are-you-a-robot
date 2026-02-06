@@ -72,10 +72,12 @@
     <label for="reverse-check">{currentLabel}</label>
   </div>
   {#if currentMessage}
-    <div class="message" class:robot={currentMessage.type === 'robot'} class:cancel={currentMessage.type === 'cancel'} class:success={currentMessage.type === 'success'} class:gameover={currentMessage.type === 'gameover'}>
-      {#if currentMessage.type === 'robot'}
-        ✓ {currentMessage.text}
-      {:else if currentMessage.type === 'success'}
+    <div
+      class="message"
+      class:message--success={currentMessage.type === 'robot' || currentMessage.type === 'success'}
+      class:message--error={currentMessage.type === 'cancel' || currentMessage.type === 'gameover'}
+    >
+      {#if currentMessage.type === 'robot' || currentMessage.type === 'success'}
         ✓ {currentMessage.text}
       {:else}
         ✗ {currentMessage.text}
@@ -83,7 +85,7 @@
     </div>
   {/if}
   {#if toggleCount >= 4 && !cleared && !gameOver}
-    <div class="despair">
+    <div class="counter">
       切り替え回数: {toggleCount}/{MAX_TOGGLES} — どちらを選んでも人間とは認められません
     </div>
   {/if}
@@ -94,90 +96,78 @@
 
 <style>
   .container {
-    padding: 16px;
-    border: 1px solid #e0e0e0;
-    border-radius: 6px;
-    background: #fafafa;
+    padding: var(--ar-container-padding, 16px);
+    border: 1px solid var(--ar-color-border, #e0e0e0);
+    border-radius: var(--ar-radius-lg, 6px);
+    background: var(--ar-color-bg, #fafafa);
   }
 
   .checkbox-wrapper {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 10px 14px;
-    background: #fff;
-    border: 1px solid #d0d0d0;
-    border-radius: 4px;
+    gap: var(--ar-checkbox-wrapper-gap, 8px);
+    padding: var(--ar-checkbox-wrapper-padding, 10px 14px);
+    background: var(--ar-color-surface, #fff);
+    border: 1px solid var(--ar-color-border-dark, #d0d0d0);
+    border-radius: var(--ar-radius, 4px);
     width: fit-content;
   }
 
   input[type="checkbox"] {
-    width: 18px;
-    height: 18px;
+    width: var(--ar-checkbox-size, 18px);
+    height: var(--ar-checkbox-size, 18px);
     cursor: pointer;
-    accent-color: #333;
+    accent-color: var(--ar-checkbox-accent, #333);
   }
 
   label {
     cursor: pointer;
     user-select: none;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    font-size: 13px;
-    color: #333;
-    transition: color 0.2s;
+    font-family: var(--ar-font-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
+    font-size: var(--ar-font-size-base, 13px);
+    color: var(--ar-color-text, #333);
+    transition: color var(--ar-transition-base, 0.2s ease);
   }
 
   .message {
-    margin-top: 10px;
-    padding: 10px 12px;
-    border-radius: 4px;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    font-size: 12px;
+    margin-top: var(--ar-space-5, 10px);
+    padding: var(--ar-message-padding, 10px 12px);
+    border-radius: var(--ar-radius, 4px);
+    font-family: var(--ar-font-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
+    font-size: var(--ar-message-font-size, 12px);
     animation: slideIn 0.2s ease-out;
   }
 
-  .message.robot {
-    background: #f0faf0;
-    color: #1a6b2a;
-    border: 1px solid #d4e8d4;
+  .message--success {
+    background: var(--ar-color-success-bg, #f0faf0);
+    color: var(--ar-color-success, #1a6b2a);
+    border: 1px solid var(--ar-color-success-border, #d4e8d4);
   }
 
-  .message.cancel {
-    background: #fef2f2;
-    color: #b91c1c;
-    border: 1px solid #fecaca;
+  .message--error {
+    background: var(--ar-color-error-bg, #fef2f2);
+    color: var(--ar-color-error, #b91c1c);
+    border: 1px solid var(--ar-color-error-border, #fecaca);
   }
 
-  .message.success {
-    background: #f0faf0;
-    color: #1a6b2a;
-    border: 1px solid #d4e8d4;
-  }
-
-  .message.gameover {
-    background: #fef2f2;
-    color: #b91c1c;
-    border: 1px solid #fecaca;
-  }
-
-  .despair {
-    margin-top: 8px;
-    padding: 8px;
-    background: #f5f5f5;
-    border: 1px solid #e0e0e0;
-    border-radius: 4px;
+  .counter {
+    margin-top: var(--ar-space-4, 8px);
+    padding: var(--ar-space-4, 8px);
+    background: var(--ar-color-surface-dim, #f5f5f5);
+    border: 1px solid var(--ar-color-border, #e0e0e0);
+    border-radius: var(--ar-radius, 4px);
     text-align: center;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    font-size: 11px;
-    color: #666;
+    font-family: var(--ar-font-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
+    font-size: var(--ar-font-size-sm, 11px);
+    color: var(--ar-color-text-secondary, #666);
   }
 
   .hint {
-    margin-top: 6px;
+    margin-top: var(--ar-space-3, 6px);
     text-align: center;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    font-size: 11px;
-    color: #999;
+    font-family: var(--ar-font-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
+    font-size: var(--ar-font-size-sm, 11px);
+    color: var(--ar-color-text-muted, #999);
     font-style: italic;
     animation: fadeIn 1s ease-out;
   }

@@ -295,9 +295,9 @@
     position: relative;
     width: 100%;
     height: 300px;
-    border: 1px solid #e0e0e0;
-    border-radius: 6px;
-    background: #fafafa;
+    border: 1px solid var(--ar-color-border, #e0e0e0);
+    border-radius: var(--ar-radius-lg, 6px);
+    background: var(--ar-color-bg, #fafafa);
     overflow: hidden;
   }
 
@@ -321,35 +321,35 @@
   .real-checkbox {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 10px 14px;
-    background: #fff;
-    border: 1px solid #d0d0d0;
-    border-radius: 4px;
+    gap: var(--ar-checkbox-wrapper-gap, 8px);
+    padding: var(--ar-checkbox-wrapper-padding, 10px 14px);
+    background: var(--ar-color-surface, #fff);
+    border: 1px solid var(--ar-color-border-dark, #d0d0d0);
+    border-radius: var(--ar-radius, 4px);
     cursor: pointer;
     white-space: nowrap;
   }
 
   .real-checkbox input {
-    width: 18px;
-    height: 18px;
-    accent-color: #333;
+    width: var(--ar-checkbox-size, 18px);
+    height: var(--ar-checkbox-size, 18px);
+    accent-color: var(--ar-checkbox-accent, #333);
   }
 
   .real-checkbox label {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    font-size: 13px;
-    color: #333;
+    font-family: var(--ar-font-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
+    font-size: var(--ar-font-size-base, 13px);
+    color: var(--ar-color-text, #333);
     cursor: pointer;
   }
 
   .popup {
     position: absolute;
     width: 190px;
-    background: #fff;
+    background: var(--ar-color-surface, #fff);
     border: 1px solid #ccc;
-    border-radius: 6px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    border-radius: var(--ar-radius-lg, 6px);
+    box-shadow: var(--ar-shadow-md, 0 4px 12px rgba(0,0,0,0.15));
     z-index: 10;
     animation: popIn 0.25s ease-out;
     cursor: grab;
@@ -372,17 +372,17 @@
     align-items: center;
     justify-content: space-between;
     padding: 7px 9px;
-    background: #f5f5f5;
-    border-bottom: 1px solid #e0e0e0;
-    border-radius: 6px 6px 0 0;
-    gap: 4px;
+    background: var(--ar-color-surface-dim, #f5f5f5);
+    border-bottom: 1px solid var(--ar-color-border, #e0e0e0);
+    border-radius: var(--ar-radius-lg, 6px) var(--ar-radius-lg, 6px) 0 0;
+    gap: var(--ar-space-2, 4px);
   }
 
   .popup-title {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    font-size: 10px;
-    font-weight: 600;
-    color: #333;
+    font-family: var(--ar-font-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
+    font-size: var(--ar-font-size-xs, 10px);
+    font-weight: var(--ar-font-weight-semibold, 600);
+    color: var(--ar-color-text, #333);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -391,36 +391,36 @@
   }
 
   .close-btn {
-    width: 18px;
-    height: 18px;
+    width: var(--ar-checkbox-size, 18px);
+    height: var(--ar-checkbox-size, 18px);
     border: none;
-    background: #e0e0e0;
-    border-radius: 3px;
-    font-size: 13px;
+    background: var(--ar-color-border, #e0e0e0);
+    border-radius: var(--ar-radius-sm, 3px);
+    font-size: var(--ar-font-size-base, 13px);
     line-height: 1;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #666;
+    color: var(--ar-color-text-secondary, #666);
     flex-shrink: 0;
     padding: 0;
   }
 
   .close-btn:hover {
-    background: #d0d0d0;
-    color: #333;
+    background: var(--ar-color-border-dark, #d0d0d0);
+    color: var(--ar-color-text, #333);
   }
 
   .popup-body {
-    padding: 8px 9px;
+    padding: var(--ar-space-4, 8px) 9px;
   }
 
   .popup-body p {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    font-size: 10px;
-    color: #666;
-    margin-bottom: 8px;
+    font-family: var(--ar-font-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
+    font-size: var(--ar-font-size-xs, 10px);
+    color: var(--ar-color-text-secondary, #666);
+    margin-bottom: var(--ar-space-4, 8px);
   }
 
   .fake-buttons {
@@ -430,20 +430,20 @@
 
   .fake-btn {
     flex: 1;
-    padding: 4px 6px;
-    border: 1px solid #d0d0d0;
-    border-radius: 4px;
-    background: #fff;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    font-size: 10px;
+    padding: var(--ar-space-2, 4px) var(--ar-space-3, 6px);
+    border: 1px solid var(--ar-color-border-dark, #d0d0d0);
+    border-radius: var(--ar-radius, 4px);
+    background: var(--ar-color-surface, #fff);
+    font-family: var(--ar-font-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
+    font-size: var(--ar-font-size-xs, 10px);
     cursor: pointer;
-    color: #333;
+    color: var(--ar-color-text, #333);
   }
 
   .fake-btn.primary {
-    background: #333;
-    color: #fff;
-    border-color: #333;
+    background: var(--ar-color-primary, #333);
+    color: var(--ar-color-primary-text, #fff);
+    border-color: var(--ar-color-primary, #333);
   }
 
   .fake-btn:hover {
@@ -455,14 +455,14 @@
     bottom: 30px;
     left: 50%;
     transform: translateX(-50%);
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    font-size: 11px;
-    font-weight: 600;
-    color: #c0392b;
+    font-family: var(--ar-font-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
+    font-size: var(--ar-font-size-sm, 11px);
+    font-weight: var(--ar-font-weight-semibold, 600);
+    color: var(--ar-color-error, #b91c1c);
     background: rgba(255, 255, 255, 0.95);
-    padding: 6px 12px;
-    border-radius: 4px;
-    border: 1px solid #e0e0e0;
+    padding: var(--ar-space-3, 6px) var(--ar-space-6, 12px);
+    border-radius: var(--ar-radius, 4px);
+    border: 1px solid var(--ar-color-border, #e0e0e0);
     animation: fadeInOut 1.5s ease-out forwards;
     pointer-events: none;
     white-space: nowrap;
@@ -478,22 +478,22 @@
 
   .attempts {
     position: absolute;
-    bottom: 8px;
-    right: 10px;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    font-size: 11px;
-    color: #999;
+    bottom: var(--ar-space-4, 8px);
+    right: var(--ar-space-5, 10px);
+    font-family: var(--ar-font-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
+    font-size: var(--ar-font-size-sm, 11px);
+    color: var(--ar-color-text-muted, #999);
     z-index: 100;
   }
 
   .swipe-hint {
     position: absolute;
-    top: 8px;
+    top: var(--ar-space-4, 8px);
     left: 50%;
     transform: translateX(-50%);
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    font-size: 10px;
-    color: #bbb;
+    font-family: var(--ar-font-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
+    font-size: var(--ar-font-size-xs, 10px);
+    color: var(--ar-color-text-faint, #bbb);
     pointer-events: none;
     z-index: 0;
     animation: hintPulse 2s ease-in-out infinite;

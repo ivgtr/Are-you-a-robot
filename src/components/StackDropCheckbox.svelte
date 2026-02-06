@@ -223,10 +223,10 @@
 
 <style>
   .container {
-    padding: 16px;
-    border: 1px solid #e0e0e0;
-    border-radius: 6px;
-    background: #fafafa;
+    padding: var(--ar-container-padding, 16px);
+    border: 1px solid var(--ar-color-border, #e0e0e0);
+    border-radius: var(--ar-radius-lg, 6px);
+    background: var(--ar-color-bg, #fafafa);
     user-select: none;
     touch-action: none;
   }
@@ -234,29 +234,29 @@
   .header {
     display: flex;
     align-items: center;
-    gap: 8px;
-    margin-bottom: 14px;
-    padding: 10px 12px;
-    background: #fff;
-    border: 1px solid #e0e0e0;
-    border-radius: 4px;
+    gap: var(--ar-header-gap, 8px);
+    margin-bottom: var(--ar-space-7, 14px);
+    padding: var(--ar-header-padding, 10px 12px);
+    background: var(--ar-color-surface, #fff);
+    border: 1px solid var(--ar-color-border, #e0e0e0);
+    border-radius: var(--ar-radius, 4px);
   }
 
   .icon {
-    font-size: 18px;
+    font-size: var(--ar-header-icon-size, 18px);
   }
 
   .title {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    font-size: 13px;
-    font-weight: 500;
-    color: #333;
+    font-family: var(--ar-font-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
+    font-size: var(--ar-font-size-base, 13px);
+    font-weight: var(--ar-font-weight-medium, 500);
+    color: var(--ar-color-text, #333);
   }
 
   .play-area {
     display: flex;
     justify-content: center;
-    padding: 10px 0;
+    padding: var(--ar-space-5, 10px) 0;
     overflow: hidden;
   }
 
@@ -271,11 +271,11 @@
   .checkbox-top {
     display: flex;
     align-items: center;
-    gap: 6px;
-    padding: 8px 14px;
-    background: #fff;
-    border: 2px solid #333;
-    border-radius: 4px;
+    gap: var(--ar-space-3, 6px);
+    padding: var(--ar-space-4, 8px) var(--ar-space-7, 14px);
+    background: var(--ar-color-surface, #fff);
+    border: 2px solid var(--ar-color-primary, #333);
+    border-radius: var(--ar-radius, 4px);
     transition: transform 0.4s ease, opacity 0.4s ease;
     white-space: nowrap;
     z-index: 2;
@@ -289,14 +289,14 @@
   .checkbox-top input {
     width: 16px;
     height: 16px;
-    accent-color: #333;
+    accent-color: var(--ar-checkbox-accent, #333);
   }
 
   .checkbox-top span {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    font-size: 12px;
-    font-weight: 600;
-    color: #333;
+    font-family: var(--ar-font-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
+    font-size: var(--ar-message-font-size, 12px);
+    font-weight: var(--ar-font-weight-semibold, 600);
+    color: var(--ar-color-text, #333);
   }
 
   .block {
@@ -305,7 +305,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 3px;
+    border-radius: var(--ar-radius-sm, 3px);
     cursor: grab;
     transition: transform 0.2s ease, opacity 0.3s ease, height 0.3s ease;
     position: relative;
@@ -315,7 +315,7 @@
     cursor: grabbing;
     transition: none;
     opacity: 0.85;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    box-shadow: var(--ar-shadow-sm, 0 2px 8px rgba(0,0,0,0.2));
     z-index: 5;
   }
 
@@ -332,9 +332,9 @@
   }
 
   .block-label {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    font-size: 11px;
-    font-weight: 600;
+    font-family: var(--ar-font-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
+    font-size: var(--ar-font-size-sm, 11px);
+    font-weight: var(--ar-font-weight-semibold, 600);
     color: #fff;
     text-shadow: 0 1px 2px rgba(0,0,0,0.2);
     pointer-events: none;
@@ -342,9 +342,9 @@
 
   .swipe-hint {
     position: absolute;
-    right: 8px;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    font-size: 10px;
+    right: var(--ar-space-4, 8px);
+    font-family: var(--ar-font-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
+    font-size: var(--ar-font-size-xs, 10px);
     color: rgba(255,255,255,0.6);
     pointer-events: none;
   }
@@ -355,32 +355,32 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: #333;
-    color: #fff;
-    border-radius: 3px;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    font-size: 10px;
-    margin-top: 4px;
+    background: var(--ar-color-primary, #333);
+    color: var(--ar-color-primary-text, #fff);
+    border-radius: var(--ar-radius-sm, 3px);
+    font-family: var(--ar-font-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
+    font-size: var(--ar-font-size-xs, 10px);
+    margin-top: var(--ar-space-2, 4px);
   }
 
   .message {
-    margin-top: 12px;
-    padding: 10px 12px;
-    border-radius: 4px;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    font-size: 12px;
-    font-weight: 500;
-    color: #b91c1c;
-    background: #fef2f2;
-    border: 1px solid #fecaca;
+    margin-top: var(--ar-space-6, 12px);
+    padding: var(--ar-message-padding, 10px 12px);
+    border-radius: var(--ar-radius, 4px);
+    font-family: var(--ar-font-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
+    font-size: var(--ar-message-font-size, 12px);
+    font-weight: var(--ar-font-weight-medium, 500);
+    color: var(--ar-color-error, #b91c1c);
+    background: var(--ar-color-error-bg, #fef2f2);
+    border: 1px solid var(--ar-color-error-border, #fecaca);
     text-align: center;
     animation: slideIn 0.2s ease-out;
   }
 
   .message.success {
-    color: #1a6b2a;
-    background: #f0faf0;
-    border: 1px solid #d4e8d4;
+    color: var(--ar-color-success, #1a6b2a);
+    background: var(--ar-color-success-bg, #f0faf0);
+    border: 1px solid var(--ar-color-success-border, #d4e8d4);
   }
 
   @keyframes slideIn {
@@ -389,10 +389,10 @@
   }
 
   .attempts {
-    margin-top: 10px;
+    margin-top: var(--ar-space-5, 10px);
     text-align: right;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    font-size: 11px;
-    color: #999;
+    font-family: var(--ar-font-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
+    font-size: var(--ar-font-size-sm, 11px);
+    color: var(--ar-color-text-muted, #999);
   }
 </style>

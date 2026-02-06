@@ -117,20 +117,20 @@
 
 <style>
   .container {
-    padding: 16px;
-    border: 1px solid #e0e0e0;
-    border-radius: 6px;
-    background: #fafafa;
+    padding: var(--ar-container-padding, 16px);
+    border: 1px solid var(--ar-color-border, #e0e0e0);
+    border-radius: var(--ar-radius-lg, 6px);
+    background: var(--ar-color-bg, #fafafa);
   }
 
   .checkbox-wrapper {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 10px 14px;
-    background: #fff;
-    border: 1px solid #d0d0d0;
-    border-radius: 4px;
+    gap: var(--ar-checkbox-wrapper-gap, 8px);
+    padding: var(--ar-checkbox-wrapper-padding, 10px 14px);
+    background: var(--ar-color-surface, #fff);
+    border: 1px solid var(--ar-color-border-dark, #d0d0d0);
+    border-radius: var(--ar-radius, 4px);
     width: fit-content;
     cursor: pointer;
     transition: all 0.1s;
@@ -138,7 +138,7 @@
 
   .checkbox-wrapper.glitching {
     animation: glitch 0.1s infinite;
-    border-color: #b91c1c;
+    border-color: var(--ar-color-error, #b91c1c);
     box-shadow: 0 0 8px rgba(185, 28, 28, 0.2);
   }
 
@@ -175,34 +175,34 @@
   }
 
   input[type="checkbox"] {
-    width: 18px;
-    height: 18px;
+    width: var(--ar-checkbox-size, 18px);
+    height: var(--ar-checkbox-size, 18px);
     cursor: pointer;
-    accent-color: #333;
+    accent-color: var(--ar-checkbox-accent, #333);
   }
 
   label {
     cursor: pointer;
     user-select: none;
-    font-family: 'SF Mono', 'Fira Code', Menlo, Consolas, monospace;
-    font-size: 13px;
+    font-family: var(--ar-font-mono, 'SF Mono', 'Fira Code', Menlo, Consolas, monospace);
+    font-size: var(--ar-font-size-base, 13px);
     min-width: 200px;
-    color: #333;
+    color: var(--ar-color-text, #333);
   }
 
   .stats {
-    margin-top: 8px;
+    margin-top: var(--ar-space-4, 8px);
     display: flex;
-    gap: 12px;
+    gap: var(--ar-space-6, 12px);
   }
 
   .probability {
-    padding: 4px 8px;
-    background: #f5f5f5;
-    border: 1px solid #e0e0e0;
-    border-radius: 4px;
-    font-family: 'SF Mono', 'Fira Code', Menlo, Consolas, monospace;
-    font-size: 11px;
-    color: #666;
+    padding: var(--ar-space-2, 4px) var(--ar-space-4, 8px);
+    background: var(--ar-color-surface-dim, #f5f5f5);
+    border: 1px solid var(--ar-color-border, #e0e0e0);
+    border-radius: var(--ar-radius, 4px);
+    font-family: var(--ar-font-mono, 'SF Mono', 'Fira Code', Menlo, Consolas, monospace);
+    font-size: var(--ar-font-size-sm, 11px);
+    color: var(--ar-color-text-secondary, #666);
   }
 </style>

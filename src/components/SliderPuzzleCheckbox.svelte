@@ -197,40 +197,40 @@
 
 <style>
   .container {
-    padding: 16px;
-    border: 1px solid #e0e0e0;
-    border-radius: 6px;
-    background: #fafafa;
+    padding: var(--ar-container-padding, 16px);
+    border: 1px solid var(--ar-color-border, #e0e0e0);
+    border-radius: var(--ar-radius-lg, 6px);
+    background: var(--ar-color-bg, #fafafa);
   }
 
   .header {
     display: flex;
     align-items: center;
-    gap: 8px;
-    margin-bottom: 14px;
-    padding: 10px 12px;
-    background: #fff;
-    border: 1px solid #e0e0e0;
-    border-radius: 4px;
+    gap: var(--ar-header-gap, 8px);
+    margin-bottom: var(--ar-space-7, 14px);
+    padding: var(--ar-header-padding, 10px 12px);
+    background: var(--ar-color-surface, #fff);
+    border: 1px solid var(--ar-color-border, #e0e0e0);
+    border-radius: var(--ar-radius, 4px);
   }
 
   .lock {
-    font-size: 18px;
+    font-size: var(--ar-header-icon-size, 18px);
   }
 
   .title {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    font-size: 13px;
-    font-weight: 500;
-    color: #333;
+    font-family: var(--ar-font-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
+    font-size: var(--ar-font-size-base, 13px);
+    font-weight: var(--ar-font-weight-medium, 500);
+    color: var(--ar-color-text, #333);
   }
 
   .puzzle-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 4px;
+    gap: var(--ar-space-2, 4px);
     max-width: 240px;
-    margin: 0 auto 14px;
+    margin: 0 auto var(--ar-space-7, 14px);
   }
 
   .tile {
@@ -239,17 +239,17 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    background: #fff;
-    border: 1px solid #d0d0d0;
-    border-radius: 4px;
+    background: var(--ar-color-surface, #fff);
+    border: 1px solid var(--ar-color-border-dark, #d0d0d0);
+    border-radius: var(--ar-radius, 4px);
     cursor: pointer;
     transition: transform 0.1s, background 0.15s, border-color 0.15s;
     position: relative;
   }
 
   .tile:hover:not(.empty) {
-    border-color: #999;
-    background: #f5f5f5;
+    border-color: var(--ar-color-border-focus, #999);
+    background: var(--ar-color-surface-dim, #f5f5f5);
   }
 
   .tile:active:not(.empty) {
@@ -263,30 +263,30 @@
   }
 
   .tile.correct {
-    background: #f0faf0;
+    background: var(--ar-color-success-bg, #f0faf0);
     border-color: #b8d4b8;
   }
 
   .tile.broken {
-    background: #fef2f2;
+    background: var(--ar-color-error-bg, #fef2f2);
     border-color: #fca5a5;
   }
 
   .tile-label {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-family: var(--ar-font-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
     font-size: 22px;
-    font-weight: 600;
-    color: #333;
+    font-weight: var(--ar-font-weight-semibold, 600);
+    color: var(--ar-color-text, #333);
   }
 
   .tile.broken .tile-label {
-    color: #b91c1c;
+    color: var(--ar-color-error, #b91c1c);
   }
 
   .tile-number {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-family: var(--ar-font-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
     font-size: 9px;
-    color: #bbb;
+    color: var(--ar-color-text-faint, #bbb);
     position: absolute;
     bottom: 3px;
     right: 5px;
@@ -294,42 +294,42 @@
 
   .target {
     text-align: center;
-    margin-bottom: 10px;
+    margin-bottom: var(--ar-space-5, 10px);
   }
 
   .target-label {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    font-size: 11px;
-    color: #999;
+    font-family: var(--ar-font-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
+    font-size: var(--ar-font-size-sm, 11px);
+    color: var(--ar-color-text-muted, #999);
     display: block;
     margin-bottom: 2px;
   }
 
   .target-hint {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    font-size: 10px;
-    color: #c0392b;
+    font-family: var(--ar-font-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
+    font-size: var(--ar-font-size-xs, 10px);
+    color: var(--ar-color-error, #b91c1c);
   }
 
   .result {
-    margin-top: 10px;
-    padding: 10px 12px;
-    border-radius: 4px;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    font-size: 12px;
+    margin-top: var(--ar-space-5, 10px);
+    padding: var(--ar-message-padding, 10px 12px);
+    border-radius: var(--ar-radius, 4px);
+    font-family: var(--ar-font-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
+    font-size: var(--ar-message-font-size, 12px);
     animation: slideIn 0.2s ease-out;
   }
 
   .result.error {
-    background: #fef2f2;
-    color: #b91c1c;
-    border: 1px solid #fecaca;
+    background: var(--ar-color-error-bg, #fef2f2);
+    color: var(--ar-color-error, #b91c1c);
+    border: 1px solid var(--ar-color-error-border, #fecaca);
   }
 
   .result.repair {
-    background: #f0faf0;
-    color: #1a6b2a;
-    border: 1px solid #d4e8d4;
+    background: var(--ar-color-success-bg, #f0faf0);
+    color: var(--ar-color-success, #1a6b2a);
+    border: 1px solid var(--ar-color-success-border, #d4e8d4);
   }
 
   @keyframes slideIn {
@@ -338,10 +338,10 @@
   }
 
   .attempts {
-    margin-top: 10px;
+    margin-top: var(--ar-space-5, 10px);
     text-align: right;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    font-size: 11px;
-    color: #999;
+    font-family: var(--ar-font-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
+    font-size: var(--ar-font-size-sm, 11px);
+    color: var(--ar-color-text-muted, #999);
   }
 </style>

@@ -1,3 +1,6 @@
+// デザイントークン (CSS custom properties — Shadow DOMへカスケードする)
+import './styles/design-tokens.css'
+
 // すべてのコンポーネントをインポート
 import './components/EscapingCheckbox.svelte'
 import './components/UnfocusableCheckbox.svelte'

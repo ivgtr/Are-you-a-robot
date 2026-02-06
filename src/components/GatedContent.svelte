@@ -545,10 +545,10 @@
 
 <style>
   .gated-wrapper {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-family: var(--ar-font-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
     max-width: 520px;
     margin: 0 auto;
-    color: #333;
+    color: var(--ar-color-text, #333);
   }
 
   /* トップバー */
@@ -556,65 +556,65 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 12px 16px;
-    background: #fff;
-    border: 1px solid #e0e0e0;
-    border-radius: 6px;
-    margin-bottom: 12px;
+    padding: var(--ar-space-6, 12px) var(--ar-space-8, 16px);
+    background: var(--ar-color-surface, #fff);
+    border: 1px solid var(--ar-color-border, #e0e0e0);
+    border-radius: var(--ar-radius-lg, 6px);
+    margin-bottom: var(--ar-space-6, 12px);
   }
 
   .progress-dots {
     display: flex;
-    gap: 8px;
+    gap: var(--ar-space-4, 8px);
   }
 
   .dot {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    background: #e0e0e0;
+    width: var(--ar-space-5, 10px);
+    height: var(--ar-space-5, 10px);
+    border-radius: var(--ar-radius-full, 50%);
+    background: var(--ar-color-border, #e0e0e0);
     transition: background 0.3s, transform 0.3s;
   }
 
   .dot.active {
-    background: #f59e0b;
+    background: var(--ar-color-accent, #f59e0b);
     transform: scale(1.2);
   }
 
   .dot.completed {
-    background: #1a6b2a;
+    background: var(--ar-color-success, #1a6b2a);
   }
 
   .timer {
-    font-family: 'SF Mono', 'Fira Code', Menlo, Consolas, monospace;
-    font-size: 13px;
-    color: #666;
+    font-family: var(--ar-font-mono, 'SF Mono', 'Fira Code', Menlo, Consolas, monospace);
+    font-size: var(--ar-font-size-base, 13px);
+    color: var(--ar-color-text-secondary, #666);
   }
 
   /* イントロ */
   .intro {
     text-align: center;
-    padding: 48px 24px;
-    background: #fff;
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
+    padding: 48px var(--ar-space-12, 24px);
+    background: var(--ar-color-surface, #fff);
+    border: 1px solid var(--ar-color-border, #e0e0e0);
+    border-radius: var(--ar-radius-xl, 8px);
   }
 
   .intro-icon {
     font-size: 48px;
-    margin-bottom: 16px;
+    margin-bottom: var(--ar-space-8, 16px);
   }
 
   .intro-title {
-    font-size: 22px;
-    font-weight: 700;
-    color: #111;
-    margin-bottom: 12px;
+    font-size: var(--ar-font-size-3xl, 22px);
+    font-weight: var(--ar-font-weight-bold, 700);
+    color: var(--ar-color-text-heading, #111);
+    margin-bottom: var(--ar-space-6, 12px);
   }
 
   .intro-description {
-    font-size: 14px;
-    color: #666;
+    font-size: var(--ar-font-size-md, 14px);
+    color: var(--ar-color-text-secondary, #666);
     line-height: 1.7;
     margin-bottom: 28px;
   }
@@ -625,53 +625,53 @@
     margin: 0 auto 28px;
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: var(--ar-space-6, 12px);
   }
 
   .rule {
     display: flex;
     align-items: center;
-    gap: 12px;
-    font-size: 13px;
+    gap: var(--ar-space-6, 12px);
+    font-size: var(--ar-font-size-base, 13px);
     color: #444;
   }
 
   .rule-num {
-    width: 24px;
-    height: 24px;
-    background: #333;
-    color: #fff;
-    border-radius: 50%;
+    width: var(--ar-space-12, 24px);
+    height: var(--ar-space-12, 24px);
+    background: var(--ar-color-primary, #333);
+    color: var(--ar-color-primary-text, #fff);
+    border-radius: var(--ar-radius-full, 50%);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 12px;
-    font-weight: 600;
+    font-size: var(--ar-font-size-base, 13px);
+    font-weight: var(--ar-font-weight-semibold, 600);
     flex-shrink: 0;
   }
 
   .begin-btn {
-    padding: 12px 32px;
-    background: #333;
-    color: #fff;
+    padding: var(--ar-space-6, 12px) var(--ar-space-16, 32px);
+    background: var(--ar-color-primary, #333);
+    color: var(--ar-color-primary-text, #fff);
     border: none;
-    border-radius: 6px;
-    font-size: 15px;
-    font-weight: 600;
+    border-radius: var(--ar-radius-lg, 6px);
+    font-size: var(--ar-font-size-lg, 15px);
+    font-weight: var(--ar-font-weight-semibold, 600);
     cursor: pointer;
     transition: background 0.2s;
     font-family: inherit;
   }
 
   .begin-btn:hover {
-    background: #1a1a1a;
+    background: var(--ar-color-primary-hover, #1a1a1a);
   }
 
   /* チャレンジ */
   .challenge {
-    background: #fff;
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
+    background: var(--ar-color-surface, #fff);
+    border: 1px solid var(--ar-color-border, #e0e0e0);
+    border-radius: var(--ar-radius-xl, 8px);
     overflow: hidden;
     animation: fadeIn 0.3s ease-out;
   }
@@ -690,37 +690,37 @@
   .challenge-header {
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 14px 18px;
-    border-bottom: 1px solid #e0e0e0;
-    background: #fafafa;
+    gap: var(--ar-space-5, 10px);
+    padding: var(--ar-space-7, 14px) 18px;
+    border-bottom: 1px solid var(--ar-color-border, #e0e0e0);
+    background: var(--ar-color-bg, #fafafa);
   }
 
   .challenge-num {
-    font-size: 12px;
-    font-weight: 700;
-    color: #fff;
-    background: #333;
-    padding: 3px 8px;
-    border-radius: 3px;
+    font-size: var(--ar-font-size-base, 13px);
+    font-weight: var(--ar-font-weight-bold, 700);
+    color: var(--ar-color-primary-text, #fff);
+    background: var(--ar-color-primary, #333);
+    padding: 3px var(--ar-space-4, 8px);
+    border-radius: var(--ar-radius-sm, 3px);
     white-space: nowrap;
   }
 
   .challenge-title {
-    font-size: 14px;
-    font-weight: 600;
-    color: #111;
+    font-size: var(--ar-font-size-md, 14px);
+    font-weight: var(--ar-font-weight-semibold, 600);
+    color: var(--ar-color-text-heading, #111);
   }
 
   .challenge-instruction {
-    padding: 10px 18px;
-    font-size: 12px;
+    padding: var(--ar-space-5, 10px) 18px;
+    font-size: var(--ar-font-size-base, 13px);
     color: #888;
-    border-bottom: 1px solid #f0f0f0;
+    border-bottom: 1px solid var(--ar-color-surface-hover, #f0f0f0);
   }
 
   .component-area {
-    padding: 16px;
+    padding: var(--ar-space-8, 16px);
     min-height: 200px;
   }
 
@@ -728,20 +728,20 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 12px 18px;
-    border-top: 1px solid #e0e0e0;
-    background: #fafafa;
-    gap: 12px;
+    padding: var(--ar-space-6, 12px) 18px;
+    border-top: 1px solid var(--ar-color-border, #e0e0e0);
+    background: var(--ar-color-bg, #fafafa);
+    gap: var(--ar-space-6, 12px);
   }
 
   .next-btn {
-    padding: 8px 20px;
-    background: #333;
-    color: #fff;
+    padding: var(--ar-space-4, 8px) var(--ar-space-10, 20px);
+    background: var(--ar-color-primary, #333);
+    color: var(--ar-color-primary-text, #fff);
     border: none;
-    border-radius: 4px;
-    font-size: 13px;
-    font-weight: 600;
+    border-radius: var(--ar-radius, 4px);
+    font-size: var(--ar-font-size-base, 13px);
+    font-weight: var(--ar-font-weight-semibold, 600);
     cursor: pointer;
     transition: background 0.2s;
     font-family: inherit;
@@ -751,20 +751,20 @@
   }
 
   .next-btn:hover {
-    background: #1a1a1a;
+    background: var(--ar-color-primary-hover, #1a1a1a);
   }
 
   .step-progress {
     width: 100%;
-    height: 4px;
-    background: #e0e0e0;
+    height: var(--ar-space-2, 4px);
+    background: var(--ar-color-border, #e0e0e0);
     border-radius: 2px;
     overflow: hidden;
   }
 
   .step-progress-bar {
     height: 100%;
-    background: #f59e0b;
+    background: var(--ar-color-accent, #f59e0b);
     border-radius: 2px;
     transition: width 0.15s linear;
   }
@@ -776,15 +776,15 @@
 
   .robot-detected-inner {
     text-align: center;
-    padding: 36px 24px;
-    background: #fff;
-    border: 2px solid #b91c1c;
-    border-radius: 8px;
+    padding: 36px var(--ar-space-12, 24px);
+    background: var(--ar-color-surface, #fff);
+    border: 2px solid var(--ar-color-error, #b91c1c);
+    border-radius: var(--ar-radius-xl, 8px);
   }
 
   .robot-icon {
     font-size: 56px;
-    margin-bottom: 12px;
+    margin-bottom: var(--ar-space-6, 12px);
     animation: robotShake 0.5s ease-out;
   }
 
@@ -797,63 +797,63 @@
   }
 
   .robot-title {
-    font-size: 22px;
-    font-weight: 700;
-    color: #b91c1c;
-    margin-bottom: 4px;
+    font-size: var(--ar-font-size-3xl, 22px);
+    font-weight: var(--ar-font-weight-bold, 700);
+    color: var(--ar-color-error, #b91c1c);
+    margin-bottom: var(--ar-space-2, 4px);
   }
 
   .robot-verdict {
-    font-size: 15px;
-    color: #dc2626;
-    font-weight: 600;
-    margin-bottom: 20px;
+    font-size: var(--ar-font-size-lg, 15px);
+    color: var(--ar-color-error-accent, #dc2626);
+    font-weight: var(--ar-font-weight-semibold, 600);
+    margin-bottom: var(--ar-space-10, 20px);
   }
 
   .robot-detail {
-    background: #fef2f2;
-    border: 1px solid #fecaca;
-    border-radius: 6px;
-    padding: 14px 18px;
-    margin-bottom: 20px;
+    background: var(--ar-color-error-bg, #fef2f2);
+    border: 1px solid var(--ar-color-error-border, #fecaca);
+    border-radius: var(--ar-radius-lg, 6px);
+    padding: var(--ar-space-7, 14px) 18px;
+    margin-bottom: var(--ar-space-10, 20px);
     text-align: left;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: var(--ar-space-4, 8px);
   }
 
   .robot-detail-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-size: 13px;
+    font-size: var(--ar-font-size-base, 13px);
   }
 
   .robot-detail-label {
-    color: #991b1b;
-    font-weight: 600;
+    color: var(--ar-color-error-hover, #991b1b);
+    font-weight: var(--ar-font-weight-semibold, 600);
   }
 
   .robot-detail-value {
-    color: #b91c1c;
-    font-family: 'SF Mono', 'Fira Code', Menlo, Consolas, monospace;
-    font-size: 12px;
+    color: var(--ar-color-error, #b91c1c);
+    font-family: var(--ar-font-mono, 'SF Mono', 'Fira Code', Menlo, Consolas, monospace);
+    font-size: var(--ar-font-size-base, 13px);
   }
 
   .robot-bar {
     position: relative;
     width: 100%;
-    height: 24px;
+    height: var(--ar-space-12, 24px);
     background: #fee2e2;
     border-radius: 12px;
     overflow: hidden;
-    margin-bottom: 24px;
+    margin-bottom: var(--ar-space-12, 24px);
   }
 
   .robot-bar-fill {
     width: 99.7%;
     height: 100%;
-    background: linear-gradient(90deg, #dc2626, #b91c1c);
+    background: linear-gradient(90deg, var(--ar-color-error-accent, #dc2626), var(--ar-color-error, #b91c1c));
     border-radius: 12px;
     animation: barFill 1s ease-out;
   }
@@ -868,9 +868,9 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    font-size: 11px;
-    font-weight: 700;
-    color: #fff;
+    font-size: var(--ar-font-size-sm, 11px);
+    font-weight: var(--ar-font-weight-bold, 700);
+    color: var(--ar-color-primary-text, #fff);
   }
 
   /* ゲーム解放 */
@@ -880,69 +880,69 @@
 
   .unlock-header {
     text-align: center;
-    padding: 32px 24px;
-    background: #fff;
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    margin-bottom: 16px;
+    padding: var(--ar-space-16, 32px) var(--ar-space-12, 24px);
+    background: var(--ar-color-surface, #fff);
+    border: 1px solid var(--ar-color-border, #e0e0e0);
+    border-radius: var(--ar-radius-xl, 8px);
+    margin-bottom: var(--ar-space-8, 16px);
   }
 
   .unlock-icon {
     font-size: 48px;
-    margin-bottom: 12px;
+    margin-bottom: var(--ar-space-6, 12px);
   }
 
   .unlock-title {
-    font-size: 20px;
-    font-weight: 700;
-    color: #111;
-    margin-bottom: 4px;
+    font-size: var(--ar-font-size-2xl, 20px);
+    font-weight: var(--ar-font-weight-bold, 700);
+    color: var(--ar-color-text-heading, #111);
+    margin-bottom: var(--ar-space-2, 4px);
   }
 
   .unlock-subtitle {
-    font-size: 13px;
-    color: #999;
-    margin-bottom: 8px;
+    font-size: var(--ar-font-size-base, 13px);
+    color: var(--ar-color-text-muted, #999);
+    margin-bottom: var(--ar-space-4, 8px);
   }
 
   .unlock-time {
-    font-family: 'SF Mono', 'Fira Code', Menlo, Consolas, monospace;
-    font-size: 14px;
-    color: #1a6b2a;
-    font-weight: 600;
-    margin-bottom: 16px;
+    font-family: var(--ar-font-mono, 'SF Mono', 'Fira Code', Menlo, Consolas, monospace);
+    font-size: var(--ar-font-size-md, 14px);
+    color: var(--ar-color-success, #1a6b2a);
+    font-weight: var(--ar-font-weight-semibold, 600);
+    margin-bottom: var(--ar-space-8, 16px);
   }
 
   .retry-btn {
-    padding: 8px 20px;
-    background: #fff;
-    color: #333;
-    border: 1px solid #e0e0e0;
-    border-radius: 4px;
-    font-size: 12px;
-    font-weight: 500;
+    padding: var(--ar-space-4, 8px) var(--ar-space-10, 20px);
+    background: var(--ar-color-surface, #fff);
+    color: var(--ar-color-text, #333);
+    border: 1px solid var(--ar-color-border, #e0e0e0);
+    border-radius: var(--ar-radius, 4px);
+    font-size: var(--ar-font-size-base, 13px);
+    font-weight: var(--ar-font-weight-medium, 500);
     cursor: pointer;
     transition: border-color 0.2s;
     font-family: inherit;
   }
 
   .retry-btn:hover {
-    border-color: #999;
+    border-color: var(--ar-color-text-muted, #999);
   }
 
   .game-section {
-    background: #fff;
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
+    background: var(--ar-color-surface, #fff);
+    border: 1px solid var(--ar-color-border, #e0e0e0);
+    border-radius: var(--ar-radius-xl, 8px);
     overflow: hidden;
   }
 
   .game-title-bar {
-    padding: 10px 16px;
-    background: #333;
-    color: #fff;
-    font-size: 13px;
-    font-weight: 600;
+    padding: var(--ar-space-5, 10px) var(--ar-space-8, 16px);
+    background: var(--ar-color-primary, #333);
+    color: var(--ar-color-primary-text, #fff);
+    font-size: var(--ar-font-size-base, 13px);
+    font-weight: var(--ar-font-weight-semibold, 600);
   }
 
   .game-start-overlay {
@@ -950,8 +950,8 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 40px 20px;
-    gap: 12px;
+    padding: 40px var(--ar-space-10, 20px);
+    gap: var(--ar-space-6, 12px);
     cursor: pointer;
   }
 
@@ -960,31 +960,31 @@
   }
 
   .game-start-text {
-    font-size: 13px;
-    color: #666;
+    font-size: var(--ar-font-size-base, 13px);
+    color: var(--ar-color-text-secondary, #666);
   }
 
   .game-start-btn {
-    padding: 10px 24px;
-    background: #333;
-    color: #fff;
+    padding: var(--ar-space-5, 10px) var(--ar-space-12, 24px);
+    background: var(--ar-color-primary, #333);
+    color: var(--ar-color-primary-text, #fff);
     border: none;
-    border-radius: 4px;
-    font-size: 14px;
-    font-weight: 600;
+    border-radius: var(--ar-radius, 4px);
+    font-size: var(--ar-font-size-md, 14px);
+    font-weight: var(--ar-font-weight-semibold, 600);
     cursor: pointer;
     font-family: inherit;
   }
 
   .game-start-btn:hover {
-    background: #1a1a1a;
+    background: var(--ar-color-primary-hover, #1a1a1a);
   }
 
   .game-canvas {
     display: block;
     width: 100%;
     height: 200px;
-    background: #fafafa;
+    background: var(--ar-color-bg, #fafafa);
     cursor: pointer;
   }
 
