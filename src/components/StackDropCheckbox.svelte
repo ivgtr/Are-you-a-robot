@@ -7,6 +7,12 @@
   let checkboxFallen = false;
   let checkboxOffset = 0;
   let checkboxTilt = 0;
+  let animating = false;
+
+  // ドラッグ状態
+  let draggingBlock = null;
+  let dragStartX = 0;
+  let dragCurrentX = 0;
 
   let blocks = [
     { id: 0, color: '#e74c3c', label: '利用規約', alive: true, offset: 0 },
@@ -30,59 +36,103 @@
     'ブロック除去は成功しましたが、認証サーバーが応答しません',
   ];
 
-  function hitBlock(block) {
-    if (checkboxFallen) return;
+  function showMsg(text) {
+    message = text;
+    showMessage = true;
+  }
 
-    const aliveBlocks = blocks.filter(b => b.alive);
-    const blockIndex = aliveBlocks.findIndex(b => b.id === block.id);
+  function onDragStart(e, block) {
+    if (animating || checkboxFallen || !block.alive) return;
+    e.preventDefault();
+    draggingBlock = block;
+    const clientX = e.type.startsWith('touch') ? e.touches[0].clientX : e.clientX;
+    dragStartX = clientX;
+    dragCurrentX = clientX;
+  }
 
-    // ブロックをスライドして外す
-    block.alive = false;
-    block.offset = (Math.random() > 0.5 ? 1 : -1) * 200;
+  function onDragMove(e) {
+    if (!draggingBlock) return;
+    e.preventDefault();
+    const clientX = e.type.startsWith('touch') ? e.touches[0].clientX : e.clientX;
+    dragCurrentX = clientX;
+    const diff = dragCurrentX - dragStartX;
+    draggingBlock.offset = diff;
     blocks = [...blocks];
+  }
 
-    attempts++;
+  function onDragEnd(e) {
+    if (!draggingBlock) return;
+    const block = draggingBlock;
+    draggingBlock = null;
 
-    // 上のブロックが少なくなるとバランスを崩す
+    const diff = Math.abs(block.offset);
+
+    // 十分にスライドしたら除去
+    if (diff > 60) {
+      const direction = block.offset > 0 ? 1 : -1;
+      block.offset = direction * 300;
+      blocks = [...blocks];
+
+      setTimeout(() => {
+        block.alive = false;
+        blocks = [...blocks];
+        attempts++;
+        checkBalance();
+      }, 200);
+    } else {
+      // 戻す
+      block.offset = 0;
+      blocks = [...blocks];
+    }
+  }
+
+  function checkBalance() {
     const remaining = blocks.filter(b => b.alive).length;
 
-    if (remaining <= 2) {
+    if (remaining === 0) {
+      // 全部除去しても失敗
+      animating = true;
+      showMsg(successButMessages[attempts % successButMessages.length]);
+      setTimeout(() => {
+        showMessage = false;
+        animating = false;
+        resetStack();
+      }, 2500);
+    } else if (remaining <= 2) {
       // 必ずバランスを崩す
+      animating = true;
       checkboxTilt = (Math.random() > 0.5 ? 1 : -1) * (15 + Math.random() * 30);
       setTimeout(() => {
         checkboxFallen = true;
         checkboxOffset = checkboxTilt > 0 ? 120 : -120;
-        message = failMessages[attempts % failMessages.length];
-        showMessage = true;
+        showMsg(failMessages[attempts % failMessages.length]);
         setTimeout(() => {
           showMessage = false;
+          animating = false;
           resetStack();
         }, 2000);
       }, 400);
-    } else if (remaining === 0) {
-      // 全部除去しても失敗
-      message = successButMessages[attempts % successButMessages.length];
-      showMessage = true;
-      setTimeout(() => {
-        showMessage = false;
-        resetStack();
-      }, 2500);
     } else {
       // 途中でもランダムにバランスを崩す
-      if (Math.random() < 0.35) {
-        checkboxTilt = (Math.random() > 0.5 ? 1 : -1) * (5 + Math.random() * 10);
+      if (Math.random() < 0.3) {
+        animating = true;
+        checkboxTilt = (Math.random() > 0.5 ? 1 : -1) * (8 + Math.random() * 15);
         setTimeout(() => {
-          if (Math.random() < 0.4) {
+          if (Math.random() < 0.5) {
             checkboxFallen = true;
             checkboxOffset = checkboxTilt > 0 ? 100 : -100;
-            message = failMessages[attempts % failMessages.length];
-            showMessage = true;
+            showMsg(failMessages[attempts % failMessages.length]);
             setTimeout(() => {
               showMessage = false;
+              animating = false;
               resetStack();
             }, 2000);
+          } else {
+            // グラついたけど耐えた
+            checkboxTilt = 0;
+            animating = false;
           }
-        }, 300);
+        }, 400);
       }
     }
   }
@@ -95,10 +145,17 @@
   }
 </script>
 
+<svelte:window
+  on:mousemove={onDragMove}
+  on:mouseup={onDragEnd}
+  on:touchmove|nonpassive={onDragMove}
+  on:touchend={onDragEnd}
+/>
+
 <div class="container">
   <div class="header">
     <span class="icon">🏗️</span>
-    <span class="title">ブロックを慎重に外して認証を取り出せ</span>
+    <span class="title">ブロックをスワイプして認証を取り出せ</span>
   </div>
 
   <div class="play-area">
@@ -117,12 +174,14 @@
         <div
           class="block"
           class:removed={!block.alive}
+          class:dragging={draggingBlock && draggingBlock.id === block.id}
           style="background: {block.color}; transform: translateX({block.offset}px);"
-          on:click={() => block.alive && hitBlock(block)}
+          on:mousedown={(e) => onDragStart(e, block)}
+          on:touchstart={(e) => onDragStart(e, block)}
         >
           <span class="block-label">{block.label}</span>
-          {#if block.alive}
-            <span class="hit-hint">← タップで除去</span>
+          {#if block.alive && !draggingBlock}
+            <span class="swipe-hint">← →</span>
           {/if}
         </div>
       {/each}
@@ -146,6 +205,8 @@
     border: 1px solid #e0e0e0;
     border-radius: 6px;
     background: #fafafa;
+    user-select: none;
+    touch-action: none;
   }
 
   .header {
@@ -174,6 +235,7 @@
     display: flex;
     justify-content: center;
     padding: 10px 0;
+    overflow: hidden;
   }
 
   .stack {
@@ -192,14 +254,14 @@
     background: #fff;
     border: 2px solid #333;
     border-radius: 4px;
-    transition: transform 0.4s ease;
+    transition: transform 0.4s ease, opacity 0.4s ease;
     white-space: nowrap;
     z-index: 2;
   }
 
   .checkbox-top.fallen {
-    transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    opacity: 0.5;
+    transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.5s ease;
+    opacity: 0.4;
   }
 
   .checkbox-top input {
@@ -222,17 +284,21 @@
     align-items: center;
     justify-content: center;
     border-radius: 3px;
-    cursor: pointer;
-    transition: transform 0.3s ease, opacity 0.3s ease;
+    cursor: grab;
+    transition: transform 0.2s ease, opacity 0.3s ease, height 0.3s ease;
     position: relative;
   }
 
-  .block:hover:not(.removed) {
-    filter: brightness(1.1);
+  .block.dragging {
+    cursor: grabbing;
+    transition: none;
+    opacity: 0.85;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    z-index: 5;
   }
 
-  .block:active:not(.removed) {
-    transform: scale(0.98);
+  .block:hover:not(.removed):not(.dragging) {
+    filter: brightness(1.1);
   }
 
   .block.removed {
@@ -249,21 +315,16 @@
     font-weight: 600;
     color: #fff;
     text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+    pointer-events: none;
   }
 
-  .hit-hint {
+  .swipe-hint {
     position: absolute;
-    right: -90px;
+    right: 8px;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    font-size: 9px;
-    color: #bbb;
-    white-space: nowrap;
-    opacity: 0;
-    transition: opacity 0.2s;
-  }
-
-  .block:hover .hit-hint {
-    opacity: 1;
+    font-size: 10px;
+    color: rgba(255,255,255,0.6);
+    pointer-events: none;
   }
 
   .base {
