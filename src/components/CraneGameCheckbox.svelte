@@ -13,6 +13,7 @@
   let attempts = 0;
   let message = '';
   let showMessage = false;
+  let cleared = false;
 
   let checkboxX = 50;
   let checkboxBottomPx = 10;
@@ -74,8 +75,14 @@
         const distance = Math.abs(craneX - checkboxX);
         hasCheckbox = distance < 15;
 
+        // 位置が近いほどキャッチ成功率が上がる（最大10%: distance<5で10%, distance<10で5%, それ以上は0%）
+        const catchSuccess = hasCheckbox && (
+          (distance < 5 && Math.random() < 0.10) ||
+          (distance < 10 && Math.random() < 0.05)
+        );
+
         // 少し待ってから上昇
-        dropPoint = 40 + Math.floor(Math.random() * 60); // 落とす高さを事前に決定
+        dropPoint = catchSuccess ? -1 : 40 + Math.floor(Math.random() * 60); // -1は成功を意味する
         setTimeout(() => {
           phase = 'rising';
           intervalId = setInterval(() => {
@@ -86,8 +93,8 @@
               checkboxBottomPx = 150 - clawY + 10;
             }
 
-            // 事前に決めた高さで落とす
-            if (hasCheckbox && clawY <= dropPoint) {
+            // 事前に決めた高さで落とす（dropPoint === -1 はキャッチ成功）
+            if (hasCheckbox && dropPoint >= 0 && clawY <= dropPoint) {
               hasCheckbox = false;
               checkboxBottomPx = 10;
               checkboxX = 15 + Math.random() * 70;
@@ -98,6 +105,15 @@
             if (clawY <= 0) {
               clawY = 0;
               clearInterval(intervalId);
+
+              // キャッチ成功判定
+              if (hasCheckbox && dropPoint === -1) {
+                cleared = true;
+                phase = 'resetting';
+                showMsg('やった！景品をゲットしました！認証成功！');
+                return;
+              }
+
               // リセットフェーズ
               phase = 'resetting';
               clawOpen = true;
@@ -151,8 +167,8 @@
       class="checkbox-prize"
       style="left: {checkboxX}%; bottom: {checkboxBottomPx}px;"
     >
-      <input type="checkbox" disabled />
-      <span>認証</span>
+      <input type="checkbox" disabled={!cleared} checked={cleared} />
+      <span>{cleared ? '認証OK' : '認証'}</span>
     </div>
     <span class="decoy" style="left: 15%; bottom: 6px;">🧸</span>
     <span class="decoy" style="left: 75%; bottom: 6px;">🎀</span>

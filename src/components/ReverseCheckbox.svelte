@@ -3,6 +3,7 @@
 <script>
   let checked = false;
   let toggleCount = 0;
+  let cleared = false;
 
   const messages = [
     { text: 'ロボットであることが確認されました', type: 'robot' },
@@ -14,10 +15,19 @@
   ];
 
   $: currentLabel = checked ? '私はロボットではありません' : '私はロボットです';
-  $: currentMessage = toggleCount > 0 ? messages[Math.min(toggleCount - 1, messages.length - 1)] : null;
+  $: currentMessage = cleared
+    ? { text: '逆転の発想...お見事です。認証成功', type: 'success' }
+    : toggleCount > 0 ? messages[Math.min(toggleCount - 1, messages.length - 1)] : null;
 
   function handleChange() {
+    if (cleared) return;
     toggleCount++;
+
+    // 6回以上切り替えた後に「私はロボットです」（未チェック状態）のままにすると
+    // 逆説的に「自分がロボットだと認める＝人間にしかできない自己否定」で認証成功
+    if (toggleCount >= 6 && !checked) {
+      cleared = true;
+    }
   }
 </script>
 
@@ -32,15 +42,17 @@
     <label for="reverse-check">{currentLabel}</label>
   </div>
   {#if currentMessage}
-    <div class="message" class:robot={currentMessage.type === 'robot'} class:cancel={currentMessage.type === 'cancel'}>
+    <div class="message" class:robot={currentMessage.type === 'robot'} class:cancel={currentMessage.type === 'cancel'} class:success={currentMessage.type === 'success'}>
       {#if currentMessage.type === 'robot'}
+        ✓ {currentMessage.text}
+      {:else if currentMessage.type === 'success'}
         ✓ {currentMessage.text}
       {:else}
         ✗ {currentMessage.text}
       {/if}
     </div>
   {/if}
-  {#if toggleCount >= 4}
+  {#if toggleCount >= 4 && !cleared}
     <div class="despair">
       切り替え回数: {toggleCount} — どちらを選んでも人間とは認められません
     </div>
@@ -101,6 +113,12 @@
     background: #fef2f2;
     color: #b91c1c;
     border: 1px solid #fecaca;
+  }
+
+  .message.success {
+    background: #f0faf0;
+    color: #1a6b2a;
+    border: 1px solid #d4e8d4;
   }
 
   .despair {

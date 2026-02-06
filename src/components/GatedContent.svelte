@@ -21,7 +21,7 @@
   ];
 
   const NUM_STEPS = 5;
-  const STEP_TIMEOUT = 15; // 秒
+  const STEP_TIMEOUT = 30; // 秒 (クリア可能にするため15→30に拡張)
 
   // ===== グローバル状態 =====
   let currentStep = 0; // 0=イントロ, 1-N=チャレンジ, N+1=ゲーム解放

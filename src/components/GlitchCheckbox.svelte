@@ -7,6 +7,11 @@
   let isGlitching = false;
   let hoverCount = 0;
   let glitchInterval;
+  let cleared = false;
+  let inCooldown = false;
+
+  // グリッチ終了後0.5秒だけクールダウン（安全にクリック可能な隙間）
+  const COOLDOWN_DURATION = 500;
 
   const glitchTexts = [
     '私は□□□ではありません',
@@ -40,11 +45,15 @@
         glitchInterval = null;
         text = '私はロボットではありません';
         isGlitching = false;
+        // グリッチ終了後の短いクールダウン期間を設ける
+        inCooldown = true;
+        setTimeout(() => { inCooldown = false; }, COOLDOWN_DURATION);
       }
     }, 100);
   }
 
   function handleMouseEnter() {
+    if (cleared || inCooldown) return;
     hoverCount++;
     if (Math.random() < glitchProbability) {
       startGlitch();
@@ -52,11 +61,19 @@
   }
 
   function handleClick(e) {
+    if (cleared) return;
     // グリッチ中はクリックを無効化
     if (isGlitching) {
       e.preventDefault();
       const checkbox = e.currentTarget.querySelector('input[type="checkbox"]');
       if (checkbox) checkbox.checked = false;
+      return;
+    }
+    // クールダウン中またはグリッチ確率100%到達後の非グリッチ時にチェック成功 = クリア
+    const checkbox = e.currentTarget.querySelector('input[type="checkbox"]');
+    if (checkbox && checkbox.checked && glitchProbability >= 1) {
+      cleared = true;
+      text = '...グリッチの隙を突かれた。認証成功';
     }
   }
 

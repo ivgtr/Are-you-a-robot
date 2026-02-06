@@ -8,6 +8,11 @@
   let progress = 0;
   let statusIndex = 0;
   let showAlmostDone = false;
+  let completed = false;
+  let clickCount = 0;
+
+  // 99%到達後、プログレスバーを10回クリックすると100%に押し上げられる
+  const CLICKS_TO_COMPLETE = 10;
 
   let dotsInterval;
   let progressInterval;
@@ -30,9 +35,25 @@
   $: currentStatus = statusMessages[statusIndex % statusMessages.length];
 
   function handleClick() {
+    if (completed) return;
     if (!clicked) {
       clicked = true;
       startLoading();
+      return;
+    }
+
+    // 99%に到達している場合、クリックで少しずつ押し上げる
+    if (progress >= 98.5) {
+      clickCount++;
+      progress = Math.min(99 + (clickCount / CLICKS_TO_COMPLETE), 100);
+      if (clickCount >= CLICKS_TO_COMPLETE) {
+        completed = true;
+        progress = 100;
+        clearInterval(dotsInterval);
+        clearInterval(progressInterval);
+        clearInterval(statusInterval);
+        clearTimeout(almostDoneTimeout);
+      }
     }
   }
 
@@ -77,6 +98,9 @@
     {#if !clicked}
       <input type="checkbox" id="loading-check" />
       <label for="loading-check">私はロボットではありません</label>
+    {:else if completed}
+      <input type="checkbox" id="loading-check" checked />
+      <label for="loading-check">認証完了！手動で押し切りました</label>
     {:else}
       <div class="loading-content">
         <div class="spinner-row">
@@ -88,7 +112,9 @@
         </div>
         <div class="progress-info">
           <span class="progress-percent">{progress.toFixed(1)}%</span>
-          {#if showAlmostDone}
+          {#if progress >= 98.5 && !completed}
+            <span class="almost-done">クリックで押し上げろ！({clickCount}/{CLICKS_TO_COMPLETE})</span>
+          {:else if showAlmostDone}
             <span class="almost-done">もうすぐ完了します...</span>
           {/if}
         </div>
