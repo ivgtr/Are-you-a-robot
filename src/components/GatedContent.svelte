@@ -1,0 +1,810 @@
+<svelte:options customElement="gated-content" />
+
+<script>
+  import { onMount, onDestroy } from 'svelte';
+
+  // ===== コンポーネントデータ =====
+  const allComponents = [
+    { tag: 'escaping-checkbox', name: '逃げるチェックボックス' },
+    { tag: 'unfocusable-checkbox', name: 'フォーカス不可能チェックボックス' },
+    { tag: 'reverse-checkbox', name: '反転チェックボックス' },
+    { tag: 'infinite-loading-checkbox', name: '無限ローディング' },
+    { tag: 'impossible-captcha', name: '不可能なCAPTCHA' },
+    { tag: 'moving-checkbox', name: '移動するチェックボックス' },
+    { tag: 'tiny-checkbox', name: '極小チェックボックス' },
+    { tag: 'glitch-checkbox', name: 'グリッチチェックボックス' },
+    { tag: 'crane-game-checkbox', name: 'UFOキャッチャー認証' },
+    { tag: 'breakout-checkbox', name: 'ブロック崩し認証' },
+    { tag: 'fake-close-checkbox', name: 'フェイク広告認証' },
+    { tag: 'slider-puzzle-checkbox', name: 'スライドパズル認証' },
+    { tag: 'stack-drop-checkbox', name: 'だるま落とし認証' },
+  ];
+
+  const NUM_STEPS = 3;
+  const STEP_TIMEOUT = 15; // 秒
+
+  const timeoutMessages = [
+    '認証サーバーがタイムアウトしました',
+    '認証処理に時間がかかりすぎています',
+    '別の認証方法を試みます',
+    '認証システムが応答しません',
+    '認証アルゴリズムが困惑しています',
+    'この認証は想定外の挙動です',
+    'サーバーが諦めかけています',
+  ];
+
+  // ===== グローバル状態 =====
+  let currentStep = 0; // 0=イントロ, 1-N=チャレンジ, N+1=ゲーム解放
+  let selectedComponents = [];
+  let startTime = null;
+  let elapsedTime = '00:00.000';
+  let timerInterval = null;
+  let completedCount = 0;
+
+  // ステップごとの状態
+  let componentContainer;
+  let stepElapsed = 0;
+  let stepTimer = null;
+  let canProceed = false;
+  let timeoutMsg = '';
+  let transitioning = false;
+
+  function shuffle(arr) {
+    const a = [...arr];
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  function startTimer() {
+    if (startTime) return;
+    startTime = Date.now();
+    timerInterval = setInterval(() => {
+      const ms = Date.now() - startTime;
+      const min = Math.floor(ms / 60000);
+      const sec = Math.floor((ms % 60000) / 1000);
+      const millis = ms % 1000;
+      elapsedTime = `${String(min).padStart(2, '0')}:${String(sec).padStart(2, '0')}.${String(millis).padStart(3, '0')}`;
+    }, 33);
+  }
+
+  function stopTimer() {
+    clearInterval(timerInterval);
+  }
+
+  function begin() {
+    selectedComponents = shuffle(allComponents).slice(0, NUM_STEPS);
+    currentStep = 1;
+    completedCount = 0;
+    startTimer();
+    // DOMの更新後にコンポーネントをロード
+    requestAnimationFrame(() => loadCurrentComponent());
+  }
+
+  function loadCurrentComponent() {
+    canProceed = false;
+    timeoutMsg = '';
+    stepElapsed = 0;
+
+    requestAnimationFrame(() => {
+      if (componentContainer) {
+        componentContainer.innerHTML = '';
+        const comp = selectedComponents[currentStep - 1];
+        const el = document.createElement(comp.tag);
+        componentContainer.appendChild(el);
+      }
+    });
+
+    // ステップタイマー開始
+    clearInterval(stepTimer);
+    const stepStart = Date.now();
+    stepTimer = setInterval(() => {
+      stepElapsed = (Date.now() - stepStart) / 1000;
+      if (stepElapsed >= STEP_TIMEOUT && !canProceed) {
+        canProceed = true;
+        timeoutMsg = timeoutMessages[Math.floor(Math.random() * timeoutMessages.length)];
+      }
+    }, 100);
+  }
+
+  function nextStep() {
+    clearInterval(stepTimer);
+    completedCount++;
+    transitioning = true;
+
+    setTimeout(() => {
+      transitioning = false;
+      if (currentStep >= NUM_STEPS) {
+        currentStep = NUM_STEPS + 1;
+        stopTimer();
+      } else {
+        currentStep++;
+        requestAnimationFrame(() => loadCurrentComponent());
+      }
+    }, 500);
+  }
+
+  function restart() {
+    clearInterval(timerInterval);
+    clearInterval(stepTimer);
+    cancelAnimationFrame(gameAnimFrame);
+    startTime = null;
+    elapsedTime = '00:00.000';
+    gameStarted = false;
+    gameOver = false;
+    gameRunning = false;
+    currentStep = 0;
+  }
+
+  // ===== ジャンプゲーム =====
+  let gameCanvas;
+  let gameScore = 0;
+  let gameBestScore = 0;
+  let gameRunning = false;
+  let gameOver = false;
+  let gameAnimFrame;
+  let gameStarted = false;
+
+  let playerY = 0;
+  let playerVelocity = 0;
+  let isJumping = false;
+  let obstacles = [];
+  let gameSpeed = 3;
+  let groundY = 0;
+  let frameCount = 0;
+
+  function initGame() {
+    if (!gameCanvas) return;
+    gameCanvas.width = gameCanvas.offsetWidth;
+    gameCanvas.height = 200;
+    groundY = gameCanvas.height - 30;
+    playerY = groundY;
+    playerVelocity = 0;
+    isJumping = false;
+    obstacles = [];
+    gameScore = 0;
+    gameSpeed = 3;
+    gameRunning = true;
+    gameOver = false;
+    gameStarted = true;
+    frameCount = 0;
+    cancelAnimationFrame(gameAnimFrame);
+    gameLoop();
+  }
+
+  function jump() {
+    if (!isJumping && gameRunning) {
+      isJumping = true;
+      playerVelocity = -10;
+    }
+    if (gameOver) {
+      initGame();
+    }
+  }
+
+  function gameLoop() {
+    if (!gameCanvas) return;
+    const ctx = gameCanvas.getContext('2d');
+    const w = gameCanvas.width;
+    const h = gameCanvas.height;
+
+    if (!gameRunning) {
+      drawGame(ctx, w, h);
+      return;
+    }
+
+    frameCount++;
+
+    if (isJumping) {
+      playerVelocity += 0.6;
+      playerY += playerVelocity;
+      if (playerY >= groundY) {
+        playerY = groundY;
+        isJumping = false;
+        playerVelocity = 0;
+      }
+    }
+
+    if (frameCount % Math.max(40, 80 - Math.floor(gameScore / 50)) === 0) {
+      obstacles.push({
+        x: w + 10,
+        width: 12 + Math.random() * 16,
+        height: 18 + Math.random() * 24,
+      });
+    }
+
+    for (let obs of obstacles) {
+      obs.x -= gameSpeed;
+    }
+    obstacles = obstacles.filter(obs => obs.x > -50);
+
+    const playerX = 40;
+    const playerW = 18;
+
+    for (let obs of obstacles) {
+      if (
+        playerX + playerW > obs.x + 2 &&
+        playerX < obs.x + obs.width - 2 &&
+        playerY > groundY - obs.height
+      ) {
+        gameRunning = false;
+        gameOver = true;
+        if (gameScore > gameBestScore) {
+          gameBestScore = gameScore;
+        }
+      }
+    }
+
+    gameScore++;
+    if (gameScore % 300 === 0) {
+      gameSpeed += 0.3;
+    }
+
+    drawGame(ctx, w, h);
+
+    if (gameRunning) {
+      gameAnimFrame = requestAnimationFrame(gameLoop);
+    }
+  }
+
+  function drawGame(ctx, w, h) {
+    ctx.clearRect(0, 0, w, h);
+
+    ctx.strokeStyle = '#ccc';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(0, groundY + 1);
+    ctx.lineTo(w, groundY + 1);
+    ctx.stroke();
+
+    ctx.strokeStyle = '#e0e0e0';
+    ctx.setLineDash([4, 8]);
+    for (let i = 0; i < 3; i++) {
+      const y = groundY + 8 + i * 6;
+      ctx.beginPath();
+      for (let x = (-frameCount * gameSpeed + i * 20) % w - w; x < w + 20; x += 20) {
+        ctx.moveTo(x, y);
+        ctx.lineTo(x + 10, y);
+      }
+      ctx.stroke();
+    }
+    ctx.setLineDash([]);
+
+    const px = 40;
+    const py = playerY;
+    const pw = 18;
+    const ph = 26;
+
+    ctx.fillStyle = '#333';
+    ctx.fillRect(px, py - ph, pw, ph);
+
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(px + 10, py - ph + 6, 6, 6);
+    ctx.fillStyle = '#333';
+    ctx.fillRect(px + 12, py - ph + 8, 3, 3);
+
+    if (!isJumping && gameRunning) {
+      const legPhase = Math.floor(frameCount / 6) % 2;
+      ctx.fillStyle = '#333';
+      if (legPhase === 0) {
+        ctx.fillRect(px + 2, py, 5, 6);
+        ctx.fillRect(px + 11, py, 5, 3);
+      } else {
+        ctx.fillRect(px + 2, py, 5, 3);
+        ctx.fillRect(px + 11, py, 5, 6);
+      }
+    }
+
+    for (let obs of obstacles) {
+      ctx.fillStyle = '#b91c1c';
+      ctx.fillRect(obs.x, groundY - obs.height, obs.width, obs.height);
+      ctx.fillStyle = '#dc2626';
+      const spikeW = obs.width / 3;
+      for (let i = 0; i < 3; i++) {
+        ctx.beginPath();
+        ctx.moveTo(obs.x + i * spikeW, groundY - obs.height);
+        ctx.lineTo(obs.x + i * spikeW + spikeW / 2, groundY - obs.height - 5);
+        ctx.lineTo(obs.x + (i + 1) * spikeW, groundY - obs.height);
+        ctx.fill();
+      }
+    }
+
+    ctx.fillStyle = '#999';
+    ctx.font = '11px -apple-system, BlinkMacSystemFont, sans-serif';
+    ctx.textAlign = 'right';
+    ctx.fillText(`SCORE: ${Math.floor(gameScore / 10)}`, w - 10, 18);
+
+    if (gameBestScore > 0) {
+      ctx.fillText(`BEST: ${Math.floor(gameBestScore / 10)}`, w - 10, 32);
+    }
+
+    if (gameOver) {
+      ctx.fillStyle = 'rgba(250, 250, 250, 0.8)';
+      ctx.fillRect(0, 0, w, h);
+
+      ctx.fillStyle = '#333';
+      ctx.font = '600 18px -apple-system, BlinkMacSystemFont, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('GAME OVER', w / 2, h / 2 - 12);
+      ctx.font = '12px -apple-system, BlinkMacSystemFont, sans-serif';
+      ctx.fillStyle = '#666';
+      ctx.fillText(`Score: ${Math.floor(gameScore / 10)}`, w / 2, h / 2 + 8);
+      ctx.fillText('Click / Space to retry', w / 2, h / 2 + 28);
+    }
+  }
+
+  function handleKeyDown(e) {
+    if (e.code === 'Space' && currentStep === NUM_STEPS + 1 && gameStarted) {
+      e.preventDefault();
+      jump();
+    }
+  }
+
+  onDestroy(() => {
+    clearInterval(timerInterval);
+    clearInterval(stepTimer);
+    cancelAnimationFrame(gameAnimFrame);
+  });
+</script>
+
+<svelte:window on:keydown={handleKeyDown} />
+
+<div class="gated-wrapper">
+  <!-- 進行バー -->
+  {#if currentStep > 0 && currentStep <= NUM_STEPS}
+    <div class="top-bar">
+      <div class="progress-dots">
+        {#each selectedComponents as _, i}
+          <div
+            class="dot"
+            class:completed={i < completedCount}
+            class:active={i === currentStep - 1 && !transitioning}
+          ></div>
+        {/each}
+      </div>
+      <div class="timer">{elapsedTime}</div>
+    </div>
+  {/if}
+
+  <!-- イントロ画面 -->
+  {#if currentStep === 0}
+    <div class="intro">
+      <div class="intro-icon">🤖</div>
+      <h1 class="intro-title">私はロボットではありません</h1>
+      <p class="intro-description">
+        あなたが人間であることを証明するため、<br />
+        {NUM_STEPS}つの認証をクリアしてください。
+      </p>
+      <div class="intro-rules">
+        <div class="rule">
+          <span class="rule-num">1</span>
+          <span>ランダムに選ばれた認証に挑戦します</span>
+        </div>
+        <div class="rule">
+          <span class="rule-num">2</span>
+          <span>各認証をクリアして次へ進んでください</span>
+        </div>
+        <div class="rule">
+          <span class="rule-num">3</span>
+          <span>全認証クリアで隠しコンテンツが解放されます</span>
+        </div>
+      </div>
+      <button class="begin-btn" on:click={begin}>認証を開始する</button>
+    </div>
+  {/if}
+
+  <!-- チャレンジ画面 -->
+  {#if currentStep >= 1 && currentStep <= NUM_STEPS}
+    <div class="challenge" class:transitioning>
+      <div class="challenge-header">
+        <span class="challenge-num">認証 {currentStep}/{NUM_STEPS}</span>
+        <span class="challenge-title">{selectedComponents[currentStep - 1]?.name ?? ''}</span>
+      </div>
+      <p class="challenge-instruction">この認証を突破してください</p>
+
+      <div class="component-area" bind:this={componentContainer}></div>
+
+      <div class="challenge-footer">
+        {#if canProceed}
+          <span class="timeout-msg">{timeoutMsg}</span>
+          <button class="next-btn" on:click={nextStep}>
+            {currentStep < NUM_STEPS ? '次の認証へ' : '結果を見る'}
+          </button>
+        {:else}
+          <div class="step-progress">
+            <div class="step-progress-bar" style="width: {Math.min(100, (stepElapsed / STEP_TIMEOUT) * 100)}%"></div>
+          </div>
+        {/if}
+      </div>
+    </div>
+  {/if}
+
+  <!-- ゲーム解放 -->
+  {#if currentStep === NUM_STEPS + 1}
+    <div class="game-unlocked">
+      <div class="unlock-header">
+        <div class="unlock-icon">🎉</div>
+        <h2 class="unlock-title">人間認証完了！</h2>
+        <p class="unlock-subtitle">あなたは（たぶん）人間です</p>
+        <p class="unlock-time">クリアタイム: {elapsedTime}</p>
+        <button class="retry-btn" on:click={restart}>もう一度挑戦する</button>
+      </div>
+
+      <div class="game-section">
+        <div class="game-title-bar">
+          <span>人間限定ミニゲーム</span>
+        </div>
+        {#if !gameStarted}
+          <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
+          <div class="game-start-overlay" on:click={initGame}>
+            <div class="game-start-icon">🏃</div>
+            <p class="game-start-text">クリック or スペースキーでジャンプ</p>
+            <button class="game-start-btn">ゲーム開始</button>
+          </div>
+        {/if}
+        <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
+        <canvas
+          class="game-canvas"
+          bind:this={gameCanvas}
+          on:click={jump}
+          class:hidden={!gameStarted}
+        ></canvas>
+      </div>
+    </div>
+  {/if}
+</div>
+
+<style>
+  .gated-wrapper {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    max-width: 520px;
+    margin: 0 auto;
+    color: #333;
+  }
+
+  /* トップバー */
+  .top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    margin-bottom: 12px;
+  }
+
+  .progress-dots {
+    display: flex;
+    gap: 8px;
+  }
+
+  .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #e0e0e0;
+    transition: background 0.3s, transform 0.3s;
+  }
+
+  .dot.active {
+    background: #f59e0b;
+    transform: scale(1.2);
+  }
+
+  .dot.completed {
+    background: #1a6b2a;
+  }
+
+  .timer {
+    font-family: 'SF Mono', 'Fira Code', Menlo, Consolas, monospace;
+    font-size: 13px;
+    color: #666;
+  }
+
+  /* イントロ */
+  .intro {
+    text-align: center;
+    padding: 48px 24px;
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+  }
+
+  .intro-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+  }
+
+  .intro-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: #111;
+    margin-bottom: 12px;
+  }
+
+  .intro-description {
+    font-size: 14px;
+    color: #666;
+    line-height: 1.7;
+    margin-bottom: 28px;
+  }
+
+  .intro-rules {
+    text-align: left;
+    max-width: 320px;
+    margin: 0 auto 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .rule {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 13px;
+    color: #444;
+  }
+
+  .rule-num {
+    width: 24px;
+    height: 24px;
+    background: #333;
+    color: #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+
+  .begin-btn {
+    padding: 12px 32px;
+    background: #333;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+    font-family: inherit;
+  }
+
+  .begin-btn:hover {
+    background: #1a1a1a;
+  }
+
+  /* チャレンジ */
+  .challenge {
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    overflow: hidden;
+    animation: fadeIn 0.3s ease-out;
+  }
+
+  .challenge.transitioning {
+    opacity: 0.5;
+    pointer-events: none;
+    transition: opacity 0.3s;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .challenge-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 18px;
+    border-bottom: 1px solid #e0e0e0;
+    background: #fafafa;
+  }
+
+  .challenge-num {
+    font-size: 12px;
+    font-weight: 700;
+    color: #fff;
+    background: #333;
+    padding: 3px 8px;
+    border-radius: 3px;
+    white-space: nowrap;
+  }
+
+  .challenge-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #111;
+  }
+
+  .challenge-instruction {
+    padding: 10px 18px;
+    font-size: 12px;
+    color: #888;
+    border-bottom: 1px solid #f0f0f0;
+  }
+
+  .component-area {
+    padding: 16px;
+    min-height: 200px;
+  }
+
+  .challenge-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 18px;
+    border-top: 1px solid #e0e0e0;
+    background: #fafafa;
+    gap: 12px;
+  }
+
+  .timeout-msg {
+    font-size: 11px;
+    color: #b91c1c;
+    flex: 1;
+    animation: fadeIn 0.3s ease-out;
+  }
+
+  .next-btn {
+    padding: 8px 20px;
+    background: #333;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+    font-family: inherit;
+    white-space: nowrap;
+    animation: fadeIn 0.3s ease-out;
+    flex-shrink: 0;
+  }
+
+  .next-btn:hover {
+    background: #1a1a1a;
+  }
+
+  .step-progress {
+    width: 100%;
+    height: 4px;
+    background: #e0e0e0;
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .step-progress-bar {
+    height: 100%;
+    background: #f59e0b;
+    border-radius: 2px;
+    transition: width 0.15s linear;
+  }
+
+  /* ゲーム解放 */
+  .game-unlocked {
+    animation: fadeIn 0.5s ease-out;
+  }
+
+  .unlock-header {
+    text-align: center;
+    padding: 32px 24px;
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    margin-bottom: 16px;
+  }
+
+  .unlock-icon {
+    font-size: 48px;
+    margin-bottom: 12px;
+  }
+
+  .unlock-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: #111;
+    margin-bottom: 4px;
+  }
+
+  .unlock-subtitle {
+    font-size: 13px;
+    color: #999;
+    margin-bottom: 8px;
+  }
+
+  .unlock-time {
+    font-family: 'SF Mono', 'Fira Code', Menlo, Consolas, monospace;
+    font-size: 14px;
+    color: #1a6b2a;
+    font-weight: 600;
+    margin-bottom: 16px;
+  }
+
+  .retry-btn {
+    padding: 8px 20px;
+    background: #fff;
+    color: #333;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: border-color 0.2s;
+    font-family: inherit;
+  }
+
+  .retry-btn:hover {
+    border-color: #999;
+  }
+
+  .game-section {
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .game-title-bar {
+    padding: 10px 16px;
+    background: #333;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .game-start-overlay {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    gap: 12px;
+    cursor: pointer;
+  }
+
+  .game-start-icon {
+    font-size: 36px;
+  }
+
+  .game-start-text {
+    font-size: 13px;
+    color: #666;
+  }
+
+  .game-start-btn {
+    padding: 10px 24px;
+    background: #333;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+  }
+
+  .game-start-btn:hover {
+    background: #1a1a1a;
+  }
+
+  .game-canvas {
+    display: block;
+    width: 100%;
+    height: 200px;
+    background: #fafafa;
+    cursor: pointer;
+  }
+
+  .game-canvas.hidden {
+    display: none;
+  }
+</style>
