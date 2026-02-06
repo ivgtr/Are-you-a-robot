@@ -32,24 +32,23 @@
 
 <style>
   .container {
-    padding: 20px;
-    border: 2px solid #ddd;
-    border-radius: 8px;
-    background: #f9f9f9;
+    padding: 16px;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    background: #fafafa;
   }
 
   .checkbox-wrapper {
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 12px 16px;
-    background: white;
-    border: 1px solid #ccc;
+    padding: 10px 14px;
+    background: #fff;
+    border: 1px solid #d0d0d0;
     border-radius: 4px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     width: fit-content;
     cursor: pointer;
-    min-width: 250px;
+    min-width: 240px;
   }
 
   .checkbox-wrapper.loading {
@@ -57,25 +56,27 @@
   }
 
   input[type="checkbox"] {
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
     cursor: pointer;
+    accent-color: #333;
   }
 
   label {
     cursor: pointer;
     user-select: none;
-    font-family: Arial, sans-serif;
-    font-size: 14px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 13px;
+    color: #333;
   }
 
   .spinner {
-    width: 20px;
-    height: 20px;
-    border: 3px solid #f3f3f3;
-    border-top: 3px solid #3498db;
+    width: 18px;
+    height: 18px;
+    border: 2px solid #e0e0e0;
+    border-top: 2px solid #555;
     border-radius: 50%;
-    animation: spin 1s linear infinite;
+    animation: spin 0.8s linear infinite;
   }
 
   @keyframes spin {
@@ -84,8 +85,8 @@
   }
 
   .loading-text {
-    font-family: Arial, sans-serif;
-    font-size: 14px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 13px;
     color: #666;
   }
 </style>

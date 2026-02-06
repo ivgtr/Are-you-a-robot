@@ -79,38 +79,40 @@
 
 <style>
   .container {
-    padding: 20px;
-    border: 2px solid #ddd;
-    border-radius: 8px;
-    background: #f9f9f9;
+    padding: 16px;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    background: #fafafa;
     max-width: 400px;
   }
 
   .header {
     display: flex;
     align-items: center;
-    gap: 12px;
-    margin-bottom: 16px;
-    padding: 12px;
-    background: white;
+    gap: 10px;
+    margin-bottom: 12px;
+    padding: 10px 12px;
+    background: #fff;
+    border: 1px solid #e0e0e0;
     border-radius: 4px;
   }
 
   .icon {
-    font-size: 24px;
+    font-size: 20px;
   }
 
   .title {
-    font-family: Arial, sans-serif;
-    font-size: 14px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 13px;
     font-weight: 500;
+    color: #333;
   }
 
   .grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
-    margin-bottom: 16px;
+    gap: 6px;
+    margin-bottom: 12px;
   }
 
   .image-box {
@@ -119,69 +121,69 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: white;
-    border: 2px solid #ccc;
+    background: #fff;
+    border: 1px solid #d0d0d0;
     border-radius: 4px;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: border-color 0.15s;
   }
 
   .image-box:hover {
-    border-color: #4285f4;
+    border-color: #999;
   }
 
   .image-box.selected {
-    border-color: #4285f4;
-    background: #e8f0fe;
+    border-color: #333;
+    background: #f5f5f5;
   }
 
   .emoji {
-    font-size: 48px;
+    font-size: 40px;
   }
 
   .checkmark {
     position: absolute;
-    bottom: 4px;
-    right: 4px;
-    width: 24px;
-    height: 24px;
-    background: #4285f4;
-    color: white;
+    bottom: 3px;
+    right: 3px;
+    width: 20px;
+    height: 20px;
+    background: #333;
+    color: #fff;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 14px;
+    font-size: 12px;
     font-weight: bold;
   }
 
   .verify-btn {
     width: 100%;
-    padding: 12px;
-    background: #4285f4;
-    color: white;
+    padding: 10px;
+    background: #333;
+    color: #fff;
     border: none;
     border-radius: 4px;
-    font-family: Arial, sans-serif;
-    font-size: 14px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 13px;
     font-weight: 500;
     cursor: pointer;
-    transition: background 0.2s;
+    transition: background 0.15s;
   }
 
   .verify-btn:hover {
-    background: #3367d6;
+    background: #1a1a1a;
   }
 
   .attempts {
-    margin-top: 12px;
+    margin-top: 10px;
     padding: 8px;
-    background: #fff3cd;
-    border: 1px solid #ffc107;
+    background: #fffbe6;
+    border: 1px solid #e6d98c;
     border-radius: 4px;
     text-align: center;
-    font-family: Arial, sans-serif;
-    font-size: 12px;
-    color: #856404;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 11px;
+    color: #7a6c1a;
   }
 </style>

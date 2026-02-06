@@ -12,140 +12,145 @@
     }
 
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: #f5f5f5;
       min-height: 100vh;
-      padding: 40px 20px;
+      padding: 48px 20px;
+      color: #333;
     }
 
     .container {
-      max-width: 1200px;
+      max-width: 960px;
       margin: 0 auto;
     }
 
     header {
       text-align: center;
-      margin-bottom: 60px;
-      color: white;
+      margin-bottom: 48px;
     }
 
     h1 {
-      font-size: 48px;
-      margin-bottom: 16px;
-      text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: #111;
+      letter-spacing: -0.02em;
     }
 
     .subtitle {
-      font-size: 18px;
-      opacity: 0.9;
+      font-size: 15px;
+      color: #666;
     }
 
     .warning {
-      background: #fff3cd;
-      border: 2px solid #ffc107;
-      border-radius: 8px;
-      padding: 20px;
-      margin-bottom: 40px;
+      background: #fffbe6;
+      border: 1px solid #e6d98c;
+      border-radius: 6px;
+      padding: 16px;
+      margin-bottom: 32px;
       text-align: center;
     }
 
     .warning-title {
-      font-size: 20px;
-      font-weight: bold;
-      color: #856404;
-      margin-bottom: 8px;
+      font-size: 15px;
+      font-weight: 600;
+      color: #7a6c1a;
+      margin-bottom: 4px;
     }
 
     .warning-text {
-      color: #856404;
-      font-size: 14px;
+      color: #7a6c1a;
+      font-size: 13px;
     }
 
     .components-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
-      gap: 30px;
-      margin-bottom: 60px;
+      grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+      gap: 16px;
+      margin-bottom: 48px;
     }
 
     .component-card {
-      background: white;
-      border-radius: 12px;
+      background: #fff;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
       padding: 24px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-      transition: transform 0.3s;
     }
 
     .component-card:hover {
-      transform: translateY(-5px);
+      border-color: #ccc;
     }
 
     .component-title {
-      font-size: 24px;
-      margin-bottom: 12px;
-      color: #333;
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: #111;
     }
 
     .component-description {
-      font-size: 14px;
+      font-size: 13px;
       color: #666;
-      margin-bottom: 20px;
+      margin-bottom: 16px;
       line-height: 1.6;
     }
 
     .difficulty {
       display: inline-block;
-      padding: 4px 12px;
-      border-radius: 12px;
-      font-size: 12px;
-      font-weight: bold;
-      margin-bottom: 16px;
+      padding: 2px 8px;
+      border-radius: 3px;
+      font-size: 11px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      letter-spacing: 0.02em;
     }
 
     .difficulty.impossible {
-      background: #dc3545;
-      color: white;
+      background: #fde8e8;
+      color: #b91c1c;
     }
 
     .difficulty.very-hard {
-      background: #fd7e14;
-      color: white;
+      background: #fff3e0;
+      color: #c2410c;
     }
 
     .difficulty.hard {
-      background: #ffc107;
-      color: #333;
+      background: #fffbe6;
+      color: #92400e;
     }
 
     .installation-section {
-      background: white;
-      border-radius: 12px;
-      padding: 32px;
-      margin-bottom: 40px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      background: #fff;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 24px;
+      margin-bottom: 32px;
     }
 
     .installation-section h2 {
-      font-size: 28px;
-      margin-bottom: 20px;
-      color: #333;
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      color: #111;
     }
 
     .installation-section h3 {
-      font-size: 20px;
-      margin: 24px 0 12px;
-      color: #444;
+      font-size: 15px;
+      font-weight: 600;
+      margin: 20px 0 8px;
+      color: #333;
     }
 
     .code-block {
-      background: #2d2d2d;
-      color: #f8f8f2;
-      padding: 16px;
-      border-radius: 8px;
-      font-family: 'Courier New', Consolas, monospace;
-      font-size: 14px;
+      background: #1a1a1a;
+      color: #e0e0e0;
+      padding: 14px 16px;
+      border-radius: 6px;
+      font-family: 'SF Mono', 'Fira Code', 'Fira Mono', Menlo, Consolas, monospace;
+      font-size: 13px;
       overflow-x: auto;
-      margin: 12px 0;
+      margin: 8px 0;
     }
 
     .code-block code {
@@ -154,54 +159,59 @@
     }
 
     .component-tag {
-      background: #e7f3ff;
-      border: 1px solid #2196f3;
-      color: #0d47a1;
+      background: #f5f5f5;
+      border: 1px solid #e0e0e0;
+      color: #333;
       padding: 2px 8px;
       border-radius: 4px;
-      font-family: 'Courier New', Consolas, monospace;
-      font-size: 13px;
+      font-family: 'SF Mono', 'Fira Code', Menlo, Consolas, monospace;
+      font-size: 12px;
       display: inline-block;
-      margin-top: 8px;
+      margin-top: 6px;
     }
 
     .btn {
       display: inline-block;
-      padding: 12px 24px;
-      background: white;
-      color: #764ba2;
+      padding: 10px 20px;
+      background: #fff;
+      color: #333;
       text-decoration: none;
-      border-radius: 8px;
-      font-weight: bold;
-      transition: all 0.3s;
-      margin: 8px;
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 500;
+      transition: border-color 0.2s;
+      margin: 4px;
     }
 
     .btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      border-color: #999;
     }
 
     .btn-github {
       background: #24292e;
+      border-color: #24292e;
       color: white;
+    }
+
+    .btn-github:hover {
+      background: #1a1e22;
     }
 
     .links {
       text-align: center;
-      margin-bottom: 40px;
+      margin-bottom: 32px;
     }
 
     footer {
       text-align: center;
-      color: white;
-      font-size: 14px;
-      opacity: 0.8;
-      margin-top: 60px;
+      font-size: 13px;
+      color: #999;
+      margin-top: 48px;
     }
 
     .github-link {
-      color: white;
+      color: #666;
       text-decoration: underline;
     }
 
@@ -211,12 +221,12 @@
       }
 
       h1 {
-        font-size: 32px;
+        font-size: 24px;
       }
 
       .btn {
         display: block;
-        margin: 8px auto;
+        margin: 4px auto;
       }
     }
   </style>
@@ -224,7 +234,7 @@
 <body>
   <div class="container">
     <header>
-      <h1>🤖 Are You a Robot?</h1>
+      <h1>Are You a Robot?</h1>
     </header>
 
     <div class="links">
@@ -234,7 +244,7 @@
     </div>
 
     <div class="installation-section">
-      <h2>📦 使い方</h2>
+      <h2>使い方</h2>
 
       <p style="margin-bottom: 12px; color: #666;">公開していません。よしなにしてください。</p>
 
@@ -326,8 +336,7 @@
     </div>
 
     <footer>
-      <p>Made with 💜 and a sense of humor</p>
-      <p>These components are for entertainment purposes only</p>
+      <p>These components are for entertainment purposes only.</p>
     </footer>
   </div>
 

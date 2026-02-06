@@ -29,17 +29,18 @@
 
 <style>
   .container {
-    padding: 20px;
-    border: 2px solid #ddd;
-    border-radius: 8px;
-    background: #f9f9f9;
+    padding: 16px;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    background: #fafafa;
   }
 
   .message {
-    margin-bottom: 20px;
-    font-family: Arial, sans-serif;
-    font-size: 14px;
+    margin-bottom: 16px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 13px;
     text-align: center;
+    color: #333;
   }
 
   .checkbox-area {
@@ -47,8 +48,8 @@
     justify-content: center;
     align-items: center;
     min-height: 100px;
-    background: white;
-    border: 1px solid #ccc;
+    background: #fff;
+    border: 1px solid #d0d0d0;
     border-radius: 4px;
   }
 
@@ -62,28 +63,30 @@
   }
 
   input[type="checkbox"] {
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
     cursor: pointer;
+    accent-color: #333;
   }
 
   label {
     cursor: pointer;
     user-select: none;
-    font-family: Arial, sans-serif;
-    font-size: 14px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 13px;
     white-space: nowrap;
+    color: #333;
   }
 
   .attempts {
-    margin-top: 12px;
+    margin-top: 10px;
     padding: 8px;
-    background: #fff3cd;
-    border: 1px solid #ffc107;
+    background: #fffbe6;
+    border: 1px solid #e6d98c;
     border-radius: 4px;
     text-align: center;
-    font-family: Arial, sans-serif;
-    font-size: 12px;
-    color: #856404;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 11px;
+    color: #7a6c1a;
   }
 </style>
