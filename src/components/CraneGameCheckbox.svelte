@@ -3,18 +3,21 @@
 <script>
   import { onDestroy } from 'svelte';
 
+  let containerRef;
   let craneX = 50;
-  let clawOpen = true;
   let clawY = 0;
-  let dropping = false;
-  let grabbing = false;
+  let clawOpen = true;
+  let phase = 'idle'; // idle | dropping | closing | rising | resetting
   let hasCheckbox = false;
-  let checkboxY = 220;
-  let checkboxX = 50;
+  let dropPoint = 0;
   let attempts = 0;
   let message = '';
   let showMessage = false;
-  let containerRef;
+
+  let checkboxX = 50;
+  let checkboxBottomPx = 10;
+
+  let intervalId = null;
 
   const messages = [
     'つるっ！滑り落ちました',
@@ -27,8 +30,14 @@
     'この台は設定が渋いです',
   ];
 
+  function showMsg(text) {
+    message = text;
+    showMessage = true;
+    setTimeout(() => { showMessage = false; }, 2000);
+  }
+
   function handleMouseMove(e) {
-    if (dropping || grabbing) return;
+    if (phase !== 'idle') return;
     if (!containerRef) return;
     const rect = containerRef.getBoundingClientRect();
     const relX = ((e.clientX - rect.left) / rect.width) * 100;
@@ -37,7 +46,7 @@
 
   function handleTouchMove(e) {
     e.preventDefault();
-    if (dropping || grabbing) return;
+    if (phase !== 'idle') return;
     if (!containerRef) return;
     const rect = containerRef.getBoundingClientRect();
     const touch = e.touches[0];
@@ -46,64 +55,72 @@
   }
 
   function dropClaw() {
-    if (dropping || grabbing) return;
-    dropping = true;
+    if (phase !== 'idle') return;
+    phase = 'dropping';
     clawOpen = true;
     clawY = 0;
 
-    const dropInterval = setInterval(() => {
-      clawY += 4;
-      if (clawY >= 180) {
-        clearInterval(dropInterval);
+    // 下降フェーズ
+    clearInterval(intervalId);
+    intervalId = setInterval(() => {
+      clawY += 3;
+      if (clawY >= 150) {
+        clawY = 150;
+        clearInterval(intervalId);
+        // 閉じるフェーズ
+        phase = 'closing';
         clawOpen = false;
-        grabbing = true;
 
         const distance = Math.abs(craneX - checkboxX);
+        hasCheckbox = distance < 15;
 
+        // 少し待ってから上昇
+        dropPoint = 40 + Math.floor(Math.random() * 60); // 落とす高さを事前に決定
         setTimeout(() => {
-          if (distance < 12) {
-            hasCheckbox = true;
-          }
-
-          const riseInterval = setInterval(() => {
-            clawY -= 3;
+          phase = 'rising';
+          intervalId = setInterval(() => {
+            clawY -= 2;
 
             if (hasCheckbox) {
-              checkboxY = 220 - (180 - clawY);
+              // チェックボックスをクローと一緒に持ち上げる
+              checkboxBottomPx = 150 - clawY + 10;
             }
 
-            // チェックボックスを掴んでも途中で必ず落とす
-            if (hasCheckbox && clawY <= 80 + Math.random() * 60) {
+            // 事前に決めた高さで落とす
+            if (hasCheckbox && clawY <= dropPoint) {
               hasCheckbox = false;
-              checkboxY = 220;
-              // チェックボックスの位置をランダムに変える
+              checkboxBottomPx = 10;
               checkboxX = 15 + Math.random() * 70;
               attempts++;
-              message = messages[attempts % messages.length];
-              showMessage = true;
-              setTimeout(() => { showMessage = false; }, 2000);
+              showMsg(messages[attempts % messages.length]);
             }
 
             if (clawY <= 0) {
-              clearInterval(riseInterval);
               clawY = 0;
-              dropping = false;
-              grabbing = false;
+              clearInterval(intervalId);
+              // リセットフェーズ
+              phase = 'resetting';
               clawOpen = true;
               hasCheckbox = false;
 
               if (!showMessage) {
                 attempts++;
-                message = messages[attempts % messages.length];
-                showMessage = true;
-                setTimeout(() => { showMessage = false; }, 2000);
+                showMsg(messages[attempts % messages.length]);
               }
+
+              setTimeout(() => {
+                phase = 'idle';
+              }, 300);
             }
-          }, 30);
-        }, 400);
+          }, 25);
+        }, 500);
       }
     }, 20);
   }
+
+  onDestroy(() => {
+    clearInterval(intervalId);
+  });
 </script>
 
 <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
@@ -114,35 +131,42 @@
   on:touchmove|preventDefault={handleTouchMove}
   on:click={dropClaw}
 >
+  <!-- マシン上部（暗い背景） -->
   <div class="machine-top">
     <div class="rail"></div>
-    <div class="crane-assembly" style="left: {craneX}%;">
+    <div class="crane-arm" style="left: {craneX}%;">
+      <div class="arm-head"></div>
       <div class="wire" style="height: {clawY}px;"></div>
-      <div class="claw" class:open={clawOpen} style="top: {clawY}px;">
+      <div class="claw" class:open={clawOpen}>
         <div class="claw-left"></div>
+        <div class="claw-center"></div>
         <div class="claw-right"></div>
       </div>
     </div>
   </div>
 
+  <!-- プレイエリア（明るい背景） -->
   <div class="play-area">
-    <div class="checkbox-prize" style="left: {checkboxX}%; bottom: 10px;">
+    <div
+      class="checkbox-prize"
+      style="left: {checkboxX}%; bottom: {checkboxBottomPx}px;"
+    >
       <input type="checkbox" disabled />
       <span>認証</span>
     </div>
-    <div class="floor-items">
-      <span class="decoy" style="left: 20%; bottom: 8px;">🧸</span>
-      <span class="decoy" style="left: 70%; bottom: 8px;">🎀</span>
-    </div>
+    <span class="decoy" style="left: 15%; bottom: 6px;">🧸</span>
+    <span class="decoy" style="left: 75%; bottom: 6px;">🎀</span>
+    <span class="decoy" style="left: 40%; bottom: 6px;">⭐</span>
   </div>
 
+  <!-- UI オーバーレイ -->
   {#if showMessage}
     <div class="message">{message}</div>
   {/if}
 
   <div class="instructions">
-    {#if !dropping && !grabbing}
-      クリックでクレーンを降ろす
+    {#if phase === 'idle'}
+      マウスで移動 → クリックでキャッチ
     {:else}
       操作中...
     {/if}
@@ -160,85 +184,107 @@
     height: 320px;
     border: 1px solid #e0e0e0;
     border-radius: 6px;
-    background: linear-gradient(180deg, #2a2a3a 0%, #1a1a2e 50%, #fafafa 50%);
     overflow: hidden;
     cursor: pointer;
     user-select: none;
     touch-action: none;
+    background: #fafafa;
   }
 
+  /* マシン上部 */
   .machine-top {
-    position: relative;
-    height: 50%;
-    overflow: visible;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 180px;
+    background: #1e1e2e;
+    border-bottom: 3px solid #444;
   }
 
   .rail {
     position: absolute;
-    top: 15px;
+    top: 18px;
     left: 5%;
     right: 5%;
     height: 4px;
-    background: #666;
+    background: #555;
     border-radius: 2px;
   }
 
-  .crane-assembly {
+  .crane-arm {
     position: absolute;
-    top: 17px;
+    top: 14px;
     transform: translateX(-50%);
-    transition: left 0.15s ease-out;
+    transition: left 0.12s ease-out;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .arm-head {
+    width: 16px;
+    height: 12px;
+    background: #888;
+    border-radius: 3px 3px 0 0;
   }
 
   .wire {
     width: 2px;
-    background: #888;
-    margin: 0 auto;
-    transition: height 0.05s linear;
+    background: #aaa;
   }
 
   .claw {
-    position: relative;
-    width: 40px;
-    margin-left: -19px;
     display: flex;
-    justify-content: space-between;
+    align-items: flex-start;
+    gap: 0;
+    transition: gap 0.3s ease;
   }
 
-  .claw-left, .claw-right {
-    width: 4px;
-    height: 20px;
-    background: #aaa;
+  .claw-center {
+    width: 6px;
+    height: 8px;
+    background: #999;
+    border-radius: 0 0 2px 2px;
+  }
+
+  .claw-left,
+  .claw-right {
+    width: 3px;
+    height: 18px;
+    background: #bbb;
     border-radius: 0 0 2px 2px;
     transition: transform 0.3s ease;
   }
 
   .claw.open .claw-left {
-    transform: rotate(-30deg);
+    transform: rotate(-35deg);
     transform-origin: top center;
   }
 
   .claw.open .claw-right {
-    transform: rotate(30deg);
+    transform: rotate(35deg);
     transform-origin: top center;
   }
 
   .claw:not(.open) .claw-left {
-    transform: rotate(-5deg);
+    transform: rotate(-8deg);
     transform-origin: top center;
   }
 
   .claw:not(.open) .claw-right {
-    transform: rotate(5deg);
+    transform: rotate(8deg);
     transform-origin: top center;
   }
 
+  /* プレイエリア */
   .play-area {
     position: absolute;
-    bottom: 50px;
+    top: 183px;
     left: 0;
     right: 0;
-    height: calc(50% - 50px);
+    bottom: 45px;
+    background: #fafafa;
   }
 
   .checkbox-prize {
@@ -248,12 +294,13 @@
     gap: 4px;
     padding: 6px 10px;
     background: #fff;
-    border: 1px solid #d0d0d0;
+    border: 2px solid #333;
     border-radius: 4px;
     transform: translateX(-50%);
-    transition: left 0.3s ease, bottom 0.1s linear;
+    transition: left 0.3s ease, bottom 0.15s ease;
     pointer-events: none;
     white-space: nowrap;
+    z-index: 2;
   }
 
   .checkbox-prize input {
@@ -265,20 +312,21 @@
   .checkbox-prize span {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     font-size: 11px;
+    font-weight: 600;
     color: #333;
   }
 
   .decoy {
     position: absolute;
-    font-size: 24px;
+    font-size: 22px;
     pointer-events: none;
   }
 
   .message {
     position: absolute;
-    top: 55%;
+    top: 195px;
     left: 50%;
-    transform: translate(-50%, -50%);
+    transform: translateX(-50%);
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     font-size: 13px;
     font-weight: 600;
@@ -290,18 +338,19 @@
     animation: fadeInOut 2s ease-out forwards;
     pointer-events: none;
     white-space: nowrap;
+    z-index: 10;
   }
 
   @keyframes fadeInOut {
-    0% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
-    15% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+    0% { opacity: 0; transform: translateX(-50%) scale(0.8); }
+    15% { opacity: 1; transform: translateX(-50%) scale(1); }
     75% { opacity: 1; }
     100% { opacity: 0; }
   }
 
   .instructions {
     position: absolute;
-    bottom: 28px;
+    bottom: 26px;
     left: 0;
     right: 0;
     text-align: center;

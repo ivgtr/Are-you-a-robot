@@ -2,9 +2,11 @@
 
 <script>
   let popups = [
-    { id: 0, title: '🎉 おめでとうございます！', body: 'あなたは100万人目の訪問者です！', x: 10, y: 10, visible: true },
+    { id: 0, title: '🎉 おめでとうございます！', body: 'あなたは100万人目の訪問者です！', x: 5, y: 5, visible: true },
+    { id: 1, title: '⚠️ ウイルスが検出されました！', body: '今すぐスキャンしてください', x: 30, y: 20, visible: true },
+    { id: 2, title: '🍪 Cookieを受け入れますか？', body: '最適な体験のために必要です', x: 15, y: 40, visible: true },
   ];
-  let nextId = 1;
+  let nextId = 3;
   let attempts = 0;
   let checkboxVisible = false;
   let message = '';
@@ -46,12 +48,16 @@
   ];
 
   function spawnPopup(sourceX, sourceY) {
+    // ポップアップ数の上限 (多すぎるとパフォーマンス低下)
+    if (popups.length >= 8) {
+      popups = popups.slice(-5);
+    }
     const newPopup = {
       id: nextId++,
       title: adTitles[Math.floor(Math.random() * adTitles.length)],
       body: adBodies[Math.floor(Math.random() * adBodies.length)],
-      x: Math.max(0, Math.min(55, sourceX + (Math.random() - 0.5) * 40)),
-      y: Math.max(0, Math.min(55, sourceY + (Math.random() - 0.5) * 30)),
+      x: Math.max(0, Math.min(50, sourceX + (Math.random() - 0.5) * 30)),
+      y: Math.max(0, Math.min(55, sourceY + (Math.random() - 0.5) * 25)),
       visible: true,
     };
     popups = [...popups, newPopup];
@@ -61,8 +67,7 @@
     attempts++;
 
     // 偽の×ボタン: 閉じる代わりに新しい広告を生成
-    popup.visible = false;
-    popups = popups.filter(p => p.visible);
+    popups = popups.filter(p => p.id !== popup.id);
 
     // 1〜2個の新しい広告を生成
     const numNew = 1 + Math.floor(Math.random() * 2);
@@ -75,21 +80,20 @@
     setTimeout(() => { showMessage = false; }, 1500);
 
     // たまにチェックボックスがチラ見えする演出
-    if (attempts % 7 === 0) {
+    if (attempts > 0 && attempts % 5 === 0) {
       checkboxVisible = true;
       setTimeout(() => {
         checkboxVisible = false;
-        spawnPopup(25, 40);
-        spawnPopup(35, 45);
+        spawnPopup(20, 35);
+        spawnPopup(30, 45);
       }, 800);
     }
   }
 
   function handleCheckboxClick() {
-    // チェックボックスが見えてもクリックすると広告で覆われる
     checkboxVisible = false;
     for (let i = 0; i < 3; i++) {
-      spawnPopup(20 + Math.random() * 30, 30 + Math.random() * 30);
+      spawnPopup(15 + Math.random() * 35, 25 + Math.random() * 30);
     }
     message = '認証エリアは広告スポンサーにより保護されています';
     showMessage = true;
@@ -108,24 +112,22 @@
   </div>
 
   {#each popups as popup (popup.id)}
-    {#if popup.visible}
-      <div
-        class="popup"
-        style="left: {popup.x}%; top: {popup.y}%;"
-      >
-        <div class="popup-header">
-          <span class="popup-title">{popup.title}</span>
-          <button class="close-btn" on:click={() => handleClose(popup)}>×</button>
-        </div>
-        <div class="popup-body">
-          <p>{popup.body}</p>
-          <div class="fake-buttons">
-            <button class="fake-btn primary" on:click={() => handleClose(popup)}>OK</button>
-            <button class="fake-btn" on:click={() => handleClose(popup)}>閉じる</button>
-          </div>
+    <div
+      class="popup"
+      style="left: {popup.x}%; top: {popup.y}%;"
+    >
+      <div class="popup-header">
+        <span class="popup-title">{popup.title}</span>
+        <button class="close-btn" on:click|stopPropagation={() => handleClose(popup)}>×</button>
+      </div>
+      <div class="popup-body">
+        <p>{popup.body}</p>
+        <div class="fake-buttons">
+          <button class="fake-btn primary" on:click|stopPropagation={() => handleClose(popup)}>OK</button>
+          <button class="fake-btn" on:click|stopPropagation={() => handleClose(popup)}>閉じる</button>
         </div>
       </div>
-    {/if}
+    </div>
   {/each}
 
   {#if showMessage}
@@ -133,7 +135,7 @@
   {/if}
 
   {#if attempts > 0}
-    <div class="attempts">閉じた広告: {attempts} / 新たな広告: {popups.length}</div>
+    <div class="attempts">閉じた広告: {attempts} / 現在の広告: {popups.length}</div>
   {/if}
 </div>
 
@@ -162,6 +164,7 @@
   .checkbox-area.visible {
     opacity: 1;
     pointer-events: auto;
+    z-index: 50;
   }
 
   .real-checkbox {
@@ -191,17 +194,17 @@
 
   .popup {
     position: absolute;
-    width: 200px;
+    width: 190px;
     background: #fff;
     border: 1px solid #ccc;
     border-radius: 6px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     z-index: 10;
-    animation: popIn 0.2s ease-out;
+    animation: popIn 0.25s ease-out;
   }
 
   @keyframes popIn {
-    from { opacity: 0; transform: scale(0.8); }
+    from { opacity: 0; transform: scale(0.85); }
     to { opacity: 1; transform: scale(1); }
   }
 
@@ -209,30 +212,32 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 8px 10px;
+    padding: 7px 9px;
     background: #f5f5f5;
     border-bottom: 1px solid #e0e0e0;
     border-radius: 6px 6px 0 0;
+    gap: 4px;
   }
 
   .popup-title {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 600;
     color: #333;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    max-width: 150px;
+    flex: 1;
+    min-width: 0;
   }
 
   .close-btn {
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
     border: none;
     background: #e0e0e0;
     border-radius: 3px;
-    font-size: 14px;
+    font-size: 13px;
     line-height: 1;
     cursor: pointer;
     display: flex;
@@ -240,6 +245,7 @@
     justify-content: center;
     color: #666;
     flex-shrink: 0;
+    padding: 0;
   }
 
   .close-btn:hover {
@@ -248,24 +254,24 @@
   }
 
   .popup-body {
-    padding: 10px;
+    padding: 8px 9px;
   }
 
   .popup-body p {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    font-size: 11px;
+    font-size: 10px;
     color: #666;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
   }
 
   .fake-buttons {
     display: flex;
-    gap: 6px;
+    gap: 5px;
   }
 
   .fake-btn {
     flex: 1;
-    padding: 5px 8px;
+    padding: 4px 6px;
     border: 1px solid #d0d0d0;
     border-radius: 4px;
     background: #fff;
@@ -287,15 +293,15 @@
 
   .message {
     position: absolute;
-    bottom: 35px;
+    bottom: 30px;
     left: 50%;
     transform: translateX(-50%);
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 600;
     color: #c0392b;
     background: rgba(255, 255, 255, 0.95);
-    padding: 6px 14px;
+    padding: 6px 12px;
     border-radius: 4px;
     border: 1px solid #e0e0e0;
     animation: fadeInOut 1.5s ease-out forwards;

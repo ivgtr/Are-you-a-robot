@@ -12,28 +12,31 @@
 
   const COLS = 8;
   const ROWS = 4;
-  const BLOCK_W = 42;
-  const BLOCK_H = 14;
-  const BLOCK_PAD = 3;
   const BALL_R = 5;
-  const PADDLE_W = 60;
   const PADDLE_H = 8;
+  const BLOCK_H = 14;
 
-  let blocks = [];
-  let ballX, ballY, ballDX, ballDY;
-  let paddleX;
   let canvasW = 350;
   let canvasH = 260;
+  let paddleW = 60;
+
+  let blocks = [];
+  let ballX = 0, ballY = 0, ballDX = 0, ballDY = 0;
+  let paddleX = 0;
   let checkboxRevealed = false;
+  let resetTimeout = null;
 
   function initBlocks() {
     blocks = [];
-    const offsetX = (canvasW - (COLS * (BLOCK_W + BLOCK_PAD))) / 2;
+    const pad = 3;
+    const bw = (canvasW - 20) / COLS - pad;
+    const offsetX = (canvasW - COLS * (bw + pad)) / 2;
     for (let r = 0; r < ROWS; r++) {
       for (let c = 0; c < COLS; c++) {
         blocks.push({
-          x: offsetX + c * (BLOCK_W + BLOCK_PAD),
-          y: 30 + r * (BLOCK_H + BLOCK_PAD),
+          x: offsetX + c * (bw + pad),
+          y: 30 + r * (BLOCK_H + pad),
+          w: bw,
           alive: true,
         });
       }
@@ -42,70 +45,96 @@
 
   function resetBall() {
     ballX = canvasW / 2;
-    ballY = canvasH - 40;
-    const angle = -Math.PI / 2 + (Math.random() - 0.5) * 0.8;
-    ballDX = Math.cos(angle) * 3;
-    ballDY = Math.sin(angle) * 3;
+    ballY = canvasH - 50;
+    const angle = -Math.PI / 2 + (Math.random() - 0.5) * 0.6;
+    const speed = 2.5;
+    ballDX = Math.cos(angle) * speed;
+    ballDY = Math.sin(angle) * speed;
+  }
+
+  function setupCanvas() {
+    if (!canvasRef) return;
+    const rect = canvasRef.getBoundingClientRect();
+    if (rect.width > 0 && rect.height > 0) {
+      canvasW = Math.floor(rect.width);
+      canvasH = Math.floor(rect.height);
+    }
+    canvasRef.width = canvasW;
+    canvasRef.height = canvasH;
+    paddleW = Math.max(50, canvasW * 0.17);
   }
 
   function startGame() {
     gameStarted = true;
+    setupCanvas();
     initBlocks();
     resetBall();
-    paddleX = canvasW / 2 - PADDLE_W / 2;
+    paddleX = canvasW / 2 - paddleW / 2;
     checkboxRevealed = false;
+    if (animationId) cancelAnimationFrame(animationId);
     loop();
+  }
+
+  function getCanvasX(clientX) {
+    if (!canvasRef) return 0;
+    const rect = canvasRef.getBoundingClientRect();
+    if (rect.width === 0) return 0;
+    return ((clientX - rect.left) / rect.width) * canvasW;
   }
 
   function handleMouseMove(e) {
     if (!canvasRef || !gameStarted) return;
-    const rect = canvasRef.getBoundingClientRect();
-    paddleX = Math.max(0, Math.min(canvasW - PADDLE_W, e.clientX - rect.left - PADDLE_W / 2));
+    const cx = getCanvasX(e.clientX);
+    paddleX = Math.max(0, Math.min(canvasW - paddleW, cx - paddleW / 2));
   }
 
   function handleTouchMove(e) {
     e.preventDefault();
     if (!canvasRef || !gameStarted) return;
-    const rect = canvasRef.getBoundingClientRect();
-    const touch = e.touches[0];
-    paddleX = Math.max(0, Math.min(canvasW - PADDLE_W, touch.clientX - rect.left - PADDLE_W / 2));
+    const cx = getCanvasX(e.touches[0].clientX);
+    paddleX = Math.max(0, Math.min(canvasW - paddleW, cx - paddleW / 2));
   }
 
   function loop() {
     if (!canvasRef) return;
     const ctx = canvasRef.getContext('2d');
+    if (!ctx) return;
 
-    // Move ball
+    // ボール移動
     ballX += ballDX;
     ballY += ballDY;
 
-    // Wall collision
-    if (ballX <= BALL_R || ballX >= canvasW - BALL_R) ballDX = -ballDX;
-    if (ballY <= BALL_R) ballDY = -ballDY;
+    // 壁との衝突
+    if (ballX <= BALL_R) { ballX = BALL_R; ballDX = Math.abs(ballDX); }
+    if (ballX >= canvasW - BALL_R) { ballX = canvasW - BALL_R; ballDX = -Math.abs(ballDX); }
+    if (ballY <= BALL_R) { ballY = BALL_R; ballDY = Math.abs(ballDY); }
 
-    // Paddle collision
+    // パドルとの衝突
+    const paddleTop = canvasH - 30;
     if (
-      ballY >= canvasH - 30 - BALL_R &&
-      ballY <= canvasH - 30 + PADDLE_H &&
+      ballDY > 0 &&
+      ballY + BALL_R >= paddleTop &&
+      ballY + BALL_R <= paddleTop + PADDLE_H + 4 &&
       ballX >= paddleX &&
-      ballX <= paddleX + PADDLE_W
+      ballX <= paddleX + paddleW
     ) {
       ballDY = -Math.abs(ballDY);
-      const hitPos = (ballX - paddleX) / PADDLE_W;
-      ballDX = (hitPos - 0.5) * 5;
+      const hitPos = (ballX - paddleX) / paddleW - 0.5;
+      ballDX = hitPos * 4;
+      ballY = paddleTop - BALL_R;
     }
 
-    // Ball out
-    if (ballY > canvasH) {
+    // ボール落下
+    if (ballY > canvasH + 10) {
       resetBall();
     }
 
-    // Block collision
+    // ブロックとの衝突
     for (let b of blocks) {
       if (!b.alive) continue;
       if (
         ballX + BALL_R > b.x &&
-        ballX - BALL_R < b.x + BLOCK_W &&
+        ballX - BALL_R < b.x + b.w &&
         ballY + BALL_R > b.y &&
         ballY - BALL_R < b.y + BLOCK_H
       ) {
@@ -115,14 +144,13 @@
       }
     }
 
-    // Check if all blocks destroyed
+    // 全ブロック破壊チェック
     const allDestroyed = blocks.every(b => !b.alive);
     if (allDestroyed && !checkboxRevealed) {
       checkboxRevealed = true;
       attempts++;
 
-      // ブロックを全部壊してもすぐにリセット
-      setTimeout(() => {
+      resetTimeout = setTimeout(() => {
         const msgs = [
           '認証ブロックが再生成されました',
           'セキュリティ層が追加されました',
@@ -139,62 +167,93 @@
       }, 1500);
     }
 
-    // Draw
+    // 描画
     ctx.clearRect(0, 0, canvasW, canvasH);
 
-    // Draw blocks
-    for (let b of blocks) {
+    // ブロック描画
+    const colors = ['#555', '#666', '#777', '#888'];
+    for (let i = 0; i < blocks.length; i++) {
+      const b = blocks[i];
       if (!b.alive) continue;
-      ctx.fillStyle = '#555';
-      ctx.fillRect(b.x, b.y, BLOCK_W, BLOCK_H);
-      ctx.strokeStyle = '#777';
-      ctx.strokeRect(b.x, b.y, BLOCK_W, BLOCK_H);
+      const row = Math.floor(i / COLS);
+      ctx.fillStyle = colors[row % colors.length];
+      ctx.fillRect(b.x, b.y, b.w, BLOCK_H);
+      ctx.strokeStyle = '#999';
+      ctx.lineWidth = 0.5;
+      ctx.strokeRect(b.x, b.y, b.w, BLOCK_H);
     }
 
-    // Draw checkbox area (behind blocks)
+    // チェックボックスエリア
     if (checkboxRevealed) {
+      const cbW = Math.min(180, canvasW - 40);
+      const cbH = 34;
+      const cbX = canvasW / 2 - cbW / 2;
+      const cbY = 45;
       ctx.fillStyle = '#fff';
-      ctx.fillRect(canvasW / 2 - 70, 50, 140, 30);
-      ctx.strokeStyle = '#d0d0d0';
-      ctx.strokeRect(canvasW / 2 - 70, 50, 140, 30);
+      ctx.fillRect(cbX, cbY, cbW, cbH);
+      ctx.strokeStyle = '#333';
+      ctx.lineWidth = 1.5;
+      ctx.strokeRect(cbX, cbY, cbW, cbH);
+      ctx.strokeStyle = '#333';
+      ctx.lineWidth = 1.5;
+      ctx.strokeRect(cbX + 10, cbY + 9, 16, 16);
       ctx.fillStyle = '#333';
       ctx.font = '12px -apple-system, sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillText('✓ 私はロボットではありません', canvasW / 2, 70);
+      ctx.textAlign = 'left';
+      ctx.fillText('私はロボットではありません', cbX + 32, cbY + 22);
     } else {
-      ctx.fillStyle = '#e0e0e0';
+      ctx.fillStyle = '#bbb';
       ctx.font = '10px -apple-system, sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText('🔒 ブロックの奥に認証が隠れています', canvasW / 2, 22);
+      ctx.fillText('ブロックの奥に認証が隠れています', canvasW / 2, 22);
     }
 
-    // Draw ball
+    // ボール描画
     ctx.beginPath();
     ctx.arc(ballX, ballY, BALL_R, 0, Math.PI * 2);
     ctx.fillStyle = '#333';
     ctx.fill();
 
-    // Draw paddle
+    // パドル描画
     ctx.fillStyle = '#333';
-    ctx.fillRect(paddleX, canvasH - 30, PADDLE_W, PADDLE_H);
+    ctx.beginPath();
+    const r = 4;
+    ctx.moveTo(paddleX + r, paddleTop);
+    ctx.lineTo(paddleX + paddleW - r, paddleTop);
+    ctx.arcTo(paddleX + paddleW, paddleTop, paddleX + paddleW, paddleTop + r, r);
+    ctx.lineTo(paddleX + paddleW, paddleTop + PADDLE_H - r);
+    ctx.arcTo(paddleX + paddleW, paddleTop + PADDLE_H, paddleX + paddleW - r, paddleTop + PADDLE_H, r);
+    ctx.lineTo(paddleX + r, paddleTop + PADDLE_H);
+    ctx.arcTo(paddleX, paddleTop + PADDLE_H, paddleX, paddleTop + PADDLE_H - r, r);
+    ctx.lineTo(paddleX, paddleTop + r);
+    ctx.arcTo(paddleX, paddleTop, paddleX + r, paddleTop, r);
+    ctx.fill();
 
     animationId = requestAnimationFrame(loop);
   }
 
+  onMount(() => {
+    // 初期描画（開始前の状態）
+    if (canvasRef) {
+      setupCanvas();
+      const ctx = canvasRef.getContext('2d');
+      if (ctx) {
+        ctx.fillStyle = '#bbb';
+        ctx.font = '10px -apple-system, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('ブロックの奥に認証が隠れています', canvasW / 2, canvasH / 2);
+      }
+    }
+  });
+
   onDestroy(() => {
     if (animationId) cancelAnimationFrame(animationId);
+    if (resetTimeout) clearTimeout(resetTimeout);
   });
 </script>
 
 <div class="container">
-  {#if !gameStarted}
-    <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
-    <div class="start-screen" on:click={startGame}>
-      <div class="start-icon">🧱</div>
-      <div class="start-text">ブロックを壊して認証を解放せよ</div>
-      <button class="start-btn">ゲーム開始</button>
-    </div>
-  {:else}
+  <div class="canvas-wrapper">
     <canvas
       bind:this={canvasRef}
       width={canvasW}
@@ -202,7 +261,16 @@
       on:mousemove={handleMouseMove}
       on:touchmove|preventDefault={handleTouchMove}
     ></canvas>
-  {/if}
+
+    {#if !gameStarted}
+      <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
+      <div class="start-overlay" on:click={startGame}>
+        <div class="start-icon">🧱</div>
+        <div class="start-text">ブロックを壊して認証を解放せよ</div>
+        <button class="start-btn">ゲーム開始</button>
+      </div>
+    {/if}
+  </div>
 
   {#if showMessage}
     <div class="message">{message}</div>
@@ -223,21 +291,33 @@
     overflow: hidden;
   }
 
+  .canvas-wrapper {
+    position: relative;
+    width: 100%;
+    height: 260px;
+  }
+
   canvas {
     display: block;
     width: 100%;
-    cursor: none;
+    height: 100%;
     background: #fafafa;
   }
 
-  .start-screen {
+  .start-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    height: 260px;
+    background: rgba(250, 250, 250, 0.95);
     cursor: pointer;
     gap: 12px;
+    z-index: 5;
   }
 
   .start-icon {
@@ -281,6 +361,7 @@
     animation: fadeInOut 2s ease-out forwards;
     pointer-events: none;
     white-space: nowrap;
+    z-index: 10;
   }
 
   @keyframes fadeInOut {

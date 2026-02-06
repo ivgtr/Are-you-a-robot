@@ -4,26 +4,38 @@
   let attempts = 0;
   let message = '';
   let showMessage = false;
-  let solved = false;
 
   // 3x3 スライドパズル (0 = empty)
+  // 「私はロボットでは」の8文字だが、1文字が欠損している
   let tiles = [1, 2, 3, 4, 5, 6, 7, 8, 0];
   let emptyIndex = 8;
 
-  const labels = ['私', 'は', 'ロ', 'ボ', 'ッ', 'ト', 'で', 'は', ''];
+  // 正しくは「私はロボットでは」だが、一部の文字が別の文字に置き換わっている
+  const correctLabels = ['私', 'は', 'ロ', 'ボ', 'ッ', 'ト', 'で', 'は'];
+  // 実際に表示されるラベル（1文字がおかしい）
+  let displayLabels = [...correctLabels];
+  let brokenIndex = 0;
+
+  const brokenReplacements = ['人', '口', 'ポ', 'つ', '卜', 'て', 'ば', '□', '?', '＿'];
+
+  function breakOneLabel() {
+    brokenIndex = Math.floor(Math.random() * 8);
+    displayLabels = [...correctLabels];
+    displayLabels[brokenIndex] = brokenReplacements[Math.floor(Math.random() * brokenReplacements.length)];
+  }
+
   const solvedState = [1, 2, 3, 4, 5, 6, 7, 8, 0];
 
-  const shuffleMessages = [
-    'パズルが再シャッフルされました',
-    '追加認証ステップが必要です',
-    'パズルの難易度が上がりました',
-    'タイムアウト！再挑戦してください',
-    'もう一度パズルを解いてください',
+  const failMessages = [
+    '文字が1つ間違っています。正しい認証文を完成できません',
+    'パズルは完成しましたが、認証文が不正です',
+    '「{wrong}」が正しくありません。正しい文字が見つかりません',
+    'フォントデータが破損しています。再試行してください',
+    '認証文の検証に失敗しました。文字化けが検出されました',
   ];
 
   function shuffle() {
-    // ランダムに有効な移動を繰り返してシャッフル
-    for (let i = 0; i < 100; i++) {
+    for (let i = 0; i < 80; i++) {
       const neighbors = getMovableTiles();
       const pick = neighbors[Math.floor(Math.random() * neighbors.length)];
       swapTile(pick, true);
@@ -35,10 +47,10 @@
     const col = emptyIndex % 3;
     const movable = [];
 
-    if (row > 0) movable.push(emptyIndex - 3); // up
-    if (row < 2) movable.push(emptyIndex + 3); // down
-    if (col > 0) movable.push(emptyIndex - 1); // left
-    if (col < 2) movable.push(emptyIndex + 1); // right
+    if (row > 0) movable.push(emptyIndex - 3);
+    if (row < 2) movable.push(emptyIndex + 3);
+    if (col > 0) movable.push(emptyIndex - 1);
+    if (col < 2) movable.push(emptyIndex + 1);
 
     return movable;
   }
@@ -57,28 +69,31 @@
   }
 
   function handleTileClick(index) {
-    if (solved) return;
     swapTile(index, false);
   }
 
   function checkSolved() {
     const isSolved = tiles.every((t, i) => t === solvedState[i]);
     if (isSolved) {
-      solved = true;
       attempts++;
 
-      // 解いても再シャッフルされる
+      // 揃っても文字が間違っているので失敗
+      let msg = failMessages[attempts % failMessages.length];
+      msg = msg.replace('{wrong}', displayLabels[brokenIndex]);
+      message = msg;
+      showMessage = true;
+
       setTimeout(() => {
-        message = shuffleMessages[attempts % shuffleMessages.length];
-        showMessage = true;
-        setTimeout(() => { showMessage = false; }, 2000);
-        solved = false;
+        showMessage = false;
+        // 間違った文字を変えてシャッフル
+        breakOneLabel();
         shuffle();
-      }, 1200);
+      }, 2500);
     }
   }
 
-  // 初期シャッフル
+  // 初期化
+  breakOneLabel();
   shuffle();
 </script>
 
@@ -94,12 +109,12 @@
       <div
         class="tile"
         class:empty={tile === 0}
-        class:correct={tile === solvedState[i] && tile !== 0}
-        class:solved={solved}
+        class:correct={tile === solvedState[i] && tile !== 0 && tile - 1 !== brokenIndex}
+        class:broken={tile !== 0 && tile - 1 === brokenIndex}
         on:click={() => handleTileClick(i)}
       >
         {#if tile !== 0}
-          <span class="tile-label">{labels[tile - 1]}</span>
+          <span class="tile-label">{displayLabels[tile - 1]}</span>
           <span class="tile-number">{tile}</span>
         {/if}
       </div>
@@ -108,13 +123,8 @@
 
   <div class="target">
     <span class="target-label">目標: 「私はロボットでは」</span>
+    <span class="target-hint">※ 文字をよく確認してください</span>
   </div>
-
-  {#if solved}
-    <div class="result success">
-      ✓ パズル完成！認証処理中...
-    </div>
-  {/if}
 
   {#if showMessage}
     <div class="result error">
@@ -123,7 +133,7 @@
   {/if}
 
   {#if attempts > 0}
-    <div class="attempts">完成回数: {attempts} (認証: 未完了)</div>
+    <div class="attempts">完成回数: {attempts} (認証: 未完了 - 文字破損)</div>
   {/if}
 </div>
 
@@ -199,9 +209,9 @@
     border-color: #b8d4b8;
   }
 
-  .tile.solved {
-    background: #e8f5e9;
-    border-color: #81c784;
+  .tile.broken {
+    background: #fef2f2;
+    border-color: #fca5a5;
   }
 
   .tile-label {
@@ -209,6 +219,10 @@
     font-size: 22px;
     font-weight: 600;
     color: #333;
+  }
+
+  .tile.broken .tile-label {
+    color: #b91c1c;
   }
 
   .tile-number {
@@ -229,6 +243,14 @@
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     font-size: 11px;
     color: #999;
+    display: block;
+    margin-bottom: 2px;
+  }
+
+  .target-hint {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 10px;
+    color: #c0392b;
   }
 
   .result {
@@ -238,12 +260,6 @@
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     font-size: 12px;
     animation: slideIn 0.2s ease-out;
-  }
-
-  .result.success {
-    background: #f0faf0;
-    color: #1a6b2a;
-    border: 1px solid #d4e8d4;
   }
 
   .result.error {
