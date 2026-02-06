@@ -85,27 +85,22 @@
   }
 
   function startLoading() {
-    // ドットアニメーション
     dotsInterval = setInterval(() => {
       dots = dots.length >= 3 ? '' : dots + '.';
     }, 500);
 
-    // 偽の進捗バー: 99%で止まる
     progressInterval = setInterval(() => {
       if (progress < 99) {
-        // 最初は速く、後半は極端に遅くなる
         const remaining = 99 - progress;
         const increment = Math.max(0.1, remaining * 0.05);
         progress = Math.min(99, progress + increment);
       }
     }, 200);
 
-    // ステータスメッセージの切替
     statusInterval = setInterval(() => {
       statusIndex++;
     }, 4000);
 
-    // 30秒後に「もうすぐ完了」を表示（嘘）
     almostDoneTimeout = setTimeout(() => {
       showAlmostDone = true;
     }, 30000);
@@ -138,15 +133,15 @@
           <div class="spinner"></div>
           <span class="loading-text">{currentStatus}{dots}</span>
         </div>
-        <div class="progress-bar-container">
-          <div class="progress-bar" style="width: {progress.toFixed(1)}%;"></div>
+        <div class="progress-track">
+          <div class="progress-fill" style="width: {progress.toFixed(1)}%;"></div>
         </div>
         <div class="progress-info">
           <span class="progress-percent">{progress.toFixed(1)}%</span>
           {#if showAlmostDone && progress < 98.5}
-            <span class="almost-done">もうすぐ完了します...</span>
+            <span class="progress-hint">もうすぐ完了します...</span>
           {:else if progress >= 98.5 && !completed && !gameOver}
-            <span class="almost-done">クリックで押し上げろ！({clickCount}/{CLICKS_TO_COMPLETE}) 残り{reached99 ? timeLeft : '--'}秒</span>
+            <span class="progress-hint">クリックで押し上げろ！({clickCount}/{CLICKS_TO_COMPLETE}) 残り{reached99 ? timeLeft : '--'}秒</span>
           {/if}
         </div>
       </div>
@@ -156,20 +151,20 @@
 
 <style>
   .container {
-    padding: 16px;
-    border: 1px solid #e0e0e0;
-    border-radius: 6px;
-    background: #fafafa;
+    padding: var(--ar-container-padding, 16px);
+    border: 1px solid var(--ar-color-border, #e0e0e0);
+    border-radius: var(--ar-radius-lg, 6px);
+    background: var(--ar-color-bg, #fafafa);
   }
 
   .checkbox-wrapper {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 10px 14px;
-    background: #fff;
-    border: 1px solid #d0d0d0;
-    border-radius: 4px;
+    gap: var(--ar-checkbox-wrapper-gap, 8px);
+    padding: var(--ar-checkbox-wrapper-padding, 10px 14px);
+    background: var(--ar-color-surface, #fff);
+    border: 1px solid var(--ar-color-border-dark, #d0d0d0);
+    border-radius: var(--ar-radius, 4px);
     width: fit-content;
     cursor: pointer;
     min-width: 300px;
@@ -181,18 +176,18 @@
   }
 
   input[type="checkbox"] {
-    width: 18px;
-    height: 18px;
+    width: var(--ar-checkbox-size, 18px);
+    height: var(--ar-checkbox-size, 18px);
     cursor: pointer;
-    accent-color: #333;
+    accent-color: var(--ar-checkbox-accent, #333);
   }
 
   label {
     cursor: pointer;
     user-select: none;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    font-size: 13px;
-    color: #333;
+    font-family: var(--ar-font-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
+    font-size: var(--ar-font-size-base, 13px);
+    color: var(--ar-color-text, #333);
   }
 
   .loading-content {
@@ -202,16 +197,16 @@
   .spinner-row {
     display: flex;
     align-items: center;
-    gap: 8px;
-    margin-bottom: 10px;
+    gap: var(--ar-checkbox-wrapper-gap, 8px);
+    margin-bottom: var(--ar-space-5, 10px);
   }
 
   .spinner {
-    width: 18px;
-    height: 18px;
-    border: 2px solid #e0e0e0;
-    border-top: 2px solid #555;
-    border-radius: 50%;
+    width: var(--ar-checkbox-size, 18px);
+    height: var(--ar-checkbox-size, 18px);
+    border: 2px solid var(--ar-color-border, #e0e0e0);
+    border-top: 2px solid var(--ar-color-text-secondary, #555);
+    border-radius: var(--ar-radius-full, 50%);
     animation: spin 0.8s linear infinite;
     flex-shrink: 0;
   }
@@ -222,22 +217,22 @@
   }
 
   .loading-text {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    font-size: 13px;
-    color: #666;
+    font-family: var(--ar-font-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
+    font-size: var(--ar-font-size-base, 13px);
+    color: var(--ar-color-text-secondary, #666);
   }
 
-  .progress-bar-container {
+  .progress-track {
     width: 100%;
     height: 4px;
-    background: #e0e0e0;
+    background: var(--ar-color-border, #e0e0e0);
     border-radius: 2px;
     overflow: hidden;
   }
 
-  .progress-bar {
+  .progress-fill {
     height: 100%;
-    background: #555;
+    background: var(--ar-color-text-secondary, #555);
     border-radius: 2px;
     transition: width 0.2s linear;
   }
@@ -246,19 +241,19 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-top: 6px;
+    margin-top: var(--ar-space-3, 6px);
   }
 
   .progress-percent {
-    font-family: 'SF Mono', 'Fira Code', Menlo, Consolas, monospace;
-    font-size: 11px;
-    color: #999;
+    font-family: var(--ar-font-mono, 'SF Mono', 'Fira Code', Menlo, Consolas, monospace);
+    font-size: var(--ar-font-size-sm, 11px);
+    color: var(--ar-color-text-muted, #999);
   }
 
-  .almost-done {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    font-size: 11px;
-    color: #1a6b2a;
+  .progress-hint {
+    font-family: var(--ar-font-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
+    font-size: var(--ar-font-size-sm, 11px);
+    color: var(--ar-color-success, #1a6b2a);
     animation: pulse 1.5s ease-in-out infinite;
   }
 

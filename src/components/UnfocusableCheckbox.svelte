@@ -27,7 +27,6 @@
   function handleFocus(e) {
     if (vulnerableWindow || cleared || gameOver) return;
     e.target.blur();
-    // フォーカスではカウントしない（クリックハンドラで一元管理）
   }
 
   function handleKeyDown(e) {
@@ -38,7 +37,7 @@
   function handleClick(e) {
     if (cleared || gameOver) return;
 
-    // 脆弱ウィンドウ中はチェックを許可する（preventDefaultしない）
+    // 脆弱ウィンドウ中はチェックを許可する
     if (vulnerableWindow) {
       const checkbox = e.currentTarget.querySelector('input[type="checkbox"]');
       if (checkbox && checkbox.checked) {
@@ -71,7 +70,6 @@
       vulnerableTimeout = setTimeout(() => {
         if (!cleared) {
           vulnerableWindow = false;
-          // チャンスを逃した → ゲームオーバー
           gameOver = true;
           disabled = true;
           message = 'セキュリティが完全に復旧しました。ゲームオーバー';
@@ -132,45 +130,45 @@
     </label>
   </div>
   {#if message}
-    <p class="hint" class:success={cleared}>{message}</p>
+    <p class="message" class:message--success={cleared} class:message--error={!cleared}>{message}</p>
   {/if}
   {#if attempts > 0}
-    <div class="attempts">試行回数: {attempts}</div>
+    <div class="counter">試行回数: {attempts}</div>
   {/if}
 </div>
 
 <style>
   .container {
-    padding: 16px;
-    border: 1px solid #e0e0e0;
-    border-radius: 6px;
-    background: #fafafa;
+    padding: var(--ar-container-padding, 16px);
+    border: 1px solid var(--ar-color-border, #e0e0e0);
+    border-radius: var(--ar-radius-lg, 6px);
+    background: var(--ar-color-bg, #fafafa);
   }
 
   .checkbox-wrapper {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 10px 14px;
-    background: #fff;
-    border: 1px solid #d0d0d0;
-    border-radius: 4px;
+    gap: var(--ar-checkbox-wrapper-gap, 8px);
+    padding: var(--ar-checkbox-wrapper-padding, 10px 14px);
+    background: var(--ar-color-surface, #fff);
+    border: 1px solid var(--ar-color-border-dark, #d0d0d0);
+    border-radius: var(--ar-radius, 4px);
     width: fit-content;
     cursor: pointer;
-    transition: opacity 0.3s, background 0.3s;
+    transition: opacity var(--ar-transition-slow, 0.3s ease), background var(--ar-transition-slow, 0.3s ease);
   }
 
   .checkbox-wrapper.disabled {
     opacity: 0.4;
     cursor: not-allowed;
-    background: #f0f0f0;
+    background: var(--ar-color-surface-hover, #f0f0f0);
   }
 
   input[type="checkbox"] {
-    width: 18px;
-    height: 18px;
+    width: var(--ar-checkbox-size, 18px);
+    height: var(--ar-checkbox-size, 18px);
     cursor: pointer;
-    accent-color: #333;
+    accent-color: var(--ar-checkbox-accent, #333);
   }
 
   input[type="checkbox"]:disabled {
@@ -185,21 +183,24 @@
   label {
     cursor: pointer;
     user-select: none;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    font-size: 13px;
-    color: #333;
+    font-family: var(--ar-font-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
+    font-size: var(--ar-font-size-base, 13px);
+    color: var(--ar-color-text, #333);
   }
 
-  .hint {
-    margin-top: 10px;
-    font-size: 11px;
-    color: #b91c1c;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  .message {
+    margin-top: var(--ar-space-5, 10px);
+    font-size: var(--ar-font-size-sm, 11px);
+    font-family: var(--ar-font-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
     animation: shake 0.3s ease-in-out;
   }
 
-  .hint.success {
-    color: #1a6b2a;
+  .message--error {
+    color: var(--ar-color-error, #b91c1c);
+  }
+
+  .message--success {
+    color: var(--ar-color-success, #1a6b2a);
   }
 
   @keyframes shake {
@@ -208,15 +209,15 @@
     75% { transform: translateX(3px); }
   }
 
-  .attempts {
-    margin-top: 8px;
-    padding: 6px 8px;
-    background: #fffbe6;
-    border: 1px solid #e6d98c;
-    border-radius: 4px;
+  .counter {
+    margin-top: var(--ar-space-4, 8px);
+    padding: var(--ar-counter-padding, 6px 8px);
+    background: var(--ar-color-warning-bg, #fffbe6);
+    border: 1px solid var(--ar-color-warning-border, #e6d98c);
+    border-radius: var(--ar-radius, 4px);
     text-align: center;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    font-size: 11px;
-    color: #7a6c1a;
+    font-family: var(--ar-font-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
+    font-size: var(--ar-font-size-sm, 11px);
+    color: var(--ar-color-warning, #7a6c1a);
   }
 </style>

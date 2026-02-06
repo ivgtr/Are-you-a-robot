@@ -87,18 +87,18 @@
 
 <style>
   .container {
-    padding: 16px;
-    border: 1px solid #e0e0e0;
-    border-radius: 6px;
-    background: #fafafa;
+    padding: var(--ar-container-padding, 16px);
+    border: 1px solid var(--ar-color-border, #e0e0e0);
+    border-radius: var(--ar-radius-lg, 6px);
+    background: var(--ar-color-bg, #fafafa);
   }
 
   .message {
-    margin-bottom: 16px;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    font-size: 13px;
+    margin-bottom: var(--ar-space-8, 16px);
+    font-family: var(--ar-font-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
+    font-size: var(--ar-font-size-base, 13px);
     text-align: center;
-    color: #333;
+    color: var(--ar-color-text, #333);
   }
 
   .checkbox-area {
@@ -106,9 +106,9 @@
     justify-content: center;
     align-items: center;
     min-height: 100px;
-    background: #fff;
-    border: 1px solid #d0d0d0;
-    border-radius: 4px;
+    background: var(--ar-color-surface, #fff);
+    border: 1px solid var(--ar-color-border-dark, #d0d0d0);
+    border-radius: var(--ar-radius, 4px);
   }
 
   .checkbox-wrapper {
@@ -121,71 +121,71 @@
   }
 
   input[type="checkbox"] {
-    width: 18px;
-    height: 18px;
+    width: var(--ar-checkbox-size, 18px);
+    height: var(--ar-checkbox-size, 18px);
     cursor: pointer;
-    accent-color: #333;
+    accent-color: var(--ar-checkbox-accent, #333);
   }
 
   label {
     cursor: pointer;
     user-select: none;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    font-size: 13px;
+    font-family: var(--ar-font-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
+    font-size: var(--ar-font-size-base, 13px);
     white-space: nowrap;
-    color: #333;
+    color: var(--ar-color-text, #333);
   }
 
   .success-message {
-    margin-top: 10px;
-    padding: 10px 12px;
-    background: #fffbe6;
-    color: #7a6c1a;
-    border: 1px solid #e6d98c;
-    border-radius: 4px;
+    margin-top: var(--ar-space-5, 10px);
+    padding: var(--ar-message-padding, 10px 12px);
+    background: var(--ar-color-warning-bg, #fffbe6);
+    color: var(--ar-color-warning, #7a6c1a);
+    border: 1px solid var(--ar-color-warning-border, #e6d98c);
+    border-radius: var(--ar-radius, 4px);
     text-align: center;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    font-size: 12px;
+    font-family: var(--ar-font-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
+    font-size: var(--ar-message-font-size, 12px);
     animation: slideIn 0.2s ease-out;
   }
 
   .success-message.is-success {
-    background: #f0faf0;
-    color: #1a6b2a;
-    border: 1px solid #d4e8d4;
+    background: var(--ar-color-success-bg, #f0faf0);
+    color: var(--ar-color-success, #1a6b2a);
+    border: 1px solid var(--ar-color-success-border, #d4e8d4);
   }
 
   .success-message.is-gameover {
-    background: #fef2f2;
-    color: #b91c1c;
-    border: 1px solid #fecaca;
+    background: var(--ar-color-error-bg, #fef2f2);
+    color: var(--ar-color-error, #b91c1c);
+    border: 1px solid var(--ar-color-error-border, #fecaca);
   }
 
   .info {
-    margin-top: 10px;
+    margin-top: var(--ar-space-5, 10px);
     display: flex;
     justify-content: space-between;
-    gap: 8px;
+    gap: var(--ar-space-4, 8px);
   }
 
   .attempts {
-    padding: 6px 8px;
-    background: #fffbe6;
-    border: 1px solid #e6d98c;
-    border-radius: 4px;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    font-size: 11px;
-    color: #7a6c1a;
+    padding: var(--ar-counter-padding, 6px 8px);
+    background: var(--ar-color-warning-bg, #fffbe6);
+    border: 1px solid var(--ar-color-warning-border, #e6d98c);
+    border-radius: var(--ar-radius, 4px);
+    font-family: var(--ar-font-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
+    font-size: var(--ar-font-size-sm, 11px);
+    color: var(--ar-color-warning, #7a6c1a);
   }
 
   .scale-info {
-    padding: 6px 8px;
-    background: #f5f5f5;
-    border: 1px solid #e0e0e0;
-    border-radius: 4px;
-    font-family: 'SF Mono', 'Fira Code', Menlo, Consolas, monospace;
-    font-size: 11px;
-    color: #666;
+    padding: var(--ar-counter-padding, 6px 8px);
+    background: var(--ar-color-surface-dim, #f5f5f5);
+    border: 1px solid var(--ar-color-border, #e0e0e0);
+    border-radius: var(--ar-radius, 4px);
+    font-family: var(--ar-font-mono, 'SF Mono', 'Fira Code', Menlo, Consolas, monospace);
+    font-size: var(--ar-font-size-sm, 11px);
+    color: var(--ar-color-text-secondary, #666);
   }
 
   @keyframes slideIn {

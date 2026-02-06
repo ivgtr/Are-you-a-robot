@@ -156,7 +156,7 @@
     <div class="taunt">{tauntText}</div>
   {/if}
   {#if chaseCount > 0}
-    <div class="chase-count">追跡回数: {chaseCount}</div>
+    <div class="counter">{chaseCount}回追跡</div>
   {/if}
 </div>
 
@@ -165,9 +165,9 @@
     position: relative;
     width: 100%;
     height: 280px;
-    border: 1px solid #e0e0e0;
-    border-radius: 6px;
-    background: #fafafa;
+    border: 1px solid var(--ar-color-border, #e0e0e0);
+    border-radius: var(--ar-radius-lg, 6px);
+    background: var(--ar-color-bg, #fafafa);
     overflow: hidden;
     touch-action: none;
   }
@@ -176,11 +176,11 @@
     position: absolute;
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 10px 14px;
-    background: #fff;
-    border: 1px solid #d0d0d0;
-    border-radius: 4px;
+    gap: var(--ar-checkbox-wrapper-gap, 8px);
+    padding: var(--ar-checkbox-wrapper-padding, 10px 14px);
+    background: var(--ar-color-surface, #fff);
+    border: 1px solid var(--ar-color-border-dark, #d0d0d0);
+    border-radius: var(--ar-radius, 4px);
     transform: translate(-50%, -50%);
     transition: left 0.25s ease-out, top 0.25s ease-out;
     cursor: pointer;
@@ -190,23 +190,23 @@
   .checkbox-wrapper.game-over {
     opacity: 0.4;
     cursor: not-allowed;
-    border-color: #b91c1c;
-    background: #fef2f2;
+    border-color: var(--ar-color-error, #b91c1c);
+    background: var(--ar-color-error-bg, #fef2f2);
   }
 
   input[type="checkbox"] {
-    width: 18px;
-    height: 18px;
+    width: var(--ar-checkbox-size, 18px);
+    height: var(--ar-checkbox-size, 18px);
     cursor: pointer;
-    accent-color: #333;
+    accent-color: var(--ar-checkbox-accent, #333);
   }
 
   label {
     cursor: pointer;
     user-select: none;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    font-size: 13px;
-    color: #333;
+    font-family: var(--ar-font-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
+    font-size: var(--ar-font-size-base, 13px);
+    color: var(--ar-color-text, #333);
   }
 
   .taunt {
@@ -214,10 +214,10 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    font-size: 14px;
-    font-weight: 600;
-    color: #999;
+    font-family: var(--ar-font-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
+    font-size: var(--ar-font-size-md, 14px);
+    font-weight: var(--ar-font-weight-semibold, 600);
+    color: var(--ar-color-text-muted, #999);
     pointer-events: none;
     animation: fadeInOut 1.5s ease-out forwards;
   }
@@ -229,12 +229,12 @@
     100% { opacity: 0; transform: translate(-50%, -60%) scale(1); }
   }
 
-  .chase-count {
+  .counter {
     position: absolute;
-    bottom: 8px;
-    right: 10px;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    font-size: 11px;
-    color: #999;
+    bottom: var(--ar-space-4, 8px);
+    right: var(--ar-space-5, 10px);
+    font-family: var(--ar-font-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
+    font-size: var(--ar-font-size-sm, 11px);
+    color: var(--ar-color-text-muted, #999);
   }
 </style>

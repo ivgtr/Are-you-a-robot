@@ -213,13 +213,13 @@
     position: relative;
     width: 100%;
     height: 320px;
-    border: 1px solid #e0e0e0;
-    border-radius: 6px;
+    border: 1px solid var(--ar-color-border, #e0e0e0);
+    border-radius: var(--ar-radius-lg, 6px);
     overflow: hidden;
     cursor: pointer;
     user-select: none;
     touch-action: none;
-    background: #fafafa;
+    background: var(--ar-color-bg, #fafafa);
   }
 
   /* マシン上部 */
@@ -315,18 +315,18 @@
     left: 0;
     right: 0;
     bottom: 45px;
-    background: #fafafa;
+    background: var(--ar-color-bg, #fafafa);
   }
 
   .checkbox-prize {
     position: absolute;
     display: flex;
     align-items: center;
-    gap: 4px;
-    padding: 6px 10px;
-    background: #fff;
-    border: 2px solid #333;
-    border-radius: 4px;
+    gap: var(--ar-space-2, 4px);
+    padding: var(--ar-space-3, 6px) var(--ar-space-5, 10px);
+    background: var(--ar-color-surface, #fff);
+    border: 2px solid var(--ar-color-primary, #333);
+    border-radius: var(--ar-radius, 4px);
     transform: translateX(-50%);
     transition: left 0.3s ease, bottom 0.15s ease;
     pointer-events: none;
@@ -337,14 +337,14 @@
   .checkbox-prize input {
     width: 14px;
     height: 14px;
-    accent-color: #333;
+    accent-color: var(--ar-checkbox-accent, #333);
   }
 
   .checkbox-prize span {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    font-size: 11px;
-    font-weight: 600;
-    color: #333;
+    font-family: var(--ar-font-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
+    font-size: var(--ar-font-size-sm, 11px);
+    font-weight: var(--ar-font-weight-semibold, 600);
+    color: var(--ar-color-text, #333);
   }
 
   .decoy {
@@ -358,14 +358,14 @@
     top: 195px;
     left: 50%;
     transform: translateX(-50%);
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    font-size: 13px;
-    font-weight: 600;
-    color: #c0392b;
+    font-family: var(--ar-font-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
+    font-size: var(--ar-font-size-base, 13px);
+    font-weight: var(--ar-font-weight-semibold, 600);
+    color: var(--ar-color-error, #b91c1c);
     background: rgba(255, 255, 255, 0.95);
-    padding: 8px 16px;
-    border-radius: 4px;
-    border: 1px solid #e0e0e0;
+    padding: var(--ar-space-4, 8px) var(--ar-space-8, 16px);
+    border-radius: var(--ar-radius, 4px);
+    border: 1px solid var(--ar-color-border, #e0e0e0);
     animation: fadeInOut 2s ease-out forwards;
     pointer-events: none;
     white-space: nowrap;
@@ -373,8 +373,8 @@
   }
 
   .message.success {
-    color: #1a6b2a;
-    border-color: #d4e8d4;
+    color: var(--ar-color-success, #1a6b2a);
+    border-color: var(--ar-color-success-border, #d4e8d4);
   }
 
   @keyframes fadeInOut {
@@ -390,17 +390,17 @@
     left: 0;
     right: 0;
     text-align: center;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    font-size: 11px;
-    color: #999;
+    font-family: var(--ar-font-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
+    font-size: var(--ar-font-size-sm, 11px);
+    color: var(--ar-color-text-muted, #999);
   }
 
   .attempts {
     position: absolute;
-    bottom: 8px;
-    right: 10px;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    font-size: 11px;
-    color: #999;
+    bottom: var(--ar-space-4, 8px);
+    right: var(--ar-space-5, 10px);
+    font-family: var(--ar-font-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
+    font-size: var(--ar-font-size-sm, 11px);
+    color: var(--ar-color-text-muted, #999);
   }
 </style>
