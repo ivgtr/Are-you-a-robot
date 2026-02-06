@@ -93,6 +93,7 @@
   function handleTouchMove(e) {
     e.preventDefault();
     if (!canvasRef || !gameStarted) return;
+    if (!e.touches[0]) return;
     const cx = getCanvasX(e.touches[0].clientX);
     paddleX = Math.max(0, Math.min(canvasW - paddleW, cx - paddleW / 2));
   }
@@ -142,6 +143,10 @@
       ballDY = -Math.abs(ballDY);
       const hitPos = (ballX - paddleX) / paddleW - 0.5;
       ballDX = hitPos * 4;
+      // Prevent pure vertical bounce
+      if (Math.abs(ballDX) < 0.5) {
+          ballDX = ballDX >= 0 ? 0.5 : -0.5;
+      }
       ballY = paddleTop - BALL_R;
     }
 
@@ -160,7 +165,18 @@
         ballY - BALL_R < b.y + BLOCK_H
       ) {
         b.alive = false;
-        ballDY = -ballDY;
+        // Determine collision side
+        const overlapLeft = (ballX + BALL_R) - b.x;
+        const overlapRight = (b.x + b.w) - (ballX - BALL_R);
+        const overlapTop = (ballY + BALL_R) - b.y;
+        const overlapBottom = (b.y + BLOCK_H) - (ballY - BALL_R);
+        const minOverlapX = Math.min(overlapLeft, overlapRight);
+        const minOverlapY = Math.min(overlapTop, overlapBottom);
+        if (minOverlapX < minOverlapY) {
+            ballDX = -ballDX;
+        } else {
+            ballDY = -ballDY;
+        }
         break;
       }
     }
@@ -292,7 +308,7 @@
   {/if}
 
   {#if showMessage}
-    <div class="message">{message}</div>
+    <div class="message" class:success={cleared}>{message}</div>
   {/if}
 
   {#if attempts > 0}
@@ -381,6 +397,11 @@
     pointer-events: none;
     white-space: nowrap;
     z-index: 10;
+  }
+
+  .message.success {
+    color: #1a6b2a;
+    border-color: #d4e8d4;
   }
 
   @keyframes fadeInOut {

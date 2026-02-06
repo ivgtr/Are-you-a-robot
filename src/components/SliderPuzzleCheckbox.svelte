@@ -1,12 +1,16 @@
 <svelte:options customElement="slider-puzzle-checkbox" />
 
 <script>
+  import { onDestroy } from 'svelte';
+
   let attempts = 0;
   let message = '';
   let showMessage = false;
   let cleared = false;
   let repairClicks = 0;
   let gameOver = false;
+  let repairMsgTimeout = null;
+  let failTimeout = null;
 
   // 破損文字を5回クリックすると修復される
   const REPAIR_CLICKS = 5;
@@ -88,7 +92,7 @@
         brokenIndex = -1; // 修復済み
         message = 'フォントデータを修復しました！パズルを完成させてください';
         showMessage = true;
-        setTimeout(() => { showMessage = false; }, 2000);
+        repairMsgTimeout = setTimeout(() => { showMessage = false; }, 2000);
         return;
       }
     }
@@ -111,7 +115,7 @@
 
       // 揃っても文字が間違っている
       if (attempts >= MAX_SOLVES) {
-        // もうチャンスがない → ゲームオーバー
+        if (failTimeout) clearTimeout(failTimeout);
         gameOver = true;
         message = '文字が破損したまま完成させてしまいました。ゲームオーバー';
         showMessage = true;
@@ -123,12 +127,17 @@
       message = msg;
       showMessage = true;
 
-      setTimeout(() => {
+      failTimeout = setTimeout(() => {
         showMessage = false;
         shuffle();
       }, 2500);
     }
   }
+
+  onDestroy(() => {
+    if (repairMsgTimeout) clearTimeout(repairMsgTimeout);
+    if (failTimeout) clearTimeout(failTimeout);
+  });
 
   // 初期化
   breakOneLabel();
@@ -170,11 +179,11 @@
 
   {#if cleared}
     <div class="result" style="background: #f0faf0; color: #1a6b2a; border: 1px solid #d4e8d4;">
-      <input type="checkbox" checked style="margin-right: 6px;" />
+      <input type="checkbox" checked disabled style="margin-right: 6px;" />
       ✓ {message}
     </div>
   {:else if showMessage}
-    <div class="result error">
+    <div class="result" class:error={brokenIndex !== -1} class:repair={brokenIndex === -1}>
       {brokenIndex === -1 ? '✓' : '✗'} {message}
     </div>
   {/if}
@@ -313,6 +322,12 @@
     background: #fef2f2;
     color: #b91c1c;
     border: 1px solid #fecaca;
+  }
+
+  .result.repair {
+    background: #f0faf0;
+    color: #1a6b2a;
+    border: 1px solid #d4e8d4;
   }
 
   @keyframes slideIn {

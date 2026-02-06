@@ -11,6 +11,8 @@
   let inCooldown = false;
   let gameOver = false;
   let cooldownUsed = false;
+  let isChecked = false;
+  let cooldownTimeout = null;
 
   // グリッチ確率100%到達後の最初のクールダウンが唯一のチャンス
   const COOLDOWN_DURATION = 500;
@@ -52,7 +54,7 @@
           cooldownUsed = true;
           inCooldown = true;
           text = '...システム安定化中（今がチャンス！）';
-          setTimeout(() => {
+          cooldownTimeout = setTimeout(() => {
             inCooldown = false;
             if (!cleared) {
               gameOver = true;
@@ -61,7 +63,7 @@
           }, COOLDOWN_DURATION);
         } else {
           inCooldown = true;
-          setTimeout(() => { inCooldown = false; }, COOLDOWN_DURATION);
+          cooldownTimeout = setTimeout(() => { inCooldown = false; }, COOLDOWN_DURATION);
         }
       }
     }, 100);
@@ -79,14 +81,11 @@
     if (cleared || gameOver) return;
     // グリッチ中はクリックを無効化
     if (isGlitching) {
-      e.preventDefault();
-      const checkbox = e.currentTarget.querySelector('input[type="checkbox"]');
-      if (checkbox) checkbox.checked = false;
+      isChecked = false;
       return;
     }
     // クールダウン中またはグリッチ確率100%到達後の非グリッチ時にチェック成功 = クリア
-    const checkbox = e.currentTarget.querySelector('input[type="checkbox"]');
-    if (checkbox && checkbox.checked && glitchProbability >= 1) {
+    if (isChecked && glitchProbability >= 1) {
       cleared = true;
       text = '...グリッチの隙を突かれた。認証成功';
     }
@@ -94,6 +93,7 @@
 
   onDestroy(() => {
     if (glitchInterval) clearInterval(glitchInterval);
+    if (cooldownTimeout) clearTimeout(cooldownTimeout);
   });
 </script>
 
@@ -105,7 +105,7 @@
     on:mouseenter={handleMouseEnter}
     on:click={handleClick}
   >
-    <input type="checkbox" id="glitch-check" />
+    <input type="checkbox" id="glitch-check" bind:checked={isChecked} disabled={cleared || gameOver} />
     <label for="glitch-check">{text}</label>
   </div>
   {#if hoverCount > 0}

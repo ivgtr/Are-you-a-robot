@@ -23,6 +23,9 @@
   let checkboxBottomPx = 10;
 
   let intervalId = null;
+  let msgTimeout = null;
+  let risingDelayTimeout = null;
+  let resetDelayTimeout = null;
 
   const messages = [
     'つるっ！滑り落ちました',
@@ -38,7 +41,7 @@
   function showMsg(text) {
     message = text;
     showMessage = true;
-    setTimeout(() => { showMessage = false; }, 2000);
+    msgTimeout = setTimeout(() => { showMessage = false; }, 2000);
   }
 
   function handleMouseMove(e) {
@@ -82,12 +85,12 @@
         // 位置が近いほどキャッチ成功率が上がる（最大10%: distance<5で10%, distance<10で5%, それ以上は0%）
         const catchSuccess = hasCheckbox && (
           (distance < 5 && Math.random() < 0.10) ||
-          (distance < 10 && Math.random() < 0.05)
+          (distance >= 5 && distance < 10 && Math.random() < 0.05)
         );
 
         // 少し待ってから上昇
         dropPoint = catchSuccess ? -1 : 40 + Math.floor(Math.random() * 60); // -1は成功を意味する
-        setTimeout(() => {
+        risingDelayTimeout = setTimeout(() => {
           phase = 'rising';
           intervalId = setInterval(() => {
             clawY -= 2;
@@ -118,6 +121,7 @@
               // キャッチ成功判定
               if (hasCheckbox && dropPoint === -1) {
                 cleared = true;
+                checkboxBottomPx = 10;
                 phase = 'resetting';
                 showMsg('やった！景品をゲットしました！認証成功！');
                 return;
@@ -128,17 +132,7 @@
               clawOpen = true;
               hasCheckbox = false;
 
-              if (!showMessage) {
-                attempts++;
-                if (attempts >= MAX_COINS) {
-                  showMsg('コインが尽きました。ゲームオーバー');
-                  gameOver = true;
-                } else {
-                  showMsg(messages[attempts % messages.length]);
-                }
-              }
-
-              setTimeout(() => {
+              resetDelayTimeout = setTimeout(() => {
                 if (!gameOver) phase = 'idle';
               }, 300);
             }
@@ -150,6 +144,9 @@
 
   onDestroy(() => {
     clearInterval(intervalId);
+    if (msgTimeout) clearTimeout(msgTimeout);
+    if (risingDelayTimeout) clearTimeout(risingDelayTimeout);
+    if (resetDelayTimeout) clearTimeout(resetDelayTimeout);
   });
 </script>
 
@@ -191,7 +188,7 @@
 
   <!-- UI オーバーレイ -->
   {#if showMessage}
-    <div class="message">{message}</div>
+    <div class="message" class:success={cleared}>{message}</div>
   {/if}
 
   <div class="instructions">
@@ -371,6 +368,11 @@
     pointer-events: none;
     white-space: nowrap;
     z-index: 10;
+  }
+
+  .message.success {
+    color: #1a6b2a;
+    border-color: #d4e8d4;
   }
 
   @keyframes fadeInOut {

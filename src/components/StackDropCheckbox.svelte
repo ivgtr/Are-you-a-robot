@@ -1,6 +1,8 @@
 <svelte:options customElement="stack-drop-checkbox" />
 
 <script>
+  import { onDestroy } from 'svelte';
+
   let attempts = 0;
   let message = '';
   let showMessage = false;
@@ -11,6 +13,8 @@
   let cleared = false;
   let dragStartTime = 0;
   let gameOver = false;
+  let isSuccess = false;
+  let pendingTimeouts = [];
 
   // ドラッグ状態
   let draggingBlock = null;
@@ -31,12 +35,6 @@
     '積み直してやり直しです',
     '物理法則には逆らえません',
     'もっと慎重にスライドしてください',
-  ];
-
-  const successButMessages = [
-    'ブロックを全て除去しましたが、チェックボックスの着地位置が不正です',
-    '認証エリア外に着地しました。やり直してください',
-    'ブロック除去は成功しましたが、認証サーバーが応答しません',
   ];
 
   function showMsg(text) {
@@ -77,12 +75,12 @@
       block.offset = direction * 300;
       blocks = [...blocks];
 
-      setTimeout(() => {
+      pendingTimeouts.push(setTimeout(() => {
         block.alive = false;
         blocks = [...blocks];
         attempts++;
         checkBalance();
-      }, 200);
+      }, 200));
     } else {
       // 戻す
       block.offset = 0;
@@ -110,6 +108,7 @@
       if (isCareful) {
         cleared = true;
         animating = false;
+        isSuccess = true;
         showMsg('完璧な手さばき...認証成功！');
         return;
       }
@@ -123,25 +122,25 @@
       if (Math.random() < surviveChance) {
         // 耐えた
         checkboxTilt = (Math.random() > 0.5 ? 1 : -1) * 5;
-        setTimeout(() => { checkboxTilt = 0; }, 300);
+        pendingTimeouts.push(setTimeout(() => { checkboxTilt = 0; }, 300));
         return;
       }
       // 落下 → ゲームオーバー
       animating = true;
       checkboxTilt = (Math.random() > 0.5 ? 1 : -1) * (15 + Math.random() * 30);
-      setTimeout(() => {
+      pendingTimeouts.push(setTimeout(() => {
         checkboxFallen = true;
         checkboxOffset = checkboxTilt > 0 ? 120 : -120;
         gameOver = true;
         showMsg(failMessages[attempts % failMessages.length] + ' ゲームオーバー');
-      }, 400);
+      }, 400));
     } else {
       // 途中でもランダムにバランスを崩す（慎重操作なら確率低下）
       const failChance = isCareful ? 0.1 : 0.3;
       if (Math.random() < failChance) {
         animating = true;
         checkboxTilt = (Math.random() > 0.5 ? 1 : -1) * (8 + Math.random() * 15);
-        setTimeout(() => {
+        pendingTimeouts.push(setTimeout(() => {
           if (Math.random() < 0.5) {
             // 落下 → ゲームオーバー
             checkboxFallen = true;
@@ -153,10 +152,14 @@
             checkboxTilt = 0;
             animating = false;
           }
-        }, 400);
+        }, 400));
       }
     }
   }
+
+  onDestroy(() => {
+    pendingTimeouts.forEach(t => clearTimeout(t));
+  });
 
 </script>
 
@@ -206,7 +209,7 @@
   </div>
 
   {#if showMessage}
-    <div class="message">{message}</div>
+    <div class="message" class:success={isSuccess}>{message}</div>
   {/if}
 
   {#if attempts > 0}
@@ -368,6 +371,12 @@
     border: 1px solid #fecaca;
     text-align: center;
     animation: slideIn 0.2s ease-out;
+  }
+
+  .message.success {
+    color: #1a6b2a;
+    background: #f0faf0;
+    border: 1px solid #d4e8d4;
   }
 
   @keyframes slideIn {

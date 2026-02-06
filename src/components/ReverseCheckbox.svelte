@@ -1,13 +1,18 @@
 <svelte:options customElement="reverse-checkbox" />
 
 <script>
+  import { onDestroy } from 'svelte';
+
   let checked = false;
   let toggleCount = 0;
   let cleared = false;
   let gameOver = false;
+  let winTimer = null;
 
   // 8回までに正解しないとゲームオーバー
   const MAX_TOGGLES = 8;
+  // この回数以上トグルした後、未チェック状態で2秒待つと勝利
+  const WIN_THRESHOLD = 6;
 
   const messages = [
     { text: 'ロボットであることが確認されました', type: 'robot' },
@@ -18,7 +23,7 @@
     { text: '何度切り替えても無駄です', type: 'cancel' },
   ];
 
-  $: currentLabel = gameOver ? 'ゲームオーバー' : checked ? '私はロボットではありません' : '私はロボットです';
+  $: currentLabel = gameOver ? 'ゲームオーバー' : cleared ? '認証成功' : checked ? '私はロボットではありません' : '私はロボットです';
   $: currentMessage = cleared
     ? { text: '逆転の発想...お見事です。認証成功', type: 'success' }
     : gameOver
@@ -29,19 +34,30 @@
     if (cleared || gameOver) return;
     toggleCount++;
 
-    // 6回以上切り替えた後に「私はロボットです」（未チェック状態）のままにすると
-    // 逆説的に「自分がロボットだと認める＝人間にしかできない自己否定」で認証成功
-    if (toggleCount >= 6 && !checked) {
-      cleared = true;
-      return;
-    }
+    // 既存のタイマーをクリア
+    if (winTimer) { clearTimeout(winTimer); winTimer = null; }
 
     // 上限に達したらゲームオーバー
     if (toggleCount >= MAX_TOGGLES) {
       gameOver = true;
       checked = false;
+      return;
+    }
+
+    // 6回以上切り替えた後に「私はロボットです」（未チェック状態）のまま2秒待つと
+    // 逆説的に「自分がロボットだと認める＝人間にしかできない自己否定」で認証成功
+    if (toggleCount >= WIN_THRESHOLD && !checked) {
+      winTimer = setTimeout(() => {
+        if (!checked && !gameOver && !cleared) {
+          cleared = true;
+        }
+      }, 2000);
     }
   }
+
+  onDestroy(() => {
+    if (winTimer) clearTimeout(winTimer);
+  });
 </script>
 
 <div class="container">
@@ -51,7 +67,7 @@
       id="reverse-check"
       bind:checked
       on:change={handleChange}
-      disabled={gameOver}
+      disabled={gameOver || cleared}
     />
     <label for="reverse-check">{currentLabel}</label>
   </div>
@@ -70,6 +86,9 @@
     <div class="despair">
       切り替え回数: {toggleCount}/{MAX_TOGGLES} — どちらを選んでも人間とは認められません
     </div>
+  {/if}
+  {#if toggleCount >= WIN_THRESHOLD && !checked && !cleared && !gameOver}
+    <div class="hint">...「私はロボットです」のままにしてみると？</div>
   {/if}
 </div>
 
@@ -153,8 +172,23 @@
     color: #666;
   }
 
+  .hint {
+    margin-top: 6px;
+    text-align: center;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 11px;
+    color: #999;
+    font-style: italic;
+    animation: fadeIn 1s ease-out;
+  }
+
   @keyframes slideIn {
     from { opacity: 0; transform: translateY(-4px); }
     to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
   }
 </style>

@@ -1,6 +1,8 @@
 <svelte:options customElement="escaping-checkbox" />
 
 <script>
+  import { onDestroy } from 'svelte';
+
   let x = 50;
   let y = 50;
   let containerRef;
@@ -17,6 +19,8 @@
     'ロボットなら捕まえられるかも？',
   ];
 
+  let tauntTimeouts = [];
+  let hasBeenTired = false;
   let tauntText = '';
   let showTaunt = false;
   let isTired = false;
@@ -67,8 +71,9 @@
       if (isTired) return;
 
       // 一定回数追跡されると疲れる — チャンスは1回のみ
-      if (chaseCount > 0 && chaseCount % TIRED_THRESHOLD === 0) {
+      if (!hasBeenTired && chaseCount > 0 && chaseCount % TIRED_THRESHOLD === 0) {
         isTired = true;
+        hasBeenTired = true;
         tauntText = 'はぁ...はぁ...（疲れた）今がチャンス！';
         showTaunt = true;
         tiredTimeout = setTimeout(() => {
@@ -113,7 +118,8 @@
       if (chaseCount % 5 === 0) {
         tauntText = taunts[Math.floor(Math.random() * taunts.length)];
         showTaunt = true;
-        setTimeout(() => { showTaunt = false; }, 1500);
+        const tid = setTimeout(() => { showTaunt = false; }, 1500);
+        tauntTimeouts.push(tid);
       }
     }
   }
@@ -121,11 +127,17 @@
   function handleTouchMove(e) {
     e.preventDefault();
     const touch = e.touches[0];
+    if (!touch) return;
     handleMouseMove({
       clientX: touch.clientX,
       clientY: touch.clientY,
     });
   }
+
+  onDestroy(() => {
+    if (tiredTimeout) clearTimeout(tiredTimeout);
+    tauntTimeouts.forEach(t => clearTimeout(t));
+  });
 </script>
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->
