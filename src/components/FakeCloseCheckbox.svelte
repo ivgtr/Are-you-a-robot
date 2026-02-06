@@ -15,11 +15,18 @@
   let checkboxClickCount = 0;
   let gameOver = false;
   let checkboxAppearances = 0;
+  let checkboxClickedThisAppearance = false;
 
   // チェックボックスを3回素早くクリックすると広告を突破して認証成功
   const CLICKS_TO_CLEAR = 3;
   // チェックボックスは最大3回しか出現しない
   const MAX_APPEARANCES = 3;
+
+  // ドラッグ/スワイプ状態
+  let drag = null;
+  let swipeOut = null;
+  const SWIPE_THRESHOLD = 80;
+  const SWIPE_VELOCITY = 0.5;
 
   const adTitles = [
     '🎰 今すぐ無料でプレイ！',
@@ -54,6 +61,15 @@
     '閉じたつもりが開いた！',
     '×ボタンが広告でした',
     'まだまだ広告はあります',
+  ];
+
+  const swipeMessages = [
+    'スワイプしても無駄です',
+    '広告は逃げない...増える！',
+    'いい腕してますね、でも無意味',
+    'フリックで消えると思った？',
+    'スワイプ対応広告です（嘘）',
+    'ドラッグお疲れ様です',
   ];
 
   function spawnPopup(sourceX, sourceY) {
@@ -99,9 +115,11 @@
         showMessage = true;
         return;
       }
+      checkboxClickedThisAppearance = false;
       checkboxVisible = true;
       setTimeout(() => {
-        if (!cleared) {
+        // チェックボックスをクリック済みなら追加ポップアップを出さない
+        if (!cleared && !checkboxClickedThisAppearance) {
           checkboxVisible = false;
           spawnPopup(20, 35);
           spawnPopup(30, 45);
@@ -113,6 +131,7 @@
   function handleCheckboxClick() {
     if (cleared || gameOver) return;
     checkboxClickCount++;
+    checkboxClickedThisAppearance = true;
 
     // 累計3回チェックボックスをクリックすればクリア
     if (checkboxClickCount >= CLICKS_TO_CLEAR) {
@@ -131,7 +150,88 @@
     showMessage = true;
     setTimeout(() => { showMessage = false; }, 2000);
   }
+
+  // ===== ドラッグ&スワイプ =====
+
+  function handleDragStart(e, popup) {
+    if (gameOver || cleared) return;
+    // ボタン上からのドラッグは無視（クリックを優先）
+    if (e.target.closest('button')) return;
+
+    const point = e.touches ? e.touches[0] : e;
+    drag = {
+      id: popup.id,
+      startX: point.clientX,
+      startY: point.clientY,
+      offsetX: 0,
+      offsetY: 0,
+      startTime: Date.now(),
+      popup,
+    };
+  }
+
+  function handleDragMove(e) {
+    if (!drag) return;
+    if (e.cancelable) e.preventDefault();
+    const point = e.touches ? e.touches[0] : e;
+    drag.offsetX = point.clientX - drag.startX;
+    drag.offsetY = point.clientY - drag.startY;
+    drag = drag;
+  }
+
+  function handleDragEnd() {
+    if (!drag) return;
+
+    const dx = drag.offsetX;
+    const elapsed = Date.now() - drag.startTime;
+    const velocity = Math.abs(dx) / Math.max(1, elapsed);
+
+    if (Math.abs(dx) > SWIPE_THRESHOLD || (velocity > SWIPE_VELOCITY && Math.abs(dx) > 20)) {
+      // スワイプで飛ばす → ただし新しい広告が出る
+      const popup = drag.popup;
+      const direction = dx > 0 ? 1 : -1;
+      swipeOut = { id: popup.id, direction };
+      drag = null;
+
+      setTimeout(() => {
+        swipeOut = null;
+        // スワイプで消しても handleClose と同じ扱い（広告増殖）
+        handleClose(popup);
+        // スワイプ用メッセージで上書き
+        message = swipeMessages[Math.floor(Math.random() * swipeMessages.length)];
+        showMessage = true;
+        setTimeout(() => { showMessage = false; }, 1500);
+      }, 300);
+    } else {
+      // 移動距離不足 → スナップバック
+      drag = null;
+    }
+  }
+
+  function getPopupStyle(popup) {
+    let base = `left: ${popup.x}%; top: ${popup.y}%;`;
+
+    if (swipeOut && swipeOut.id === popup.id) {
+      return base + ` transform: translateX(${swipeOut.direction * 400}px) rotate(${swipeOut.direction * 20}deg); opacity: 0; transition: transform 0.3s ease-out, opacity 0.3s ease-out;`;
+    }
+
+    if (drag && drag.id === popup.id) {
+      const rotation = drag.offsetX * 0.08;
+      const opacity = Math.max(0.4, 1 - Math.abs(drag.offsetX) / 250);
+      return base + ` transform: translate(${drag.offsetX}px, ${drag.offsetY}px) rotate(${rotation}deg); opacity: ${opacity}; transition: none; z-index: 20; cursor: grabbing;`;
+    }
+
+    return base;
+  }
 </script>
+
+<!-- svelte-ignore a11y-no-static-element-interactions -->
+<svelte:window
+  on:mousemove={handleDragMove}
+  on:mouseup={handleDragEnd}
+  on:touchmove|passive={handleDragMove}
+  on:touchend={handleDragEnd}
+/>
 
 <div class="container">
   <div class="checkbox-area" class:visible={checkboxVisible || cleared}>
@@ -144,9 +244,13 @@
   </div>
 
   {#each popups as popup (popup.id)}
+    <!-- svelte-ignore a11y-no-static-element-interactions -->
     <div
       class="popup"
-      style="left: {popup.x}%; top: {popup.y}%;"
+      class:dragging={drag && drag.id === popup.id}
+      style={getPopupStyle(popup)}
+      on:mousedown={(e) => handleDragStart(e, popup)}
+      on:touchstart={(e) => handleDragStart(e, popup)}
     >
       <div class="popup-header">
         <span class="popup-title">{popup.title}</span>
@@ -168,6 +272,10 @@
 
   {#if attempts > 0}
     <div class="attempts">閉じた広告: {attempts} / 現在の広告: {popups.length}</div>
+  {/if}
+
+  {#if !cleared && !gameOver && popups.length > 0}
+    <div class="swipe-hint">← スワイプで広告を消す →</div>
   {/if}
 </div>
 
@@ -233,6 +341,14 @@
     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     z-index: 10;
     animation: popIn 0.25s ease-out;
+    cursor: grab;
+    user-select: none;
+    touch-action: none;
+  }
+
+  .popup.dragging {
+    cursor: grabbing;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.25);
   }
 
   @keyframes popIn {
@@ -357,5 +473,23 @@
     font-size: 11px;
     color: #999;
     z-index: 100;
+  }
+
+  .swipe-hint {
+    position: absolute;
+    top: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 10px;
+    color: #bbb;
+    pointer-events: none;
+    z-index: 0;
+    animation: hintPulse 2s ease-in-out infinite;
+  }
+
+  @keyframes hintPulse {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; }
   }
 </style>
