@@ -19,89 +19,196 @@
       color: #333;
     }
 
-    .container {
-      max-width: 960px;
+    .main-container {
+      max-width: 600px;
       margin: 0 auto;
     }
 
     header {
       text-align: center;
-      margin-bottom: 48px;
+      margin-bottom: 32px;
     }
 
     h1 {
-      font-size: 32px;
+      font-size: 24px;
       font-weight: 700;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
       color: #111;
       letter-spacing: -0.02em;
     }
 
     .subtitle {
-      font-size: 15px;
-      color: #666;
-    }
-
-    .warning {
-      background: #fffbe6;
-      border: 1px solid #e6d98c;
-      border-radius: 6px;
-      padding: 16px;
-      margin-bottom: 32px;
-      text-align: center;
-    }
-
-    .warning-title {
-      font-size: 15px;
-      font-weight: 600;
-      color: #7a6c1a;
-      margin-bottom: 4px;
-    }
-
-    .warning-text {
-      color: #7a6c1a;
       font-size: 13px;
+      color: #999;
     }
 
-    .components-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
-      gap: 16px;
-      margin-bottom: 48px;
+    .main-footer {
+      text-align: center;
+      font-size: 12px;
+      color: #bbb;
+      margin-top: 48px;
     }
 
-    .component-card {
+    .main-footer a {
+      color: #999;
+      text-decoration: underline;
+    }
+
+    /* ===== コンポーネント一覧モーダル ===== */
+    .catalog-toggle {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 48px;
+      height: 48px;
+      background: #333;
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      font-size: 20px;
+      cursor: pointer;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+      transition: background 0.2s, transform 0.2s;
+    }
+
+    .catalog-toggle:hover {
+      background: #1a1a1a;
+      transform: scale(1.05);
+    }
+
+    .catalog-toggle.open {
+      background: #b91c1c;
+    }
+
+    .catalog-toggle.open:hover {
+      background: #991b1b;
+    }
+
+    .catalog-backdrop {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.4);
+      z-index: 999;
+    }
+
+    .catalog-backdrop.visible {
+      display: block;
+    }
+
+    .catalog-modal {
+      display: none;
+      position: fixed;
+      bottom: 80px;
+      right: 20px;
+      width: min(calc(100vw - 40px), 520px);
+      max-height: calc(100vh - 140px);
       background: #fff;
       border: 1px solid #e0e0e0;
-      border-radius: 8px;
-      padding: 24px;
+      border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+      z-index: 1001;
+      overflow: hidden;
+      flex-direction: column;
     }
 
-    .component-card:hover {
-      border-color: #ccc;
+    .catalog-modal.visible {
+      display: flex;
+      animation: modalSlideUp 0.25s ease-out;
     }
 
-    .component-title {
-      font-size: 16px;
+    @keyframes modalSlideUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .catalog-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 18px;
+      border-bottom: 1px solid #e0e0e0;
+      background: #fafafa;
+      flex-shrink: 0;
+    }
+
+    .catalog-header-title {
+      font-size: 14px;
       font-weight: 600;
-      margin-bottom: 8px;
       color: #111;
     }
 
-    .component-description {
-      font-size: 13px;
+    .catalog-header-sub {
+      font-size: 11px;
+      color: #999;
+    }
+
+    .catalog-close {
+      width: 28px;
+      height: 28px;
+      background: none;
+      border: 1px solid #e0e0e0;
+      border-radius: 4px;
+      font-size: 14px;
+      cursor: pointer;
       color: #666;
-      margin-bottom: 16px;
-      line-height: 1.6;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .catalog-close:hover {
+      background: #f5f5f5;
+      border-color: #ccc;
+    }
+
+    .catalog-body {
+      overflow-y: auto;
+      padding: 12px;
+      flex: 1;
+    }
+
+    .catalog-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .catalog-card {
+      background: #fafafa;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 16px;
+    }
+
+    .catalog-card-title {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 4px;
+      color: #111;
+    }
+
+    .catalog-card-desc {
+      font-size: 12px;
+      color: #666;
+      margin-bottom: 12px;
+      line-height: 1.5;
     }
 
     .difficulty {
       display: inline-block;
       padding: 2px 8px;
       border-radius: 3px;
-      font-size: 11px;
+      font-size: 10px;
       font-weight: 600;
-      margin-bottom: 12px;
+      margin-bottom: 10px;
       letter-spacing: 0.02em;
     }
 
@@ -120,276 +227,220 @@
       color: #92400e;
     }
 
-    .installation-section {
-      background: #fff;
-      border: 1px solid #e0e0e0;
-      border-radius: 8px;
-      padding: 24px;
-      margin-bottom: 32px;
+    .catalog-info {
+      padding: 12px;
+      background: #fafafa;
+      border-top: 1px solid #e0e0e0;
+      flex-shrink: 0;
     }
 
-    .installation-section h2 {
-      font-size: 18px;
-      font-weight: 600;
-      margin-bottom: 16px;
-      color: #111;
-    }
-
-    .installation-section h3 {
-      font-size: 15px;
-      font-weight: 600;
-      margin: 20px 0 8px;
-      color: #333;
-    }
-
-    .code-block {
-      background: #1a1a1a;
-      color: #e0e0e0;
-      padding: 14px 16px;
-      border-radius: 6px;
-      font-family: 'SF Mono', 'Fira Code', 'Fira Mono', Menlo, Consolas, monospace;
-      font-size: 13px;
-      overflow-x: auto;
-      margin: 8px 0;
-    }
-
-    .code-block code {
-      display: block;
-      white-space: pre;
-    }
-
-    .component-tag {
-      background: #f5f5f5;
-      border: 1px solid #e0e0e0;
-      color: #333;
-      padding: 2px 8px;
-      border-radius: 4px;
-      font-family: 'SF Mono', 'Fira Code', Menlo, Consolas, monospace;
-      font-size: 12px;
-      display: inline-block;
-      margin-top: 6px;
-    }
-
-    .btn {
-      display: inline-block;
-      padding: 10px 20px;
-      background: #fff;
-      color: #333;
-      text-decoration: none;
-      border: 1px solid #e0e0e0;
-      border-radius: 6px;
-      font-size: 14px;
-      font-weight: 500;
-      transition: border-color 0.2s;
-      margin: 4px;
-    }
-
-    .btn:hover {
-      border-color: #999;
-    }
-
-    .btn-github {
-      background: #24292e;
-      border-color: #24292e;
-      color: white;
-    }
-
-    .btn-github:hover {
-      background: #1a1e22;
-    }
-
-    .links {
-      text-align: center;
-      margin-bottom: 32px;
-    }
-
-    footer {
-      text-align: center;
-      font-size: 13px;
+    .catalog-info-text {
+      font-size: 11px;
       color: #999;
-      margin-top: 48px;
+      text-align: center;
     }
 
-    .github-link {
+    .catalog-info-text a {
       color: #666;
       text-decoration: underline;
     }
 
     @media (max-width: 768px) {
-      .components-grid {
-        grid-template-columns: 1fr;
+      body {
+        padding: 24px 12px;
       }
 
       h1 {
-        font-size: 24px;
+        font-size: 20px;
       }
 
-      .btn {
-        display: block;
-        margin: 4px auto;
+      .catalog-modal {
+        right: 10px;
+        bottom: 76px;
+        width: calc(100vw - 20px);
+        max-height: calc(100vh - 100px);
+      }
+
+      .catalog-toggle {
+        bottom: 16px;
+        right: 16px;
       }
     }
   </style>
 </head>
 <body>
-  <div class="container">
+  <!-- メインコンテンツ: 利用規約同意チャレンジ -->
+  <div class="main-container">
     <header>
       <h1>Are You a Robot?</h1>
+      <p class="subtitle">全ての規約に同意すると、隠しコンテンツが解放されます</p>
     </header>
 
-    <div class="links">
-      <a href="https://github.com/ivgtr/Are-you-a-robot" class="btn btn-github" target="_blank" rel="noopener">
-        View on GitHub
-      </a>
-    </div>
+    <gated-content></gated-content>
 
-    <div class="installation-section">
-      <h2>使い方</h2>
-
-      <p style="margin-bottom: 12px; color: #666;">公開していません。よしなにしてください。</p>
-
-      <h3>利用可能なコンポーネント</h3>
-      <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px;">
-        <span class="component-tag">&lt;escaping-checkbox&gt;</span>
-        <span class="component-tag">&lt;unfocusable-checkbox&gt;</span>
-        <span class="component-tag">&lt;reverse-checkbox&gt;</span>
-        <span class="component-tag">&lt;infinite-loading-checkbox&gt;</span>
-        <span class="component-tag">&lt;impossible-captcha&gt;</span>
-        <span class="component-tag">&lt;moving-checkbox&gt;</span>
-        <span class="component-tag">&lt;tiny-checkbox&gt;</span>
-        <span class="component-tag">&lt;glitch-checkbox&gt;</span>
-        <span class="component-tag">&lt;crane-game-checkbox&gt;</span>
-        <span class="component-tag">&lt;breakout-checkbox&gt;</span>
-        <span class="component-tag">&lt;fake-close-checkbox&gt;</span>
-        <span class="component-tag">&lt;slider-puzzle-checkbox&gt;</span>
-        <span class="component-tag">&lt;stack-drop-checkbox&gt;</span>
-      </div>
-    </div>
-
-    <div class="components-grid">
-      <div class="component-card">
-        <h2 class="component-title">1. 逃げるチェックボックス</h2>
-        <span class="difficulty impossible">不可能</span>
-        <p class="component-description">
-          マウスカーソルが近づくとフェイントやジグザグ移動で逃げます。近いほど速く逃げ、タッチデバイスにも対応。追いかけると挑発してきます。
-        </p>
-        <escaping-checkbox></escaping-checkbox>
-      </div>
-
-      <div class="component-card">
-        <h2 class="component-title">2. フォーカス不可能</h2>
-        <span class="difficulty impossible">不可能</span>
-        <p class="component-description">
-          最初はキーボード操作のみ無効。何度も試すとマウスクリックも無効化され、最終的にチェックボックス自体が使用不能になります。
-        </p>
-        <unfocusable-checkbox></unfocusable-checkbox>
-      </div>
-
-      <div class="component-card">
-        <h2 class="component-title">3. 反転チェックボックス</h2>
-        <span class="difficulty impossible">不可能</span>
-        <p class="component-description">
-          チェックを入れると「ロボット確認」、外すと「人間確認取消」。ラベルも動的に変わり、どちらを選んでも人間とは認められません。
-        </p>
-        <reverse-checkbox></reverse-checkbox>
-      </div>
-
-      <div class="component-card">
-        <h2 class="component-title">4. 無限ローディング</h2>
-        <span class="difficulty impossible">不可能</span>
-        <p class="component-description">
-          クリックすると検証開始。進捗バーは99%で止まり、ステータスは「量子認証」「AI評価」と荒唐無稽にエスカレートします。
-        </p>
-        <infinite-loading-checkbox></infinite-loading-checkbox>
-      </div>
-
-      <div class="component-card">
-        <h2 class="component-title">5. 不可能なCAPTCHA</h2>
-        <span class="difficulty impossible">不可能</span>
-        <p class="component-description">
-          どの画像を選択しても失敗。失敗ごとに画像がシャッフルされ、お題も「赤い車を選べ」「存在しない車を選べ」とエスカレート。たまに偽の正解演出も。
-        </p>
-        <impossible-captcha></impossible-captcha>
-      </div>
-
-      <div class="component-card">
-        <h2 class="component-title">6. 移動するチェックボックス</h2>
-        <span class="difficulty impossible">不可能</span>
-        <p class="component-description">
-          クリックするたびにランダムな位置に移動し、速度もどんどん上がります。5回クリック後は分身が出現し、本物がどれか分からなくなります。
-        </p>
-        <moving-checkbox></moving-checkbox>
-      </div>
-
-      <div class="component-card">
-        <h2 class="component-title">7. 極小チェックボックス</h2>
-        <span class="difficulty very-hard">非常に困難</span>
-        <p class="component-description">
-          最初は普通サイズですが、クリックするたびに縮小。チェックに成功しても「もう一度お願いします」とリセットされます。
-        </p>
-        <tiny-checkbox></tiny-checkbox>
-      </div>
-
-      <div class="component-card">
-        <h2 class="component-title">8. グリッチチェックボックス</h2>
-        <span class="difficulty hard">困難</span>
-        <p class="component-description">
-          マウスを近づけるとテキストがグリッチし、色相回転やスキューの視覚効果も発動。グリッチ中はクリック無効。ホバーするほど発動確率が上がります。
-        </p>
-        <glitch-checkbox></glitch-checkbox>
-      </div>
-
-      <div class="component-card">
-        <h2 class="component-title">9. UFOキャッチャー認証</h2>
-        <span class="difficulty impossible">不可能</span>
-        <p class="component-description">
-          クレーンを操作してチェックボックスを掴め！...と思いきや、掴んでも途中で必ず滑り落ちます。景品の位置も毎回変わります。投入金額だけが増えていきます。
-        </p>
-        <crane-game-checkbox></crane-game-checkbox>
-      </div>
-
-      <div class="component-card">
-        <h2 class="component-title">10. ブロック崩し認証</h2>
-        <span class="difficulty impossible">不可能</span>
-        <p class="component-description">
-          ブロックの壁の奥に認証チェックボックスが隠されています。ブロック崩しで全て壊すと一瞬見えますが、すぐにブロックが再生成されます。
-        </p>
-        <breakout-checkbox></breakout-checkbox>
-      </div>
-
-      <div class="component-card">
-        <h2 class="component-title">11. フェイク広告認証</h2>
-        <span class="difficulty impossible">不可能</span>
-        <p class="component-description">
-          チェックボックスの上に偽の広告ポップアップが重なっています。×ボタンで閉じようとすると、逆に広告が増殖。たまにチェックボックスが見えますが...
-        </p>
-        <fake-close-checkbox></fake-close-checkbox>
-      </div>
-
-      <div class="component-card">
-        <h2 class="component-title">12. スライドパズル認証</h2>
-        <span class="difficulty impossible">不可能</span>
-        <p class="component-description">
-          「私はロボットでは」の文字がスライドパズルに。正しく並べ替えると一瞬成功しますが、すぐにシャッフルされて振り出しに戻ります。
-        </p>
-        <slider-puzzle-checkbox></slider-puzzle-checkbox>
-      </div>
-
-      <div class="component-card">
-        <h2 class="component-title">13. だるま落とし認証</h2>
-        <span class="difficulty impossible">不可能</span>
-        <p class="component-description">
-          利用規約やCookie同意などのブロックの上にチェックボックスが乗っています。ブロックを慎重に外しても、物理法則によりチェックボックスは必ず落下します。
-        </p>
-        <stack-drop-checkbox></stack-drop-checkbox>
-      </div>
-    </div>
-
-    <footer>
-      <p>These components are for entertainment purposes only.</p>
+    <footer class="main-footer">
+      <p>本ページに登場する「利用規約」に法的効力はありません</p>
     </footer>
   </div>
 
+  <!-- コンポーネント一覧トグル -->
+  <button class="catalog-toggle" id="catalogToggle" title="コンポーネント一覧">
+    <span id="catalogToggleIcon">&#9776;</span>
+  </button>
+
+  <!-- モーダル背景 -->
+  <div class="catalog-backdrop" id="catalogBackdrop"></div>
+
+  <!-- コンポーネント一覧モーダル -->
+  <div class="catalog-modal" id="catalogModal">
+    <div class="catalog-header">
+      <div>
+        <div class="catalog-header-title">コンポーネント一覧</div>
+        <div class="catalog-header-sub">13種類のパロディCAPTCHA</div>
+      </div>
+      <button class="catalog-close" id="catalogClose">&times;</button>
+    </div>
+    <div class="catalog-body">
+      <div class="catalog-grid">
+        <div class="catalog-card">
+          <h3 class="catalog-card-title">1. 逃げるチェックボックス</h3>
+          <span class="difficulty impossible">不可能</span>
+          <p class="catalog-card-desc">マウスカーソルが近づくとフェイントやジグザグ移動で逃げます。</p>
+          <escaping-checkbox></escaping-checkbox>
+        </div>
+
+        <div class="catalog-card">
+          <h3 class="catalog-card-title">2. フォーカス不可能</h3>
+          <span class="difficulty impossible">不可能</span>
+          <p class="catalog-card-desc">何度も試すとマウスクリックも無効化され、最終的にチェックボックスが使用不能に。</p>
+          <unfocusable-checkbox></unfocusable-checkbox>
+        </div>
+
+        <div class="catalog-card">
+          <h3 class="catalog-card-title">3. 反転チェックボックス</h3>
+          <span class="difficulty impossible">不可能</span>
+          <p class="catalog-card-desc">チェックを入れると「ロボット確認」、外すと「人間確認取消」。どちらを選んでも失敗。</p>
+          <reverse-checkbox></reverse-checkbox>
+        </div>
+
+        <div class="catalog-card">
+          <h3 class="catalog-card-title">4. 無限ローディング</h3>
+          <span class="difficulty impossible">不可能</span>
+          <p class="catalog-card-desc">進捗バーは99%で止まり、ステータスが荒唐無稽にエスカレートします。</p>
+          <infinite-loading-checkbox></infinite-loading-checkbox>
+        </div>
+
+        <div class="catalog-card">
+          <h3 class="catalog-card-title">5. 不可能なCAPTCHA</h3>
+          <span class="difficulty impossible">不可能</span>
+          <p class="catalog-card-desc">どの画像を選択しても失敗。お題もエスカレートし、たまに偽の正解演出も。</p>
+          <impossible-captcha></impossible-captcha>
+        </div>
+
+        <div class="catalog-card">
+          <h3 class="catalog-card-title">6. 移動するチェックボックス</h3>
+          <span class="difficulty impossible">不可能</span>
+          <p class="catalog-card-desc">クリックするたびにランダムな位置に移動。5回後は分身が出現。</p>
+          <moving-checkbox></moving-checkbox>
+        </div>
+
+        <div class="catalog-card">
+          <h3 class="catalog-card-title">7. 極小チェックボックス</h3>
+          <span class="difficulty very-hard">非常に困難</span>
+          <p class="catalog-card-desc">クリックするたびに縮小。チェック成功してもリセットされます。</p>
+          <tiny-checkbox></tiny-checkbox>
+        </div>
+
+        <div class="catalog-card">
+          <h3 class="catalog-card-title">8. グリッチチェックボックス</h3>
+          <span class="difficulty hard">困難</span>
+          <p class="catalog-card-desc">テキストがグリッチし、グリッチ中はクリック無効。ホバーするほど発動確率アップ。</p>
+          <glitch-checkbox></glitch-checkbox>
+        </div>
+
+        <div class="catalog-card">
+          <h3 class="catalog-card-title">9. UFOキャッチャー認証</h3>
+          <span class="difficulty impossible">不可能</span>
+          <p class="catalog-card-desc">クレーンで掴んでも途中で必ず滑り落ちます。投入金額だけが増えていきます。</p>
+          <crane-game-checkbox></crane-game-checkbox>
+        </div>
+
+        <div class="catalog-card">
+          <h3 class="catalog-card-title">10. ブロック崩し認証</h3>
+          <span class="difficulty impossible">不可能</span>
+          <p class="catalog-card-desc">ブロックを全て壊すと一瞬見えますが、すぐに再生成されます。</p>
+          <breakout-checkbox></breakout-checkbox>
+        </div>
+
+        <div class="catalog-card">
+          <h3 class="catalog-card-title">11. フェイク広告認証</h3>
+          <span class="difficulty impossible">不可能</span>
+          <p class="catalog-card-desc">×ボタンで閉じようとすると、逆に広告が増殖します。</p>
+          <fake-close-checkbox></fake-close-checkbox>
+        </div>
+
+        <div class="catalog-card">
+          <h3 class="catalog-card-title">12. スライドパズル認証</h3>
+          <span class="difficulty impossible">不可能</span>
+          <p class="catalog-card-desc">正しく並べると一瞬成功しますが、すぐにシャッフルされます。</p>
+          <slider-puzzle-checkbox></slider-puzzle-checkbox>
+        </div>
+
+        <div class="catalog-card">
+          <h3 class="catalog-card-title">13. だるま落とし認証</h3>
+          <span class="difficulty impossible">不可能</span>
+          <p class="catalog-card-desc">ブロックを慎重に外しても、チェックボックスは必ず落下します。</p>
+          <stack-drop-checkbox></stack-drop-checkbox>
+        </div>
+      </div>
+    </div>
+    <div class="catalog-info">
+      <p class="catalog-info-text">
+        <a href="https://github.com/ivgtr/Are-you-a-robot" target="_blank" rel="noopener">GitHub</a>
+        &nbsp;&middot;&nbsp;
+        These components are for entertainment purposes only.
+      </p>
+    </div>
+  </div>
+
   <script type="module" src="/src/index.js"></script>
+  <script>
+    // モーダル開閉
+    const toggle = document.getElementById('catalogToggle');
+    const toggleIcon = document.getElementById('catalogToggleIcon');
+    const backdrop = document.getElementById('catalogBackdrop');
+    const modal = document.getElementById('catalogModal');
+    const closeBtn = document.getElementById('catalogClose');
+
+    let isOpen = false;
+
+    function openModal() {
+      isOpen = true;
+      modal.classList.add('visible');
+      backdrop.classList.add('visible');
+      toggle.classList.add('open');
+      toggleIcon.innerHTML = '&times;';
+    }
+
+    function closeModal() {
+      isOpen = false;
+      modal.classList.remove('visible');
+      backdrop.classList.remove('visible');
+      toggle.classList.remove('open');
+      toggleIcon.innerHTML = '&#9776;';
+    }
+
+    toggle.addEventListener('click', () => {
+      if (isOpen) closeModal();
+      else openModal();
+    });
+
+    backdrop.addEventListener('click', closeModal);
+    closeBtn.addEventListener('click', closeModal);
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && isOpen) closeModal();
+    });
+  </script>
 </body>
 </html>
